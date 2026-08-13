@@ -1,0 +1,1700 @@
+{
+  "splits": {
+    "train": {
+      "n_patterns": 18,
+      "n_images": 108,
+      "pattern_ids": [
+        "kolam19.csv#10",
+        "kolam19.csv#15",
+        "kolam19.csv#20",
+        "kolam19.csv#30",
+        "kolam19.csv#40",
+        "kolam19.csv#60",
+        "kolam19.csv#70",
+        "kolam19.csv#90",
+        "kolam19.csv#120",
+        "kolam19.csv#160",
+        "kolam19.csv#180",
+        "kolam19.csv#200",
+        "kolam29.csv#5",
+        "kolam29.csv#10",
+        "kolam29.csv#15",
+        "kolam29.csv#25",
+        "kolam29.csv#30",
+        "kolam29.csv#35"
+      ],
+      "images": [
+        {
+          "stem": "kolam19_k10_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 10,
+          "seed": 20000,
+          "n_nodes": 216,
+          "gray_mean": 33.463302469135805,
+          "gray_std": 20.12436307299433,
+          "severity": 0.8588572794148963
+        },
+        {
+          "stem": "kolam19_k10_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 10,
+          "seed": 20001,
+          "n_nodes": 216,
+          "gray_mean": 113.04692962962963,
+          "gray_std": 34.64086010721858,
+          "severity": 0.49814914964609913
+        },
+        {
+          "stem": "kolam19_k10_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 10,
+          "seed": 20002,
+          "n_nodes": 216,
+          "gray_mean": 111.31585555555556,
+          "gray_std": 38.575501301993775,
+          "severity": 0.46578011731030655
+        },
+        {
+          "stem": "kolam19_k10_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 10,
+          "seed": 20003,
+          "n_nodes": 216,
+          "gray_mean": 186.00182098765433,
+          "gray_std": 69.4525802551022,
+          "severity": 0.05954700827105197
+        },
+        {
+          "stem": "kolam19_k10_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 10,
+          "seed": 20004,
+          "n_nodes": 216,
+          "gray_mean": 182.36065679012344,
+          "gray_std": 40.76963392203232,
+          "severity": 0.19564088911805422
+        },
+        {
+          "stem": "kolam19_k10_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 10,
+          "seed": 20005,
+          "n_nodes": 216,
+          "gray_mean": 110.24365061728395,
+          "gray_std": 48.921903181702845,
+          "severity": 0.44211880316690966
+        },
+        {
+          "stem": "kolam19_k15_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 15,
+          "seed": 20006,
+          "n_nodes": 200,
+          "gray_mean": 218.72131234567902,
+          "gray_std": 58.41150864199028,
+          "severity": 0.0004965449075939876
+        },
+        {
+          "stem": "kolam19_k15_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 15,
+          "seed": 20007,
+          "n_nodes": 200,
+          "gray_mean": 70.76772962962963,
+          "gray_std": 25.964060390403688,
+          "severity": 0.6889526748479464
+        },
+        {
+          "stem": "kolam19_k15_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 15,
+          "seed": 20008,
+          "n_nodes": 200,
+          "gray_mean": 89.05757901234568,
+          "gray_std": 46.49925338007321,
+          "severity": 0.5396568264233221
+        },
+        {
+          "stem": "kolam19_k15_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 15,
+          "seed": 20009,
+          "n_nodes": 200,
+          "gray_mean": 43.75346296296296,
+          "gray_std": 20.925759563670074,
+          "severity": 0.8228018932536457
+        },
+        {
+          "stem": "kolam19_k15_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 15,
+          "seed": 20010,
+          "n_nodes": 200,
+          "gray_mean": 85.61982345679013,
+          "gray_std": 29.004562397493032,
+          "severity": 0.6087960229625835
+        },
+        {
+          "stem": "kolam19_k15_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 15,
+          "seed": 20011,
+          "n_nodes": 200,
+          "gray_mean": 208.0188950617284,
+          "gray_std": 43.135213906727195,
+          "severity": 0.08715260193077035
+        },
+        {
+          "stem": "kolam19_k20_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 20,
+          "seed": 20012,
+          "n_nodes": 212,
+          "gray_mean": 56.329013580246915,
+          "gray_std": 23.178898197907323,
+          "severity": 0.7630838328572541
+        },
+        {
+          "stem": "kolam19_k20_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 20,
+          "seed": 20013,
+          "n_nodes": 212,
+          "gray_mean": 75.16572716049383,
+          "gray_std": 33.6472243081666,
+          "severity": 0.6247594983709343
+        },
+        {
+          "stem": "kolam19_k20_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 20,
+          "seed": 20014,
+          "n_nodes": 212,
+          "gray_mean": 188.98321975308642,
+          "gray_std": 48.5831224558397,
+          "severity": 0.15700359583216528
+        },
+        {
+          "stem": "kolam19_k20_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 20,
+          "seed": 20015,
+          "n_nodes": 212,
+          "gray_mean": 202.76825802469136,
+          "gray_std": 60.82041955760461,
+          "severity": 0.062384045832370894
+        },
+        {
+          "stem": "kolam19_k20_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 20,
+          "seed": 20016,
+          "n_nodes": 212,
+          "gray_mean": 145.39988641975307,
+          "gray_std": 33.09980701128982,
+          "severity": 0.376066270083922
+        },
+        {
+          "stem": "kolam19_k20_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 20,
+          "seed": 20017,
+          "n_nodes": 212,
+          "gray_mean": 56.165604938271606,
+          "gray_std": 27.48695236495058,
+          "severity": 0.7438601107756204
+        },
+        {
+          "stem": "kolam19_k30_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 30,
+          "seed": 20018,
+          "n_nodes": 224,
+          "gray_mean": 20.090593827160493,
+          "gray_std": 12.378101787818338,
+          "severity": 0.9722646213658613
+        },
+        {
+          "stem": "kolam19_k30_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 30,
+          "seed": 20019,
+          "n_nodes": 224,
+          "gray_mean": 205.3691037037037,
+          "gray_std": 63.09853021697359,
+          "severity": 0.047313433039746444
+        },
+        {
+          "stem": "kolam19_k30_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 30,
+          "seed": 20020,
+          "n_nodes": 224,
+          "gray_mean": 184.52411728395063,
+          "gray_std": 47.415795837461424,
+          "severity": 0.17488160368291006
+        },
+        {
+          "stem": "kolam19_k30_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 30,
+          "seed": 20021,
+          "n_nodes": 224,
+          "gray_mean": 148.09146296296296,
+          "gray_std": 64.52450041867425,
+          "severity": 0.21703417741821363
+        },
+        {
+          "stem": "kolam19_k30_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 30,
+          "seed": 20022,
+          "n_nodes": 224,
+          "gray_mean": 91.86819135802469,
+          "gray_std": 25.28964259886242,
+          "severity": 0.6137418996727517
+        },
+        {
+          "stem": "kolam19_k30_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 30,
+          "seed": 20023,
+          "n_nodes": 224,
+          "gray_mean": 90.98696172839506,
+          "gray_std": 25.003091050952865,
+          "severity": 0.6065087771570417
+        },
+        {
+          "stem": "kolam19_k40_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 40,
+          "seed": 20024,
+          "n_nodes": 220,
+          "gray_mean": 78.68191728395061,
+          "gray_std": 26.993234999374,
+          "severity": 0.6584046046891999
+        },
+        {
+          "stem": "kolam19_k40_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 40,
+          "seed": 20025,
+          "n_nodes": 220,
+          "gray_mean": 18.882765432098765,
+          "gray_std": 10.930393202545911,
+          "severity": 0.995792901400779
+        },
+        {
+          "stem": "kolam19_k40_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 40,
+          "seed": 20026,
+          "n_nodes": 220,
+          "gray_mean": 78.99696666666667,
+          "gray_std": 42.40376118227988,
+          "severity": 0.5979016725661124
+        },
+        {
+          "stem": "kolam19_k40_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 40,
+          "seed": 20027,
+          "n_nodes": 220,
+          "gray_mean": 111.68670864197532,
+          "gray_std": 24.673429936295502,
+          "severity": 0.5323645836562193
+        },
+        {
+          "stem": "kolam19_k40_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 40,
+          "seed": 20028,
+          "n_nodes": 220,
+          "gray_mean": 29.812008641975307,
+          "gray_std": 18.04142794271759,
+          "severity": 0.8933359989976458
+        },
+        {
+          "stem": "kolam19_k40_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 40,
+          "seed": 20029,
+          "n_nodes": 220,
+          "gray_mean": 169.61346666666665,
+          "gray_std": 43.693384920481755,
+          "severity": 0.24108173453457615
+        },
+        {
+          "stem": "kolam19_k60_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 60,
+          "seed": 20030,
+          "n_nodes": 216,
+          "gray_mean": 59.25403950617284,
+          "gray_std": 24.133937781020993,
+          "severity": 0.740150789321867
+        },
+        {
+          "stem": "kolam19_k60_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 60,
+          "seed": 20031,
+          "n_nodes": 216,
+          "gray_mean": 140.00632592592592,
+          "gray_std": 47.25561030884771,
+          "severity": 0.3482583731976877
+        },
+        {
+          "stem": "kolam19_k60_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 60,
+          "seed": 20032,
+          "n_nodes": 216,
+          "gray_mean": 151.50475802469137,
+          "gray_std": 47.98462857864315,
+          "severity": 0.3127679262764963
+        },
+        {
+          "stem": "kolam19_k60_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 60,
+          "seed": 20033,
+          "n_nodes": 216,
+          "gray_mean": 54.47293333333333,
+          "gray_std": 23.83703557337656,
+          "severity": 0.7565910528776842
+        },
+        {
+          "stem": "kolam19_k60_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 60,
+          "seed": 20034,
+          "n_nodes": 216,
+          "gray_mean": 99.29742962962963,
+          "gray_std": 45.215008977661235,
+          "severity": 0.504793120336929
+        },
+        {
+          "stem": "kolam19_k60_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 60,
+          "seed": 20035,
+          "n_nodes": 216,
+          "gray_mean": 115.90751481481482,
+          "gray_std": 38.71278566121295,
+          "severity": 0.4604136778821899
+        },
+        {
+          "stem": "kolam19_k70_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 70,
+          "seed": 20036,
+          "n_nodes": 200,
+          "gray_mean": 181.80328641975308,
+          "gray_std": 58.859202811618154,
+          "severity": 0.15148094099813447
+        },
+        {
+          "stem": "kolam19_k70_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 70,
+          "seed": 20037,
+          "n_nodes": 200,
+          "gray_mean": 18.131917283950617,
+          "gray_std": 11.126158435592172,
+          "severity": 0.9952593127927778
+        },
+        {
+          "stem": "kolam19_k70_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 70,
+          "seed": 20038,
+          "n_nodes": 200,
+          "gray_mean": 188.8995938271605,
+          "gray_std": 49.82056302453775,
+          "severity": 0.11282922940690032
+        },
+        {
+          "stem": "kolam19_k70_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 70,
+          "seed": 20039,
+          "n_nodes": 200,
+          "gray_mean": 30.37456172839506,
+          "gray_std": 15.64370629746986,
+          "severity": 0.9086370356592457
+        },
+        {
+          "stem": "kolam19_k70_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 70,
+          "seed": 20040,
+          "n_nodes": 200,
+          "gray_mean": 176.60253703703702,
+          "gray_std": 67.71972311300242,
+          "severity": 0.10989733051032846
+        },
+        {
+          "stem": "kolam19_k70_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 70,
+          "seed": 20041,
+          "n_nodes": 200,
+          "gray_mean": 183.50871851851852,
+          "gray_std": 67.28323367573809,
+          "severity": 0.0828547946448921
+        },
+        {
+          "stem": "kolam19_k90_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 90,
+          "seed": 20042,
+          "n_nodes": 208,
+          "gray_mean": 231.70747777777777,
+          "gray_std": 36.45984549087724,
+          "severity": 0.00166474590768928
+        },
+        {
+          "stem": "kolam19_k90_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 90,
+          "seed": 20043,
+          "n_nodes": 208,
+          "gray_mean": 80.0518925925926,
+          "gray_std": 31.375784989415706,
+          "severity": 0.636371294822529
+        },
+        {
+          "stem": "kolam19_k90_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 90,
+          "seed": 20044,
+          "n_nodes": 208,
+          "gray_mean": 177.56881975308642,
+          "gray_std": 50.62873143342261,
+          "severity": 0.17343888659827433
+        },
+        {
+          "stem": "kolam19_k90_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 90,
+          "seed": 20045,
+          "n_nodes": 208,
+          "gray_mean": 65.02096790123457,
+          "gray_std": 23.300766740978467,
+          "severity": 0.7183792466805914
+        },
+        {
+          "stem": "kolam19_k90_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 90,
+          "seed": 20046,
+          "n_nodes": 208,
+          "gray_mean": 154.0247925925926,
+          "gray_std": 45.97960508848226,
+          "severity": 0.29762108625964623
+        },
+        {
+          "stem": "kolam19_k90_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 90,
+          "seed": 20047,
+          "n_nodes": 208,
+          "gray_mean": 200.84647530864197,
+          "gray_std": 54.072229510565016,
+          "severity": 0.09644050150776629
+        },
+        {
+          "stem": "kolam19_k120_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 120,
+          "seed": 20048,
+          "n_nodes": 196,
+          "gray_mean": 55.825512345679016,
+          "gray_std": 24.579869857398307,
+          "severity": 0.7628944926095905
+        },
+        {
+          "stem": "kolam19_k120_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 120,
+          "seed": 20049,
+          "n_nodes": 196,
+          "gray_mean": 56.22646666666667,
+          "gray_std": 31.62902931746307,
+          "severity": 0.7160523454018696
+        },
+        {
+          "stem": "kolam19_k120_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 120,
+          "seed": 20050,
+          "n_nodes": 196,
+          "gray_mean": 49.75887407407407,
+          "gray_std": 20.128515465156795,
+          "severity": 0.8054179732381606
+        },
+        {
+          "stem": "kolam19_k120_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 120,
+          "seed": 20051,
+          "n_nodes": 196,
+          "gray_mean": 47.44681358024691,
+          "gray_std": 20.895858077260208,
+          "severity": 0.802082539872049
+        },
+        {
+          "stem": "kolam19_k120_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 120,
+          "seed": 20052,
+          "n_nodes": 196,
+          "gray_mean": 48.8134024691358,
+          "gray_std": 22.987490610576696,
+          "severity": 0.8027129666737357
+        },
+        {
+          "stem": "kolam19_k120_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 120,
+          "seed": 20053,
+          "n_nodes": 196,
+          "gray_mean": 40.04377901234568,
+          "gray_std": 20.35801557649696,
+          "severity": 0.8433904179766212
+        },
+        {
+          "stem": "kolam19_k160_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 160,
+          "seed": 20054,
+          "n_nodes": 200,
+          "gray_mean": 56.65603827160494,
+          "gray_std": 19.869836441348546,
+          "severity": 0.7742695308440277
+        },
+        {
+          "stem": "kolam19_k160_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 160,
+          "seed": 20055,
+          "n_nodes": 200,
+          "gray_mean": 75.4456950617284,
+          "gray_std": 25.241731693267674,
+          "severity": 0.6689893699648536
+        },
+        {
+          "stem": "kolam19_k160_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 160,
+          "seed": 20056,
+          "n_nodes": 200,
+          "gray_mean": 121.8121061728395,
+          "gray_std": 52.857799285369715,
+          "severity": 0.39524072823109657
+        },
+        {
+          "stem": "kolam19_k160_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 160,
+          "seed": 20057,
+          "n_nodes": 200,
+          "gray_mean": 171.43637037037038,
+          "gray_std": 38.41575105406649,
+          "severity": 0.25220014895340903
+        },
+        {
+          "stem": "kolam19_k160_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 160,
+          "seed": 20058,
+          "n_nodes": 200,
+          "gray_mean": 190.56551604938272,
+          "gray_std": 36.06747293536893,
+          "severity": 0.1784633697852207
+        },
+        {
+          "stem": "kolam19_k160_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 160,
+          "seed": 20059,
+          "n_nodes": 200,
+          "gray_mean": 151.91316049382715,
+          "gray_std": 39.427575104909195,
+          "severity": 0.3306828292234574
+        },
+        {
+          "stem": "kolam19_k180_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 180,
+          "seed": 20060,
+          "n_nodes": 208,
+          "gray_mean": 155.72604567901234,
+          "gray_std": 60.33804221151777,
+          "severity": 0.23078215170855632
+        },
+        {
+          "stem": "kolam19_k180_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 180,
+          "seed": 20061,
+          "n_nodes": 208,
+          "gray_mean": 110.96387530864197,
+          "gray_std": 37.02878633210784,
+          "severity": 0.49651731381090036
+        },
+        {
+          "stem": "kolam19_k180_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 180,
+          "seed": 20062,
+          "n_nodes": 208,
+          "gray_mean": 89.61862222222223,
+          "gray_std": 30.30324654208881,
+          "severity": 0.5985896784862635
+        },
+        {
+          "stem": "kolam19_k180_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 180,
+          "seed": 20063,
+          "n_nodes": 208,
+          "gray_mean": 159.30694938271606,
+          "gray_std": 39.58155656802868,
+          "severity": 0.30508709061659
+        },
+        {
+          "stem": "kolam19_k180_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 180,
+          "seed": 20064,
+          "n_nodes": 208,
+          "gray_mean": 42.5558061728395,
+          "gray_std": 21.59546607061018,
+          "severity": 0.8303850555982887
+        },
+        {
+          "stem": "kolam19_k180_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 180,
+          "seed": 20065,
+          "n_nodes": 208,
+          "gray_mean": 175.52552716049382,
+          "gray_std": 49.87032941310378,
+          "severity": 0.21360784495790974
+        },
+        {
+          "stem": "kolam19_k200_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 200,
+          "seed": 20066,
+          "n_nodes": 192,
+          "gray_mean": 179.42080617283952,
+          "gray_std": 70.2532156282936,
+          "severity": 0.07663713849812792
+        },
+        {
+          "stem": "kolam19_k200_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 200,
+          "seed": 20067,
+          "n_nodes": 192,
+          "gray_mean": 145.76511358024692,
+          "gray_std": 40.331758233394396,
+          "severity": 0.34922922979688764
+        },
+        {
+          "stem": "kolam19_k200_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 200,
+          "seed": 20068,
+          "n_nodes": 192,
+          "gray_mean": 97.29246666666667,
+          "gray_std": 35.72421192370626,
+          "severity": 0.5202222068288096
+        },
+        {
+          "stem": "kolam19_k200_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 200,
+          "seed": 20069,
+          "n_nodes": 192,
+          "gray_mean": 180.92417037037038,
+          "gray_std": 43.66887851893884,
+          "severity": 0.21381335869392204
+        },
+        {
+          "stem": "kolam19_k200_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 200,
+          "seed": 20070,
+          "n_nodes": 192,
+          "gray_mean": 42.52566049382716,
+          "gray_std": 19.55177598092286,
+          "severity": 0.8410285158765849
+        },
+        {
+          "stem": "kolam19_k200_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 200,
+          "seed": 20071,
+          "n_nodes": 192,
+          "gray_mean": 201.72376419753087,
+          "gray_std": 52.85708620121495,
+          "severity": 0.07267762574421888
+        },
+        {
+          "stem": "kolam29_k5_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 5,
+          "seed": 20072,
+          "n_nodes": 444,
+          "gray_mean": 97.82692469135803,
+          "gray_std": 33.813394186609244,
+          "severity": 0.5563295617623568
+        },
+        {
+          "stem": "kolam29_k5_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 5,
+          "seed": 20073,
+          "n_nodes": 444,
+          "gray_mean": 127.20724444444444,
+          "gray_std": 44.25951272917718,
+          "severity": 0.40166902551331807
+        },
+        {
+          "stem": "kolam29_k5_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 5,
+          "seed": 20074,
+          "n_nodes": 444,
+          "gray_mean": 215.87284567901236,
+          "gray_std": 59.302791460339634,
+          "severity": 0.0052578820190306574
+        },
+        {
+          "stem": "kolam29_k5_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 5,
+          "seed": 20075,
+          "n_nodes": 444,
+          "gray_mean": 19.64181234567901,
+          "gray_std": 10.844920316259609,
+          "severity": 0.9929799072147384
+        },
+        {
+          "stem": "kolam29_k5_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 5,
+          "seed": 20076,
+          "n_nodes": 444,
+          "gray_mean": 118.82412962962962,
+          "gray_std": 33.528210222496774,
+          "severity": 0.46810512667083715
+        },
+        {
+          "stem": "kolam29_k5_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 5,
+          "seed": 20077,
+          "n_nodes": 444,
+          "gray_mean": 108.19025432098765,
+          "gray_std": 28.52083809712613,
+          "severity": 0.5125598836073257
+        },
+        {
+          "stem": "kolam29_k10_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 10,
+          "seed": 20078,
+          "n_nodes": 464,
+          "gray_mean": 198.12891975308642,
+          "gray_std": 40.454886816694774,
+          "severity": 0.14322098263275285
+        },
+        {
+          "stem": "kolam29_k10_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 10,
+          "seed": 20079,
+          "n_nodes": 464,
+          "gray_mean": 29.506967901234567,
+          "gray_std": 13.939412490638004,
+          "severity": 0.9250112801875595
+        },
+        {
+          "stem": "kolam29_k10_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 10,
+          "seed": 20080,
+          "n_nodes": 464,
+          "gray_mean": 24.726451851851852,
+          "gray_std": 15.880695045064883,
+          "severity": 0.9247294246984629
+        },
+        {
+          "stem": "kolam29_k10_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 10,
+          "seed": 20081,
+          "n_nodes": 464,
+          "gray_mean": 217.8772209876543,
+          "gray_std": 33.84402681774221,
+          "severity": 0.06839219341583036
+        },
+        {
+          "stem": "kolam29_k10_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 10,
+          "seed": 20082,
+          "n_nodes": 464,
+          "gray_mean": 150.43924320987654,
+          "gray_std": 64.88682319748624,
+          "severity": 0.2083265429868758
+        },
+        {
+          "stem": "kolam29_k10_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 10,
+          "seed": 20083,
+          "n_nodes": 464,
+          "gray_mean": 19.415096296296298,
+          "gray_std": 11.860118095433982,
+          "severity": 0.9817727037753639
+        },
+        {
+          "stem": "kolam29_k15_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 15,
+          "seed": 20084,
+          "n_nodes": 488,
+          "gray_mean": 28.53797037037037,
+          "gray_std": 15.766178998929407,
+          "severity": 0.9127095879595033
+        },
+        {
+          "stem": "kolam29_k15_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 15,
+          "seed": 20085,
+          "n_nodes": 488,
+          "gray_mean": 109.58672345679012,
+          "gray_std": 39.792824001382535,
+          "severity": 0.47806001702934076
+        },
+        {
+          "stem": "kolam29_k15_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 15,
+          "seed": 20086,
+          "n_nodes": 488,
+          "gray_mean": 49.688801234567904,
+          "gray_std": 29.960957656981787,
+          "severity": 0.7446082723174752
+        },
+        {
+          "stem": "kolam29_k15_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 15,
+          "seed": 20087,
+          "n_nodes": 488,
+          "gray_mean": 56.687153086419755,
+          "gray_std": 22.328331410985164,
+          "severity": 0.7502767464111595
+        },
+        {
+          "stem": "kolam29_k15_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 15,
+          "seed": 20088,
+          "n_nodes": 488,
+          "gray_mean": 71.0884012345679,
+          "gray_std": 22.125180309779296,
+          "severity": 0.6984685904959032
+        },
+        {
+          "stem": "kolam29_k15_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 15,
+          "seed": 20089,
+          "n_nodes": 488,
+          "gray_mean": 169.3161987654321,
+          "gray_std": 42.98941560597455,
+          "severity": 0.1938025516379227
+        },
+        {
+          "stem": "kolam29_k25_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 25,
+          "seed": 20090,
+          "n_nodes": 492,
+          "gray_mean": 204.52027530864197,
+          "gray_std": 55.72995285931958,
+          "severity": 0.0676478438572411
+        },
+        {
+          "stem": "kolam29_k25_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 25,
+          "seed": 20091,
+          "n_nodes": 492,
+          "gray_mean": 42.102513580246914,
+          "gray_std": 23.567689424146476,
+          "severity": 0.8156782932839417
+        },
+        {
+          "stem": "kolam29_k25_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 25,
+          "seed": 20092,
+          "n_nodes": 492,
+          "gray_mean": 71.22370493827161,
+          "gray_std": 25.6731724665195,
+          "severity": 0.6928642531450196
+        },
+        {
+          "stem": "kolam29_k25_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 25,
+          "seed": 20093,
+          "n_nodes": 492,
+          "gray_mean": 167.03462962962962,
+          "gray_std": 48.1096936491075,
+          "severity": 0.24200925129850237
+        },
+        {
+          "stem": "kolam29_k25_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 25,
+          "seed": 20094,
+          "n_nodes": 492,
+          "gray_mean": 115.99931111111111,
+          "gray_std": 41.78267763251555,
+          "severity": 0.44099269872989033
+        },
+        {
+          "stem": "kolam29_k25_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 25,
+          "seed": 20095,
+          "n_nodes": 492,
+          "gray_mean": 60.792443209876545,
+          "gray_std": 27.972937149528402,
+          "severity": 0.717994426466937
+        },
+        {
+          "stem": "kolam29_k30_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 30,
+          "seed": 20096,
+          "n_nodes": 464,
+          "gray_mean": 182.0138024691358,
+          "gray_std": 38.0254636855909,
+          "severity": 0.19707408634892354
+        },
+        {
+          "stem": "kolam29_k30_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 30,
+          "seed": 20097,
+          "n_nodes": 464,
+          "gray_mean": 22.098264197530863,
+          "gray_std": 12.573059910201188,
+          "severity": 0.9631250748840494
+        },
+        {
+          "stem": "kolam29_k30_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 30,
+          "seed": 20098,
+          "n_nodes": 464,
+          "gray_mean": 209.3489975308642,
+          "gray_std": 54.35591653584589,
+          "severity": 0.06138587828840836
+        },
+        {
+          "stem": "kolam29_k30_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 30,
+          "seed": 20099,
+          "n_nodes": 464,
+          "gray_mean": 49.25568395061728,
+          "gray_std": 20.325347394449402,
+          "severity": 0.8089400753715538
+        },
+        {
+          "stem": "kolam29_k30_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 30,
+          "seed": 20100,
+          "n_nodes": 464,
+          "gray_mean": 118.07105432098766,
+          "gray_std": 57.94189614658157,
+          "severity": 0.34401247473941454
+        },
+        {
+          "stem": "kolam29_k30_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 30,
+          "seed": 20101,
+          "n_nodes": 464,
+          "gray_mean": 41.92582222222222,
+          "gray_std": 26.95731832429796,
+          "severity": 0.7933820549403048
+        },
+        {
+          "stem": "kolam29_k35_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 35,
+          "seed": 20102,
+          "n_nodes": 464,
+          "gray_mean": 132.54312222222222,
+          "gray_std": 43.40236435762428,
+          "severity": 0.3760821099374211
+        },
+        {
+          "stem": "kolam29_k35_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 35,
+          "seed": 20103,
+          "n_nodes": 464,
+          "gray_mean": 106.4349888888889,
+          "gray_std": 34.51366897904276,
+          "severity": 0.5178842156013802
+        },
+        {
+          "stem": "kolam29_k35_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 35,
+          "seed": 20104,
+          "n_nodes": 464,
+          "gray_mean": 189.74694197530863,
+          "gray_std": 47.61822926078243,
+          "severity": 0.1624418605491088
+        },
+        {
+          "stem": "kolam29_k35_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 35,
+          "seed": 20105,
+          "n_nodes": 464,
+          "gray_mean": 93.17468641975309,
+          "gray_std": 26.75594583903125,
+          "severity": 0.6010894529353786
+        },
+        {
+          "stem": "kolam29_k35_v4",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 35,
+          "seed": 20106,
+          "n_nodes": 464,
+          "gray_mean": 161.32235308641975,
+          "gray_std": 47.124615224876,
+          "severity": 0.2519542396269342
+        },
+        {
+          "stem": "kolam29_k35_v5",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 35,
+          "seed": 20107,
+          "n_nodes": 464,
+          "gray_mean": 122.19478024691358,
+          "gray_std": 26.04994858246824,
+          "severity": 0.47491015652446444
+        }
+      ]
+    },
+    "val": {
+      "n_patterns": 5,
+      "n_images": 20,
+      "pattern_ids": [
+        "kolam19.csv#220",
+        "kolam19.csv#240",
+        "kolam19.csv#260",
+        "kolam29.csv#40",
+        "kolam29.csv#45"
+      ],
+      "images": [
+        {
+          "stem": "kolam19_k220_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 220,
+          "seed": 30000,
+          "n_nodes": 200,
+          "gray_mean": 195.84147901234567,
+          "gray_std": 56.80749802262286,
+          "severity": 0.09975341871221644
+        },
+        {
+          "stem": "kolam19_k220_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 220,
+          "seed": 30001,
+          "n_nodes": 200,
+          "gray_mean": 149.36425679012345,
+          "gray_std": 52.01727783663864,
+          "severity": 0.28661122431917463
+        },
+        {
+          "stem": "kolam19_k220_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 220,
+          "seed": 30002,
+          "n_nodes": 200,
+          "gray_mean": 102.48882592592592,
+          "gray_std": 35.50288544808814,
+          "severity": 0.5185849313180405
+        },
+        {
+          "stem": "kolam19_k220_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 220,
+          "seed": 30003,
+          "n_nodes": 200,
+          "gray_mean": 58.18657901234568,
+          "gray_std": 34.04858343530851,
+          "severity": 0.7085896541493194
+        },
+        {
+          "stem": "kolam19_k240_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 240,
+          "seed": 30004,
+          "n_nodes": 208,
+          "gray_mean": 28.59433209876543,
+          "gray_std": 16.44458897003553,
+          "severity": 0.9098011344359017
+        },
+        {
+          "stem": "kolam19_k240_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 240,
+          "seed": 30005,
+          "n_nodes": 208,
+          "gray_mean": 127.64169753086419,
+          "gray_std": 52.78444227706781,
+          "severity": 0.3536076730097
+        },
+        {
+          "stem": "kolam19_k240_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 240,
+          "seed": 30006,
+          "n_nodes": 208,
+          "gray_mean": 89.94218271604939,
+          "gray_std": 33.769682770876415,
+          "severity": 0.5873657509569508
+        },
+        {
+          "stem": "kolam19_k240_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 240,
+          "seed": 30007,
+          "n_nodes": 208,
+          "gray_mean": 94.69646419753086,
+          "gray_std": 25.056709691907287,
+          "severity": 0.6044528890097011
+        },
+        {
+          "stem": "kolam19_k260_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 260,
+          "seed": 30008,
+          "n_nodes": 216,
+          "gray_mean": 176.1794888888889,
+          "gray_std": 50.78607586984137,
+          "severity": 0.1800092971108982
+        },
+        {
+          "stem": "kolam19_k260_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 260,
+          "seed": 30009,
+          "n_nodes": 216,
+          "gray_mean": 17.959053086419754,
+          "gray_std": 11.229017025112586,
+          "severity": 0.9941675716597728
+        },
+        {
+          "stem": "kolam19_k260_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 260,
+          "seed": 30010,
+          "n_nodes": 216,
+          "gray_mean": 28.374996296296295,
+          "gray_std": 15.333783930576823,
+          "severity": 0.9182141022364817
+        },
+        {
+          "stem": "kolam19_k260_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 260,
+          "seed": 30011,
+          "n_nodes": 216,
+          "gray_mean": 173.6857962962963,
+          "gray_std": 51.21818037302709,
+          "severity": 0.2111116467524854
+        },
+        {
+          "stem": "kolam29_k40_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 40,
+          "seed": 30012,
+          "n_nodes": 472,
+          "gray_mean": 110.08515432098766,
+          "gray_std": 37.10029864910427,
+          "severity": 0.456422920951688
+        },
+        {
+          "stem": "kolam29_k40_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 40,
+          "seed": 30013,
+          "n_nodes": 472,
+          "gray_mean": 59.428207407407406,
+          "gray_std": 22.691630564494492,
+          "severity": 0.7507104508560375
+        },
+        {
+          "stem": "kolam29_k40_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 40,
+          "seed": 30014,
+          "n_nodes": 472,
+          "gray_mean": 164.3835061728395,
+          "gray_std": 39.75306379438049,
+          "severity": 0.27003404799199315
+        },
+        {
+          "stem": "kolam29_k40_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 40,
+          "seed": 30015,
+          "n_nodes": 472,
+          "gray_mean": 153.13973333333334,
+          "gray_std": 52.87327895716299,
+          "severity": 0.248923225669345
+        },
+        {
+          "stem": "kolam29_k45_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 45,
+          "seed": 30016,
+          "n_nodes": 500,
+          "gray_mean": 69.06394074074075,
+          "gray_std": 26.373796347964312,
+          "severity": 0.6889468164916961
+        },
+        {
+          "stem": "kolam29_k45_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 45,
+          "seed": 30017,
+          "n_nodes": 500,
+          "gray_mean": 170.0791111111111,
+          "gray_std": 40.78410654127868,
+          "severity": 0.24321065205058012
+        },
+        {
+          "stem": "kolam29_k45_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 45,
+          "seed": 30018,
+          "n_nodes": 500,
+          "gray_mean": 118.94202098765432,
+          "gray_std": 43.41974342025803,
+          "severity": 0.4389656917752338
+        },
+        {
+          "stem": "kolam29_k45_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 45,
+          "seed": 30019,
+          "n_nodes": 500,
+          "gray_mean": 191.3844222222222,
+          "gray_std": 44.347627239541055,
+          "severity": 0.14906245532655638
+        }
+      ]
+    },
+    "test": {
+      "n_patterns": 9,
+      "n_images": 36,
+      "pattern_ids": [
+        "kolam19.csv#280",
+        "kolam19.csv#300",
+        "kolam19.csv#320",
+        "kolam19.csv#340",
+        "kolam19.csv#360",
+        "kolam19.csv#380",
+        "kolam29.csv#55",
+        "kolam29.csv#60",
+        "kolam29.csv#65"
+      ],
+      "images": [
+        {
+          "stem": "kolam19_k280_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 280,
+          "seed": 40000,
+          "n_nodes": 180,
+          "gray_mean": 186.8597074074074,
+          "gray_std": 45.86499919679271,
+          "severity": 0.18079525440780642
+        },
+        {
+          "stem": "kolam19_k280_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 280,
+          "seed": 40001,
+          "n_nodes": 180,
+          "gray_mean": 104.24717160493827,
+          "gray_std": 30.461554336859855,
+          "severity": 0.5382369370916812
+        },
+        {
+          "stem": "kolam19_k280_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 280,
+          "seed": 40002,
+          "n_nodes": 180,
+          "gray_mean": 68.04959382716049,
+          "gray_std": 25.486091069113993,
+          "severity": 0.7147216895588198
+        },
+        {
+          "stem": "kolam19_k280_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 280,
+          "seed": 40003,
+          "n_nodes": 180,
+          "gray_mean": 191.54664444444444,
+          "gray_std": 58.706902718206294,
+          "severity": 0.1076797844839451
+        },
+        {
+          "stem": "kolam19_k300_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 300,
+          "seed": 40004,
+          "n_nodes": 212,
+          "gray_mean": 23.754356790123456,
+          "gray_std": 12.819031141761124,
+          "severity": 0.9555829120933543
+        },
+        {
+          "stem": "kolam19_k300_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 300,
+          "seed": 40005,
+          "n_nodes": 212,
+          "gray_mean": 112.5391987654321,
+          "gray_std": 43.31413331625453,
+          "severity": 0.4229170077026406
+        },
+        {
+          "stem": "kolam19_k300_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 300,
+          "seed": 40006,
+          "n_nodes": 212,
+          "gray_mean": 58.05421851851852,
+          "gray_std": 21.39377588860841,
+          "severity": 0.7640221326197847
+        },
+        {
+          "stem": "kolam19_k300_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 300,
+          "seed": 40007,
+          "n_nodes": 212,
+          "gray_mean": 166.0012024691358,
+          "gray_std": 53.89515652931626,
+          "severity": 0.2222064305569832
+        },
+        {
+          "stem": "kolam19_k320_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 320,
+          "seed": 40008,
+          "n_nodes": 208,
+          "gray_mean": 46.281753086419755,
+          "gray_std": 24.69985235899838,
+          "severity": 0.7957963018945974
+        },
+        {
+          "stem": "kolam19_k320_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 320,
+          "seed": 40009,
+          "n_nodes": 208,
+          "gray_mean": 34.67972098765432,
+          "gray_std": 19.28507967049814,
+          "severity": 0.8614725695982123
+        },
+        {
+          "stem": "kolam19_k320_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 320,
+          "seed": 40010,
+          "n_nodes": 208,
+          "gray_mean": 95.97358888888888,
+          "gray_std": 37.73434643953228,
+          "severity": 0.5300324972162354
+        },
+        {
+          "stem": "kolam19_k320_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 320,
+          "seed": 40011,
+          "n_nodes": 208,
+          "gray_mean": 78.42716419753087,
+          "gray_std": 27.29885116983483,
+          "severity": 0.6544834030819537
+        },
+        {
+          "stem": "kolam19_k340_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 340,
+          "seed": 40012,
+          "n_nodes": 208,
+          "gray_mean": 19.40558148148148,
+          "gray_std": 12.199252201637735,
+          "severity": 0.9768131044851349
+        },
+        {
+          "stem": "kolam19_k340_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 340,
+          "seed": 40013,
+          "n_nodes": 208,
+          "gray_mean": 128.9035135802469,
+          "gray_std": 52.245385373637916,
+          "severity": 0.3628563658195936
+        },
+        {
+          "stem": "kolam19_k340_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 340,
+          "seed": 40014,
+          "n_nodes": 208,
+          "gray_mean": 115.93382962962963,
+          "gray_std": 43.525340276365945,
+          "severity": 0.44773454985678707
+        },
+        {
+          "stem": "kolam19_k340_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 340,
+          "seed": 40015,
+          "n_nodes": 208,
+          "gray_mean": 47.98433580246913,
+          "gray_std": 20.273472336007014,
+          "severity": 0.8126487528901554
+        },
+        {
+          "stem": "kolam19_k360_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 360,
+          "seed": 40016,
+          "n_nodes": 200,
+          "gray_mean": 193.8124901234568,
+          "gray_std": 50.112100426763206,
+          "severity": 0.14060159471602418
+        },
+        {
+          "stem": "kolam19_k360_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 360,
+          "seed": 40017,
+          "n_nodes": 200,
+          "gray_mean": 56.06330864197531,
+          "gray_std": 30.225010646136436,
+          "severity": 0.7297915354159631
+        },
+        {
+          "stem": "kolam19_k360_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 360,
+          "seed": 40018,
+          "n_nodes": 200,
+          "gray_mean": 85.78046296296296,
+          "gray_std": 29.7871565211053,
+          "severity": 0.6215126085750676
+        },
+        {
+          "stem": "kolam19_k360_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 360,
+          "seed": 40019,
+          "n_nodes": 200,
+          "gray_mean": 39.75363950617284,
+          "gray_std": 21.305981663730712,
+          "severity": 0.8299157253261816
+        },
+        {
+          "stem": "kolam19_k380_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 380,
+          "seed": 40020,
+          "n_nodes": 192,
+          "gray_mean": 85.70836419753087,
+          "gray_std": 29.079309035649672,
+          "severity": 0.623175183014098
+        },
+        {
+          "stem": "kolam19_k380_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 380,
+          "seed": 40021,
+          "n_nodes": 192,
+          "gray_mean": 191.2706962962963,
+          "gray_std": 54.30213596562065,
+          "severity": 0.1323804109830643
+        },
+        {
+          "stem": "kolam19_k380_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 380,
+          "seed": 40022,
+          "n_nodes": 192,
+          "gray_mean": 32.54517283950617,
+          "gray_std": 16.176683385060638,
+          "severity": 0.896269234367675
+        },
+        {
+          "stem": "kolam19_k380_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv",
+          "kolam_number": 380,
+          "seed": 40023,
+          "n_nodes": 192,
+          "gray_mean": 189.62966790123457,
+          "gray_std": 52.016033862915585,
+          "severity": 0.1450977732699107
+        },
+        {
+          "stem": "kolam29_k55_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 55,
+          "seed": 40024,
+          "n_nodes": 480,
+          "gray_mean": 23.25182839506173,
+          "gray_std": 14.981633314843489,
+          "severity": 0.936793751822047
+        },
+        {
+          "stem": "kolam29_k55_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 55,
+          "seed": 40025,
+          "n_nodes": 480,
+          "gray_mean": 67.96395555555556,
+          "gray_std": 35.11327538418243,
+          "severity": 0.6718934030303303
+        },
+        {
+          "stem": "kolam29_k55_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 55,
+          "seed": 40026,
+          "n_nodes": 480,
+          "gray_mean": 68.37438024691357,
+          "gray_std": 28.41519607227412,
+          "severity": 0.6932485333907871
+        },
+        {
+          "stem": "kolam29_k55_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 55,
+          "seed": 40027,
+          "n_nodes": 480,
+          "gray_mean": 32.33388765432099,
+          "gray_std": 16.79993398788385,
+          "severity": 0.8910595375484935
+        },
+        {
+          "stem": "kolam29_k60_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 60,
+          "seed": 40028,
+          "n_nodes": 468,
+          "gray_mean": 92.75627530864197,
+          "gray_std": 32.49524059362825,
+          "severity": 0.5770781550464178
+        },
+        {
+          "stem": "kolam29_k60_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 60,
+          "seed": 40029,
+          "n_nodes": 468,
+          "gray_mean": 192.57075308641976,
+          "gray_std": 52.39487948712067,
+          "severity": 0.12704800923879989
+        },
+        {
+          "stem": "kolam29_k60_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 60,
+          "seed": 40030,
+          "n_nodes": 468,
+          "gray_mean": 79.77143580246914,
+          "gray_std": 47.04385079809879,
+          "severity": 0.5615753186962511
+        },
+        {
+          "stem": "kolam29_k60_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 60,
+          "seed": 40031,
+          "n_nodes": 468,
+          "gray_mean": 22.468732098765432,
+          "gray_std": 12.084988549613042,
+          "severity": 0.965480429325004
+        },
+        {
+          "stem": "kolam29_k65_v0",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 65,
+          "seed": 40032,
+          "n_nodes": 488,
+          "gray_mean": 135.53221728395062,
+          "gray_std": 32.26556956463912,
+          "severity": 0.39884080870390326
+        },
+        {
+          "stem": "kolam29_k65_v1",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 65,
+          "seed": 40033,
+          "n_nodes": 488,
+          "gray_mean": 210.74986913580247,
+          "gray_std": 50.04930842735941,
+          "severity": 0.03929758252835569
+        },
+        {
+          "stem": "kolam29_k65_v2",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 65,
+          "seed": 40034,
+          "n_nodes": 488,
+          "gray_mean": 94.59709382716049,
+          "gray_std": 40.20450493704868,
+          "severity": 0.5382962646077762
+        },
+        {
+          "stem": "kolam29_k65_v3",
+          "csv_path": "kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv",
+          "kolam_number": 65,
+          "seed": 40035,
+          "n_nodes": 488,
+          "gray_mean": 172.30086049382717,
+          "gray_std": 63.498344551185205,
+          "severity": 0.1372456429491049
+        }
+      ]
+    }
+  }
+}

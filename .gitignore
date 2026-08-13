@@ -15,6 +15,10 @@
 # License/attribution record for third-party-licensed real photos --
 # must travel with the images it documents, not be silently dropped.
 !/real_photos/MANIFEST.md
+# M4.1 diagnostic findings referenced directly from PROJECT_STATE.md --
+# institutional memory, not scratch notes.
+!/diagnostics/M4_1_HEATMAP_DIAGNOSIS.md
+!/experiments/m4_1/diagnostics/TARGET_RESOLUTION_REPORT.md
 
 # Python
 __pycache__/

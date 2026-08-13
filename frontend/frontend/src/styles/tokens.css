@@ -1,87 +1,57 @@
 /* =========================================================
-   PULLI — Archival & Editorial Design Tokens
+   PULLI — Screenshot-Accurate Design Tokens
    ========================================================= */
 
 :root {
-  /* --- Colors (Restrained Archival Palette) --- */
-  --color-paper:       #F6F3EC;
-  --color-paper-dark:  #EBE6DC;
-  --color-ink:         #171614;
-  --color-ink-light:   #2C2A28;
-  --color-soft-gray:   #77736D;
-  --color-muted:       #9E9890;
-  --color-line:        #D9D4C7;
-  --color-line-dark:   #BDB7A8;
-  --color-white:       #FFFFFF;
-  --color-utility-bg:  #141312;
+  /* --- Colors (Reference Screenshot Palette) --- */
+  --color-header-bg:    #500914; /* Deep Maroon / Burgundy */
+  --color-footer-bg:    #43000F; /* Dark Wine / Deep Maroon */
+  --color-maroon-main:  #5A0718; /* Primary Maroon Button & Accent */
+  --color-maroon-dark:  #3D030F;
+  --color-gold:         #B88735; /* Muted Gold / Bronze */
+  --color-gold-light:   #D4AF37;
+  --color-gold-subtle:  #F4E8D2;
 
-  /* Accent — Restrained Terracotta */
-  --color-accent:      #A64B35;
-  --color-accent-dark: #843927;
-  --color-accent-muted:#C87661;
+  --color-paper:        #FAF7F0; /* Warm Ivory background */
+  --color-paper-card:   #FFFFFF; /* Pure White Card background */
+  --color-paper-light:  #F7F4EC;
+  --color-card-border:  #E4DCD0; /* Thin warm border */
 
-  /* State colors */
-  --color-valid:       #2A5930;
-  --color-valid-bg:    #E5EFE6;
+  --color-text-dark:    #201A18; /* Dark Charcoal Heading */
+  --color-text-body:    #5A524C; /* Warm Gray Body */
+  --color-text-muted:   #888078; /* Light Muted Gray */
+
+  --color-step-done:    #227B44; /* Green completed step circle */
+  --color-step-active:  #5A0718; /* Active maroon step circle */
+  --color-step-muted:   #CECAC2; /* Muted gray step circle */
 
   /* --- Typography --- */
-  --font-serif:  'DM Serif Display', 'Georgia', serif;
-  --font-sans:   'Inter', 'IBM Plex Sans', system-ui, sans-serif;
-  --font-mono:   'IBM Plex Mono', 'Courier New', monospace;
+  --font-serif:  'Playfair Display', Georgia, serif;
+  --font-sans:   'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:   'Courier New', monospace;
 
   /* Scale */
-  --text-xs:   0.6875rem;   /* 11px */
-  --text-sm:   0.8125rem;   /* 13px */
-  --text-base: 1rem;        /* 16px */
-  --text-md:   1.125rem;    /* 18px */
-  --text-lg:   1.375rem;    /* 22px */
-  --text-xl:   1.75rem;     /* 28px */
-  --text-2xl:  2.25rem;     /* 36px */
-  --text-3xl:  3.25rem;     /* 52px */
-  --text-4xl:  4.25rem;     /* 68px */
-  --text-hero: clamp(2.75rem, 5.5vw, 4.75rem);
+  --text-xs:   0.75rem;     /* 12px */
+  --text-sm:   0.84rem;     /* 13.5px */
+  --text-base: 0.938rem;    /* 15px */
+  --text-md:   1.0625rem;   /* 17px */
+  --text-lg:   1.25rem;     /* 20px */
+  --text-xl:   1.5rem;      /* 24px */
+  --text-2xl:  2.125rem;    /* 34px */
+  --text-3xl:  2.75rem;     /* 44px */
 
-  /* Letter spacing */
-  --tracking-wide:   0.05em;
-  --tracking-wider:  0.1em;
-  --tracking-widest: 0.16em;
+  /* --- Layout & Spacing --- */
+  --max-width: 1480px;
+  --gutter: 48px;
 
-  /* Line heights */
-  --leading-tight:  1.1;
-  --leading-snug:   1.25;
-  --leading-normal: 1.6;
-  --leading-relaxed:1.75;
-
-  /* --- Spacing --- */
-  --space-1:  0.25rem;
-  --space-2:  0.5rem;
-  --space-3:  0.75rem;
-  --space-4:  1rem;
-  --space-5:  1.25rem;
-  --space-6:  1.5rem;
-  --space-8:  2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  --space-20: 5rem;
-  --space-24: 6rem;
-  --space-32: 8rem;
-
-  /* --- Layout --- */
-  --max-width: 1320px;
-  --content-width: 860px;
-  --gutter: clamp(1.5rem, 4.5vw, 3.5rem);
-
-  /* --- ZERO ROUNDING for Archival / Museum Aesthetic --- */
-  --radius-sm: 0px;
-  --radius-md: 0px;
+  /* --- Border Radius --- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 9999px;
 
   /* --- Transitions --- */
   --transition-fast:   150ms ease;
   --transition-normal: 250ms ease;
-
-  /* --- Z-index --- */
-  --z-base:    0;
-  --z-above:   10;
-  --z-nav:     100;
 }

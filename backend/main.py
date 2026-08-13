@@ -41,10 +41,13 @@ real_photos_dir = os.path.join(PROJECT_ROOT, "real_photos")
 if os.path.exists(real_photos_dir):
     app.mount("/static/sample_ideas", StaticFiles(directory=real_photos_dir), name="sample_ideas")
 
+from api.v1_router import router as v1_router
+
 # Include API routers
 app.include_router(analyze.router)
 app.include_router(generate.router)
 app.include_router(gallery.router)
+app.include_router(v1_router)
 
 
 @app.get("/api/health")

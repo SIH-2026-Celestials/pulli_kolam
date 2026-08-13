@@ -21,6 +21,21 @@ def test_health_endpoint():
     assert data["status"] == "online"
 
 
+def test_v1_health_endpoint():
+    response = client.get("/api/v1/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ok"
+
+
+def test_v1_model_endpoint():
+    response = client.get("/api/v1/model")
+    assert response.status_code == 200
+    data = response.json()
+    assert "architecture" in data
+    assert data["architecture"] == "DotHeatmapNet"
+
+
 def test_gallery_endpoint():
     response = client.get("/api/gallery")
     assert response.status_code == 200
@@ -44,10 +59,34 @@ def test_generate_endpoint():
 
 
 def test_analyze_with_default_sample():
-    # Calling analyze with no form parameters should fallback to the default sample
     response = client.post("/api/analyze")
     assert response.status_code == 200
     data = response.json()
     assert "analysis_id" in data
     assert "symmetry" in data
     assert "validity" in data
+
+
+def test_v1_detect_endpoint():
+    response = client.post("/api/v1/detect")
+    assert response.status_code == 200
+    data = response.json()
+    assert "dot_count" in data
+    assert "dots" in data
+    assert "edges" in data
+
+
+def test_v1_reconstruct_endpoint():
+    response = client.post("/api/v1/reconstruct")
+    assert response.status_code == 200
+    data = response.json()
+    assert "status" in data
+
+
+def test_v1_compare_detectors_endpoint():
+    response = client.post("/api/v1/compare-detectors")
+    assert response.status_code == 200
+    data = response.json()
+    assert "classical" in data
+    assert "ml" in data
+    assert "comparison" in data

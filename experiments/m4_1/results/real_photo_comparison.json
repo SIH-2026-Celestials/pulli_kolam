@@ -1,0 +1,397 @@
+{
+  "note": "No pixel-exact ground truth exists for real photos -- precision/recall are NOT computed here, only raw detection counts and rough human estimates. NO_VISIBLE_DOT_MARKERS images never contribute to a recall metric.",
+  "in_scope": [
+    {
+      "file": "kolam2_tshrinivasan.jpg",
+      "in_scope": true,
+      "classification": "IN_SCOPE_VISIBLE_DOTS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 1,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 48,
+        "n_lattice_coords": 48
+      },
+      "human_estimate": {
+        "estimate": "25-30",
+        "confidence": "low",
+        "note": "blurry low-light photo, eyeballed, not precisely countable"
+      },
+      "failure_reason": "SEE_HUMAN_ESTIMATE -- no pixel-exact ground truth to compute a precise failure mode"
+    },
+    {
+      "file": "kolam_attur1_infofarmer.jpg",
+      "in_scope": true,
+      "classification": "IN_SCOPE_VISIBLE_DOTS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 12,
+        "n_lattice_coords": 12
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 52,
+        "n_lattice_coords": 52
+      },
+      "human_estimate": {
+        "estimate": "~4 clearly visible (pinwheel centers)",
+        "confidence": "low",
+        "note": "re-inspected this session: only 4 large maroon dots clearly visible at the 4 outer pinwheel centers; detector found 12 -- this DISCREPANCY is reported, not resolved. Possible causes (not determined): additional small dots not resolvable at this image resolution, OR detector false positives that happened to fit a plausible lattice geometry. Do not treat the detector's 12/12 'lattice fit succeeded' as a validated clean match against true dot count."
+      },
+      "failure_reason": "SEE_HUMAN_ESTIMATE -- no pixel-exact ground truth to compute a precise failure mode"
+    },
+    {
+      "file": "kolam_naduveetu_meenakshisundaram.jpg",
+      "in_scope": true,
+      "classification": "IN_SCOPE_VISIBLE_DOTS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 54,
+        "n_lattice_coords": 54
+      },
+      "human_estimate": {
+        "estimate": "~100-150 (dense grid)",
+        "confidence": "very low",
+        "note": "dense kambi-kolam grid, individual dots not reliably countable at available resolution/glare"
+      },
+      "failure_reason": "SEE_HUMAN_ESTIMATE -- no pixel-exact ground truth to compute a precise failure mode"
+    },
+    {
+      "file": "muggu_kollam_sirensongs.jpg",
+      "in_scope": true,
+      "classification": "IN_SCOPE_VISIBLE_DOTS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 4,
+        "n_lattice_coords": 4
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 44,
+        "n_lattice_coords": 44
+      },
+      "human_estimate": {
+        "estimate": "~20-30 (visible diamond motif only)",
+        "confidence": "low",
+        "note": "photo shows kolam partially, compressed/distant view"
+      },
+      "failure_reason": "SEE_HUMAN_ESTIMATE -- no pixel-exact ground truth to compute a precise failure mode"
+    }
+  ],
+  "no_visible_dot_markers": [
+    {
+      "file": "kolam1_raaj.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 69,
+        "n_lattice_coords": 69
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_aruppukottai_tanandaraj.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 1,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 33,
+        "n_lattice_coords": 33
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_attur12_infofarmer.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 36,
+        "n_lattice_coords": 36
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_attur5_infofarmer.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 57,
+        "n_lattice_coords": 57
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_bangalore_moed.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 32,
+        "n_lattice_coords": 32
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_diamond_aiswarya.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 80,
+        "n_lattice_coords": 80
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_floral_salem_thamizhpparithi.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 48,
+        "n_lattice_coords": 48
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_house_tamilnadu_vadakkan.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 51,
+        "n_lattice_coords": 51
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_india06_mckaysavage.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 4,
+        "n_lattice_coords": 4
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 29,
+        "n_lattice_coords": 29
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_india09_mckaysavage.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 56,
+        "n_lattice_coords": 56
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_india12_mckaysavage.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 2,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 52,
+        "n_lattice_coords": 52
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_paris_dalbera.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 58,
+        "n_lattice_coords": 58
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_patteeswaram_dalbera.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 56,
+        "n_lattice_coords": 56
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_pongal_uthandi_tagooty.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 6,
+        "n_lattice_coords": 6
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 54,
+        "n_lattice_coords": 54
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_sandpainting_mckaysavage.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 50,
+        "n_lattice_coords": 50
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "kolam_thiruvananthapuram_vism.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 11,
+        "n_lattice_coords": 11
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 36,
+        "n_lattice_coords": 36
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "pulli_kolam_ramdhaya.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 20,
+        "n_lattice_coords": 20
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    },
+    {
+      "file": "rangoli_32dots_rachana.jpg",
+      "in_scope": false,
+      "classification": "NO_VISIBLE_DOT_MARKERS",
+      "classical_detector": {
+        "crashed": false,
+        "n_pixel_detections": 36,
+        "n_lattice_coords": 36
+      },
+      "learned_detector": {
+        "crashed": false,
+        "n_pixel_detections": 57,
+        "n_lattice_coords": 57
+      },
+      "human_estimate": null,
+      "failure_reason": "N/A_NO_DOTS -- any detections here are false positives by definition, not a failure to recall"
+    }
+  ]
+}

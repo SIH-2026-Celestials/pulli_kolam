@@ -1,129 +1,79 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
+import { ChevronDown, Sun, User } from 'lucide-react'
 import './Header.css'
 
 export default function Header() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => { document.body.style.overflow = '' }
-  }, [menuOpen])
+  const [langOpen, setLangOpen] = useState(false)
 
   return (
-    <header className={`site-header${scrolled ? ' site-header--scrolled' : ''}`}>
-      {/* Institutional Utility Bar */}
-      <div className="utility-bar" role="banner">
-        <div className="container utility-bar__inner">
-          <span className="utility-bar__brand">
-            PULLI — Computational Study of Traditional Kolam Patterns
-          </span>
-          <nav className="utility-bar__links" aria-label="Utility navigation">
-            <a href="#main-content" className="utility-bar__link utility-bar__skip">
-              Skip to content
-            </a>
-            <span className="utility-bar__link">Accessibility</span>
-            <span className="utility-bar__link">EN</span>
-            <Link to="/about" className="utility-bar__link">Contact</Link>
-          </nav>
-        </div>
-      </div>
+    <header className="navbar-clone">
+      <div className="navbar-inner">
+        {/* Left: Brand Logo & Title */}
+        <Link to="/" className="navbar-brand">
+          <div className="brand-icon-wrapper">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="20" cy="8" r="1.5" fill="#B88735" />
+              <circle cx="20" cy="32" r="1.5" fill="#B88735" />
+              <circle cx="8" cy="20" r="1.5" fill="#B88735" />
+              <circle cx="32" cy="20" r="1.5" fill="#B88735" />
+              <circle cx="14" cy="14" r="1.5" fill="#B88735" />
+              <circle cx="26" cy="14" r="1.5" fill="#B88735" />
+              <circle cx="14" cy="26" r="1.5" fill="#B88735" />
+              <circle cx="26" cy="26" r="1.5" fill="#B88735" />
+              <circle cx="20" cy="20" r="2" fill="#B88735" />
+              {/* Kolam interlocking loops */}
+              <path d="M 20 8 C 28 8, 32 12, 32 20 C 32 28, 28 32, 20 32 C 12 32, 8 28, 8 20 C 8 12, 12 8, 20 8 Z" stroke="#B88735" strokeWidth="1.5" fill="none"/>
+              <path d="M 14 14 C 20 8, 26 8, 26 14 C 32 20, 32 26, 26 26 C 20 32, 14 32, 14 26 C 8 20, 8 14, 14 14 Z" stroke="#B88735" strokeWidth="1.2" strokeDasharray="60 0" fill="none"/>
+            </svg>
+          </div>
+          <div className="brand-text">
+            <span className="brand-title">PULLI</span>
+            <span className="brand-subtitle">Kolam Design-Principle Engine</span>
+          </div>
+        </Link>
 
-      {/* Main navigation */}
-      <div className="main-nav">
-        <div className="container main-nav__inner">
-          {/* Logo / wordmark */}
-          <Link to="/" className="wordmark" aria-label="PULLI Home">
-            <div className="wordmark__mark" aria-hidden="true">
-              <svg viewBox="0 0 42 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="7" cy="7" r="2.2" fill="currentColor"/>
-                <circle cx="21" cy="7" r="2.2" fill="currentColor"/>
-                <circle cx="35" cy="7" r="2.2" fill="currentColor"/>
-                <circle cx="14" cy="14" r="2.2" fill="currentColor"/>
-                <circle cx="28" cy="14" r="2.2" fill="currentColor"/>
-                <circle cx="7" cy="21" r="2.2" fill="currentColor"/>
-                <circle cx="21" cy="21" r="2.2" fill="currentColor"/>
-                <circle cx="35" cy="21" r="2.2" fill="currentColor"/>
-                <line x1="7" y1="7" x2="14" y2="14" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.4"/>
-                <line x1="21" y1="7" x2="14" y2="14" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.4"/>
-                <line x1="21" y1="7" x2="28" y2="14" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.4"/>
-                <line x1="35" y1="7" x2="28" y2="14" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.4"/>
-                <line x1="14" y1="14" x2="7" y2="21" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.4"/>
-                <line x1="14" y1="14" x2="21" y2="21" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.4"/>
-                <line x1="28" y1="14" x2="21" y2="21" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.4"/>
-                <line x1="28" y1="14" x2="35" y2="21" stroke="currentColor" strokeWidth="0.8" strokeOpacity="0.4"/>
-              </svg>
-            </div>
-            <div className="wordmark__text">
-              <span className="wordmark__name">PULLI</span>
-              <span className="wordmark__subtitle">Computational Understanding of One-Stroke Dotted Kolam Patterns</span>
-            </div>
-          </Link>
+        {/* Center: Navigation Links */}
+        <nav className="navbar-nav">
+          <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+            Home
+          </NavLink>
+          <NavLink to="/analyze" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+            Analyze
+          </NavLink>
+          <NavLink to="/generate" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+            Generate
+          </NavLink>
+          <NavLink to="/explore" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+            Gallery
+          </NavLink>
+          <NavLink to="/about" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+            About
+          </NavLink>
+          <NavLink to="/how-it-works" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+            How it Works
+          </NavLink>
+        </nav>
 
-          {/* Desktop nav links */}
-          <nav className="desktop-nav" aria-label="Main navigation">
-            <NavLink to="/" end className={({ isActive }) => isActive ? 'desktop-nav__link desktop-nav__link--active' : 'desktop-nav__link'}>
-              Home
-            </NavLink>
-            <NavLink to="/project" className={({ isActive }) => isActive ? 'desktop-nav__link desktop-nav__link--active' : 'desktop-nav__link'}>
-              Project
-            </NavLink>
-            <NavLink to="/how-it-works" className={({ isActive }) => isActive ? 'desktop-nav__link desktop-nav__link--active' : 'desktop-nav__link'}>
-              How It Works
-            </NavLink>
-            <NavLink to="/explore" className={({ isActive }) => isActive ? 'desktop-nav__link desktop-nav__link--active' : 'desktop-nav__link'}>
-              Explore
-            </NavLink>
-            <NavLink to="/technology" className={({ isActive }) => isActive ? 'desktop-nav__link desktop-nav__link--active' : 'desktop-nav__link'}>
-              Technology
-            </NavLink>
-            <NavLink to="/impact" className={({ isActive }) => isActive ? 'desktop-nav__link desktop-nav__link--active' : 'desktop-nav__link'}>
-              Impact
-            </NavLink>
-            <NavLink to="/about" className={({ isActive }) => isActive ? 'desktop-nav__link desktop-nav__link--active' : 'desktop-nav__link'}>
-              About
-            </NavLink>
-          </nav>
+        {/* Right: Controls */}
+        <div className="navbar-controls">
+          <div className="lang-dropdown">
+            <button className="btn-lang" onClick={() => setLangOpen(!langOpen)}>
+              <span>English</span>
+              <ChevronDown size={14} />
+            </button>
+          </div>
 
-          {/* Mobile hamburger */}
-          <button
-            className={`hamburger${menuOpen ? ' hamburger--open' : ''}`}
-            onClick={() => setMenuOpen(v => !v)}
-            aria-expanded={menuOpen}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          >
-            <span className="hamburger__bar" />
-            <span className="hamburger__bar" />
-            <span className="hamburger__bar" />
+          <button className="btn-theme" aria-label="Toggle Theme">
+            <Sun size={18} />
+          </button>
+
+          <button className="btn-login">
+            <User size={16} />
+            <span>Login</span>
           </button>
         </div>
       </div>
-
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div className="mobile-menu" role="dialog" aria-modal="true" aria-label="Site navigation">
-          <nav className="mobile-menu__nav">
-            <NavLink to="/" end onClick={() => setMenuOpen(false)} className="mobile-menu__link">Home</NavLink>
-            <NavLink to="/project" onClick={() => setMenuOpen(false)} className="mobile-menu__link">Project</NavLink>
-            <NavLink to="/how-it-works" onClick={() => setMenuOpen(false)} className="mobile-menu__link">How It Works</NavLink>
-            <NavLink to="/explore" onClick={() => setMenuOpen(false)} className="mobile-menu__link">Explore</NavLink>
-            <NavLink to="/technology" onClick={() => setMenuOpen(false)} className="mobile-menu__link">Technology</NavLink>
-            <NavLink to="/impact" onClick={() => setMenuOpen(false)} className="mobile-menu__link">Impact</NavLink>
-            <NavLink to="/about" onClick={() => setMenuOpen(false)} className="mobile-menu__link">About</NavLink>
-          </nav>
-        </div>
-      )}
     </header>
   )
 }

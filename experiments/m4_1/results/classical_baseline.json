@@ -1,0 +1,506 @@
+{
+  "detector": "engine.image_io.detect_lattice (classical, deterministic, unmodified)",
+  "localization_tolerance_px": 6.0,
+  "synthetic_tuned": {
+    "per_image": [
+      {
+        "stem": "kolam19_k1",
+        "n_lattice_coords": 184,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_localization_error_px": 0.8216353595008259,
+        "n_detected": 184,
+        "n_ground_truth": 184,
+        "n_matched": 184,
+        "trace_path_crash": false,
+        "n_traced_edges": 310,
+        "n_lattice_nodes": 184
+      },
+      {
+        "stem": "kolam19_k2",
+        "n_lattice_coords": 188,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_localization_error_px": 0.6887872262356123,
+        "n_detected": 188,
+        "n_ground_truth": 188,
+        "n_matched": 188,
+        "trace_path_crash": false,
+        "n_traced_edges": 306,
+        "n_lattice_nodes": 188
+      },
+      {
+        "stem": "kolam19_k27",
+        "n_lattice_coords": 204,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_localization_error_px": 0.673888773535546,
+        "n_detected": 204,
+        "n_ground_truth": 204,
+        "n_matched": 204,
+        "trace_path_crash": false,
+        "n_traced_edges": 376,
+        "n_lattice_nodes": 204
+      },
+      {
+        "stem": "kolam19_k3",
+        "n_lattice_coords": 212,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_localization_error_px": 0.597120182200827,
+        "n_detected": 212,
+        "n_ground_truth": 212,
+        "n_matched": 212,
+        "trace_path_crash": false,
+        "n_traced_edges": 384,
+        "n_lattice_nodes": 212
+      },
+      {
+        "stem": "kolam19_k50",
+        "n_lattice_coords": 208,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_localization_error_px": 0.583262626467374,
+        "n_detected": 208,
+        "n_ground_truth": 208,
+        "n_matched": 208,
+        "trace_path_crash": false,
+        "n_traced_edges": 356,
+        "n_lattice_nodes": 208
+      },
+      {
+        "stem": "kolam29_k1",
+        "n_lattice_coords": 473,
+        "precision": 0.9978858350951374,
+        "recall": 1.0,
+        "f1": 0.9989417989417989,
+        "mean_localization_error_px": 0.795526103552067,
+        "n_detected": 473,
+        "n_ground_truth": 472,
+        "n_matched": 472,
+        "trace_path_crash": false,
+        "n_traced_edges": 783,
+        "n_lattice_nodes": 473
+      },
+      {
+        "stem": "kolam29_k2",
+        "n_lattice_coords": 472,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_localization_error_px": 0.850936471965573,
+        "n_detected": 472,
+        "n_ground_truth": 472,
+        "n_matched": 472,
+        "trace_path_crash": false,
+        "n_traced_edges": 765,
+        "n_lattice_nodes": 472
+      }
+    ],
+    "aggregate": {
+      "n_images": 7,
+      "mean_recall": 1.0,
+      "mean_precision": 0.9996979764421624,
+      "mean_localization_error_px": 0.7158795347796892,
+      "n_trace_path_crashes": 0
+    }
+  },
+  "synthetic_heldout": {
+    "per_image": [
+      {
+        "stem": "kolam19_k100",
+        "n_lattice_coords": 196,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_localization_error_px": 0.7536876189594022,
+        "n_detected": 196,
+        "n_ground_truth": 196,
+        "n_matched": 196,
+        "trace_path_crash": false,
+        "n_traced_edges": 342,
+        "n_lattice_nodes": 196
+      },
+      {
+        "stem": "kolam19_k150",
+        "n_lattice_coords": 204,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_localization_error_px": 0.6923738934947291,
+        "n_detected": 204,
+        "n_ground_truth": 204,
+        "n_matched": 204,
+        "trace_path_crash": false,
+        "n_traced_edges": 368,
+        "n_lattice_nodes": 204
+      },
+      {
+        "stem": "kolam19_k250",
+        "n_lattice_coords": 196,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_localization_error_px": 0.6670195684768767,
+        "n_detected": 196,
+        "n_ground_truth": 196,
+        "n_matched": 196,
+        "trace_path_crash": false,
+        "n_traced_edges": 346,
+        "n_lattice_nodes": 196
+      },
+      {
+        "stem": "kolam19_k350",
+        "n_lattice_coords": 200,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_localization_error_px": 0.720634490322201,
+        "n_detected": 200,
+        "n_ground_truth": 200,
+        "n_matched": 200,
+        "trace_path_crash": false,
+        "n_traced_edges": 345,
+        "n_lattice_nodes": 200
+      },
+      {
+        "stem": "kolam19_k75",
+        "n_lattice_coords": 196,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_localization_error_px": 0.6795083281479872,
+        "n_detected": 196,
+        "n_ground_truth": 196,
+        "n_matched": 196,
+        "trace_path_crash": false,
+        "n_traced_edges": 343,
+        "n_lattice_nodes": 196
+      },
+      {
+        "stem": "kolam29_k20",
+        "n_lattice_coords": 452,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_localization_error_px": 0.9063546000988133,
+        "n_detected": 452,
+        "n_ground_truth": 452,
+        "n_matched": 452,
+        "trace_path_crash": false,
+        "n_traced_edges": 714,
+        "n_lattice_nodes": 452
+      },
+      {
+        "stem": "kolam29_k50",
+        "n_lattice_coords": 482,
+        "precision": 1.0,
+        "recall": 0.9958677685950413,
+        "f1": 0.9979296066252588,
+        "mean_localization_error_px": 0.8742984080656527,
+        "n_detected": 482,
+        "n_ground_truth": 484,
+        "n_matched": 482,
+        "trace_path_crash": false,
+        "n_traced_edges": 787,
+        "n_lattice_nodes": 482
+      },
+      {
+        "stem": "kolam29_k80",
+        "n_lattice_coords": 469,
+        "precision": 0.997867803837953,
+        "recall": 1.0,
+        "f1": 0.9989327641408752,
+        "mean_localization_error_px": 0.8955313245228785,
+        "n_detected": 469,
+        "n_ground_truth": 468,
+        "n_matched": 468,
+        "trace_path_crash": false,
+        "n_traced_edges": 775,
+        "n_lattice_nodes": 469
+      }
+    ],
+    "aggregate": {
+      "n_images": 8,
+      "mean_recall": 0.9994834710743802,
+      "mean_precision": 0.9997334754797441,
+      "mean_localization_error_px": 0.7736760290110676,
+      "n_trace_path_crashes": 0
+    }
+  },
+  "real_photos": {
+    "in_scope": [
+      {
+        "file": "kolam2_tshrinivasan.jpg",
+        "n_pixel_detections": 1,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": true,
+        "human_estimate": {
+          "estimate": "25-30",
+          "confidence": "low",
+          "note": "blurry low-light photo, eyeballed, not precisely countable"
+        },
+        "note": "No pixel-exact ground truth exists for this image -- precision/recall NOT computed. human_estimate is a rough, explicitly-uncertain visual count for qualitative comparison only."
+      },
+      {
+        "file": "kolam_attur1_infofarmer.jpg",
+        "n_pixel_detections": 12,
+        "n_lattice_coords": 12,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": true,
+        "human_estimate": {
+          "estimate": "~4 clearly visible (pinwheel centers)",
+          "confidence": "low",
+          "note": "re-inspected this session: only 4 large maroon dots clearly visible at the 4 outer pinwheel centers; detector found 12 -- this DISCREPANCY is reported, not resolved. Possible causes (not determined): additional small dots not resolvable at this image resolution, OR detector false positives that happened to fit a plausible lattice geometry. Do not treat the detector's 12/12 'lattice fit succeeded' as a validated clean match against true dot count."
+        },
+        "note": "No pixel-exact ground truth exists for this image -- precision/recall NOT computed. human_estimate is a rough, explicitly-uncertain visual count for qualitative comparison only."
+      },
+      {
+        "file": "kolam_naduveetu_meenakshisundaram.jpg",
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": true,
+        "human_estimate": {
+          "estimate": "~100-150 (dense grid)",
+          "confidence": "very low",
+          "note": "dense kambi-kolam grid, individual dots not reliably countable at available resolution/glare"
+        },
+        "note": "No pixel-exact ground truth exists for this image -- precision/recall NOT computed. human_estimate is a rough, explicitly-uncertain visual count for qualitative comparison only."
+      },
+      {
+        "file": "muggu_kollam_sirensongs.jpg",
+        "n_pixel_detections": 4,
+        "n_lattice_coords": 4,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 7,
+        "in_scope": true,
+        "human_estimate": {
+          "estimate": "~20-30 (visible diamond motif only)",
+          "confidence": "low",
+          "note": "photo shows kolam partially, compressed/distant view"
+        },
+        "note": "No pixel-exact ground truth exists for this image -- precision/recall NOT computed. human_estimate is a rough, explicitly-uncertain visual count for qualitative comparison only."
+      }
+    ],
+    "no_visible_dot_markers": [
+      {
+        "file": "kolam1_raaj.jpg",
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_aruppukottai_tanandaraj.jpg",
+        "n_pixel_detections": 1,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_attur12_infofarmer.jpg",
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_attur5_infofarmer.jpg",
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_bangalore_moed.jpg",
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_diamond_aiswarya.jpg",
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_floral_salem_thamizhpparithi.jpg",
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_house_tamilnadu_vadakkan.jpg",
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_india06_mckaysavage.jpg",
+        "n_pixel_detections": 4,
+        "n_lattice_coords": 4,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 2,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_india09_mckaysavage.jpg",
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_india12_mckaysavage.jpg",
+        "n_pixel_detections": 2,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": true,
+        "trace_path_crash_type": "IndexError",
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_paris_dalbera.jpg",
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_patteeswaram_dalbera.jpg",
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_pongal_uthandi_tagooty.jpg",
+        "n_pixel_detections": 6,
+        "n_lattice_coords": 6,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 21,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_sandpainting_mckaysavage.jpg",
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "kolam_thiruvananthapuram_vism.jpg",
+        "n_pixel_detections": 11,
+        "n_lattice_coords": 11,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 45,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "pulli_kolam_ramdhaya.jpg",
+        "n_pixel_detections": 0,
+        "n_lattice_coords": 0,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 0,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      },
+      {
+        "file": "rangoli_32dots_rachana.jpg",
+        "n_pixel_detections": 36,
+        "n_lattice_coords": 36,
+        "detect_lattice_crash": false,
+        "trace_path_crash": false,
+        "n_traced_edges": 86,
+        "in_scope": false,
+        "classification": "NO_VISIBLE_DOT_MARKERS",
+        "note": "This image has NO real dot markers by design (confirmed by direct visual inspection). Any nonzero n_pixel_detections above is a FALSE POSITIVE by definition -- recall is undefined and NOT computed for this image. Per PROJECT_STATE.md: never treat this as a detector 'failure' relative to a recall metric."
+      }
+    ],
+    "summary": {
+      "n_in_scope": 4,
+      "n_no_visible_dot_markers": 18,
+      "n_no_visible_dot_markers_with_false_positive_detections": 6,
+      "false_positive_image_rate_on_no_dot_photos": 0.3333333333333333
+    }
+  }
+}

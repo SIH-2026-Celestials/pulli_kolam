@@ -6,3 +6,10 @@ scipy
 scikit-image
 opencv-python
 pytest
+
+# Used only by experiments/m4_1/ (M4.1 learned lattice-detection
+# baseline) -- NOT a dependency of engine/, which remains pure
+# numpy/scipy/opencv/networkx. Already present in this project's
+# development environment prior to M4.1; declared here for
+# reproducibility, not newly introduced for convenience.
+torch

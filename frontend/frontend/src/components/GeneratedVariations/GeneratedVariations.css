@@ -1,0 +1,152 @@
+.generated-card {
+  width: 100%;
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-card-border);
+  border-radius: 14px;
+  padding: 24px 26px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+}
+
+.generated-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.generated-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.generated-title {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin-bottom: 2px;
+}
+
+.generated-subtitle {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-text-body);
+}
+
+.btn-generate-more {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #FAF7F0;
+  border: 1px solid var(--color-card-border);
+  color: var(--color-text-dark);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-generate-more:hover {
+  background-color: #F4EDE0;
+  border-color: #CFC5B8;
+}
+
+.refresh-icon {
+  color: var(--color-text-dark);
+}
+
+/* 4 THUMBNAILS GRID */
+.variations-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.variation-thumb-box {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #0C0A09;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.variation-thumb-box:hover {
+  transform: translateY(-2px);
+}
+
+/* DESIGN RULE SUMMARY */
+.rule-summary-container {
+  display: flex;
+  flex-direction: column;
+  background-color: #FAF7F0;
+  border: 1px solid #EAE2D5;
+  border-radius: 10px;
+  padding: 16px 20px;
+}
+
+.rule-summary-title {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  margin-bottom: 14px;
+}
+
+.rule-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+}
+
+.metric-col {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border-right: 1px solid #E4DCD0;
+}
+
+.metric-col:first-child {
+  padding-left: 0;
+}
+
+.metric-col:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+
+.metric-icon {
+  color: #B88735;
+  flex-shrink: 0;
+}
+
+.metric-text-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.metric-val {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  white-space: nowrap;
+}
