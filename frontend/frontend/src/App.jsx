@@ -7,7 +7,6 @@ import HowItWorks from './pages/HowItWorks/HowItWorks'
 import Explore from './pages/Explore/Explore'
 import KolamDetail from './pages/KolamDetail/KolamDetail'
 import Analyze from './pages/Analyze/Analyze'
-import Generate from './pages/Generate/Generate'
 import Detect from './pages/Detect/Detect'
 import Learn from './pages/Learn/Learn'
 import LearnModule from './pages/Learn/LearnModule'
@@ -28,7 +27,7 @@ export default function App() {
         <Route path="/explore" element={<Explore />} />
         <Route path="/explore/:id" element={<KolamDetail />} />
         <Route path="/analyze" element={<Analyze />} />
-        <Route path="/generate" element={<Generate />} />
+        
         <Route path="/detect" element={<Detect />} />
         <Route path="/learn" element={<Learn />} />
         <Route path="/learn/:moduleSlug" element={<LearnModule />} />

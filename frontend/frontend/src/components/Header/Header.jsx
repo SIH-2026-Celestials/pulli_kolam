@@ -61,9 +61,9 @@ export default function Header() {
           <NavLink to="/detect" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
             {t('nav.detect')}
           </NavLink>
-          <NavLink to="/generate" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+          {/* <NavLink to="/generate" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
             {t('nav.generate')}
-          </NavLink>
+          </NavLink> */}
           <NavLink to="/explore" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
             {t('nav.gallery')}
           </NavLink>

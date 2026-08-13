@@ -1,5 +1,5 @@
-import { useCallback, useRef, useState } from 'react'
-import { detect, analyze, reconstruct, compareDetectors } from '../../lib/api/kolam'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { detect, analyze, reconstruct, compareDetectors, getModelInfo } from '../../lib/api/kolam'
 import { categorizeCompareDots } from '../../lib/api/kolam'
 import './Detect.css'
 
@@ -24,6 +24,24 @@ export default function Detect() {
   const [imgRenderedSize, setImgRenderedSize] = useState(null)
   const imgRef = useRef(null)
   const fileInputRef = useRef(null)
+  // 'loading' | 'available' | 'unavailable' -- reflects GET /api/v1/model,
+  // not merely whether this frontend code exists.
+  const [modelStatus, setModelStatus] = useState('loading')
+  const [modelInfo, setModelInfo] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    getModelInfo().then(({ data }) => {
+      if (cancelled) return
+      if (data && data.ml_checkpoint_exists) {
+        setModelInfo(data)
+        setModelStatus('available')
+      } else {
+        setModelStatus('unavailable')
+      }
+    })
+    return () => { cancelled = true }
+  }, [])
 
   const onFileSelected = useCallback((f) => {
     if (!f) return
@@ -182,6 +200,14 @@ export default function Detect() {
               </div>
             </div>
 
+            <p className="label-tech model-status-line">
+              ML MODEL: {modelStatus === 'loading' && '…'}
+              {modelStatus === 'available' && (
+                <span className="text-valid">● Available{modelInfo?.ml_model_version ? ` — ${modelInfo.ml_model_version}` : ''} (CPU)</span>
+              )}
+              {modelStatus === 'unavailable' && <span>○ Unavailable</span>}
+            </p>
+
             <button className="btn-primary analyze-btn" disabled={!file || status === 'loading'} onClick={handleAnalyze}>
               {status === 'loading' ? stageLabel(stage) : 'Analyze Kolam'}
             </button>
@@ -206,8 +232,11 @@ export default function Detect() {
                   <div className="step-row"><span className="label-tech">Detected dots</span><strong>{detectResult.count}</strong></div>
                   <div className="step-row"><span className="label-tech">Processing</span><strong>{detectResult.processing_ms} ms</strong></div>
                   <div className="step-row"><span className="label-tech">Detector</span><strong>{detectResult.detector}</strong></div>
-                  {detectResult.model_version && (
-                    <div className="step-row"><span className="label-tech">Model</span><strong>{detectResult.model_version}</strong></div>
+                  {detectResult.model && (
+                    <>
+                      <div className="step-row"><span className="label-tech">Model</span><strong>{detectResult.model.name}{detectResult.model.version ? ` (${detectResult.model.version})` : ''}</strong></div>
+                      <div className="step-row"><span className="label-tech">Device</span><strong>{detectResult.model.device.toUpperCase()}</strong></div>
+                    </>
                   )}
                 </div>
               </div>
@@ -246,6 +275,13 @@ export default function Detect() {
             {analysis && (
               <div className="archival-frame result-card">
                 <h2 className="heading-display heading-3">Structural Analysis</h2>
+                {analysis.dot_count > 0 && !analysis.validity.is_eulerian_circuit && !analysis.validity.has_eulerian_path && (
+                  <p className="body-text body-text--sm detect-placeholder">
+                    Detection succeeded — structural validation failed. The detected graph is not a valid
+                    single-stroke (Eulerian) structure; this is a property of the detected structure, not a
+                    request failure.
+                  </p>
+                )}
                 <div className="step-table">
                   <div className="step-row"><span className="label-tech">Dot count</span><strong>{analysis.dot_count}</strong></div>
                   <div className="step-row"><span className="label-tech">Graph nodes</span><strong>{analysis.graph.nodes}</strong></div>
@@ -254,6 +290,9 @@ export default function Detect() {
                   <div className="step-row"><span className="label-tech">Motif count</span><strong>{analysis.motifs.motif_count}</strong></div>
                   <div className="step-row"><span className="label-tech">Eulerian circuit</span><strong>{analysis.validity.is_eulerian_circuit ? 'Valid' : 'No'}</strong></div>
                   <div className="step-row"><span className="label-tech">Connected</span><strong>{analysis.validity.largest_component_covers_all_nodes ? 'Yes' : 'No'}</strong></div>
+                  {analysis.timing_ms && (
+                    <div className="step-row"><span className="label-tech">Analysis time</span><strong>{analysis.timing_ms.total} ms</strong></div>
+                  )}
                 </div>
               </div>
             )}
@@ -273,18 +312,29 @@ export default function Detect() {
                   <p className="detect-error" role="alert">{reconstruction.reconstruction.note}</p>
                 )}
                 {reconstruction.reconstruction && reconstruction.reconstruction.is_valid !== undefined && (
-                  <div className="step-table">
-                    <div className="step-row">
-                      <span className="label-tech">Valid reconstruction</span>
-                      <strong className={reconstruction.reconstruction.is_valid ? 'text-valid' : ''}>
-                        {reconstruction.reconstruction.is_valid ? 'Yes' : 'No'}
-                      </strong>
+                  <>
+                    {!reconstruction.reconstruction.is_valid && (
+                      <p className="detect-error" role="status">
+                        Detection succeeded — reconstruction validation failed (the motif/residual
+                        decomposition does not reproduce a valid single-stroke structure).
+                      </p>
+                    )}
+                    <div className="step-table">
+                      <div className="step-row">
+                        <span className="label-tech">Valid reconstruction</span>
+                        <strong className={reconstruction.reconstruction.is_valid ? 'text-valid' : ''}>
+                          {reconstruction.reconstruction.is_valid ? 'Yes' : 'No'}
+                        </strong>
+                      </div>
+                      <div className="step-row"><span className="label-tech">Motif edges</span><strong>{reconstruction.reconstruction.motif_edges}</strong></div>
+                      <div className="step-row"><span className="label-tech">Residual edges</span><strong>{reconstruction.reconstruction.residual_edges}</strong></div>
+                      <div className="step-row"><span className="label-tech">Capped excess pairs</span><strong>{reconstruction.reconstruction.capped_excess_pairs}</strong></div>
+                      <div className="step-row"><span className="label-tech">Connected</span><strong>{reconstruction.reconstruction.connectivity.largest_component_covers_all_nodes ? 'Yes' : 'No'}</strong></div>
+                      {reconstruction.timing_ms && (
+                        <div className="step-row"><span className="label-tech">Reconstruction time</span><strong>{reconstruction.timing_ms.total} ms</strong></div>
+                      )}
                     </div>
-                    <div className="step-row"><span className="label-tech">Motif edges</span><strong>{reconstruction.reconstruction.motif_edges}</strong></div>
-                    <div className="step-row"><span className="label-tech">Residual edges</span><strong>{reconstruction.reconstruction.residual_edges}</strong></div>
-                    <div className="step-row"><span className="label-tech">Capped excess pairs</span><strong>{reconstruction.reconstruction.capped_excess_pairs}</strong></div>
-                    <div className="step-row"><span className="label-tech">Connected</span><strong>{reconstruction.reconstruction.connectivity.largest_component_covers_all_nodes ? 'Yes' : 'No'}</strong></div>
-                  </div>
+                  </>
                 )}
               </div>
             )}
@@ -335,6 +385,10 @@ function describeError(error) {
       return 'The request timed out. Try a smaller image or try again.'
     case 'model_unavailable':
       return 'The ML detector is currently unavailable on the server.'
+    case 'upload_too_large':
+      return error.message || 'That image is too large. Please upload a smaller file (20MB limit).'
+    case 'invalid_request':
+      return error.message || 'That request could not be processed.'
     case 'invalid_image':
       return error.message || 'That file could not be processed as an image.'
     default:

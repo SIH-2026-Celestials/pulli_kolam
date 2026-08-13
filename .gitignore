@@ -31,6 +31,8 @@
 # directly from PROJECT_STATE.md.
 !/docs/M4_1_ML_INVESTIGATION.md
 !/docs/M4_1_ML_COMPLETION_REPORT.md
+!/docs/M4_2_CANONICALIZATION_EVALUATION.md
+!/docs/M4_2_REAL_IMAGE_PREPROCESSING.md
 !/docs/M4_2_GENERATION.md
 !/docs/M4_2_CONNECTIVITY_EVALUATION.md
 !/docs/M4_2_PARITY_EVALUATION.md
@@ -45,6 +47,9 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Root dev launcher (package.json at repo root -- concurrently/cross-env only)
+/node_modules/
 
 # Frontend
 frontend/frontend/node_modules/

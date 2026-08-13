@@ -12,6 +12,32 @@ Computational study of traditional South Indian *Pulli Kolam* patterns - represe
 
 ---
 
+## Run PULLI locally
+
+```
+npm install
+npm run dev
+```
+
+Frontend:
+http://localhost:5173
+
+Backend:
+http://localhost:8000
+
+API health:
+http://localhost:8000/api/v1/health
+
+This single command starts the FastAPI backend (classical CV + the ML
+detector, both served in-process — see `api/detectors.py`) and the
+React/Vite frontend together, prefixing each process's output
+(`[API]`, `[FRONTEND]`, `[ML]`). It requires Python (with
+`pip install -r requirements.txt` already run once) and Node on `PATH`;
+see `package.json` for what each `npm run dev:*` script does
+individually, and `docs/DEPLOYMENT.md` for production deployment.
+
+---
+
 ## What is a Kolam?
 
 A **Pulli Kolam** is a traditional South Indian geometric drawing made by looping a single continuous line around a grid of dots (*pulli*) without lifting the hand. The resulting patterns look intuitive and artistic, but many of them follow strict underlying rules - symmetry, repeated local motifs, and closed single-stroke (Eulerian) continuity.

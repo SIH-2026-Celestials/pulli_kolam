@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Upload, Landmark, Cpu, Network, Sparkles, HeartHandshake, Sparkle } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
 import KolamHeroSvg from './KolamHeroSvg'
@@ -8,6 +8,8 @@ import './Hero.css'
 export default function Hero({ onUploadImage }) {
   const { t } = useLanguage()
   const fileInputRef = useRef(null)
+  const navigate=useNavigate();
+
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0]
@@ -57,7 +59,7 @@ export default function Hero({ onUploadImage }) {
               accept="image/png, image/jpeg, image/webp"
               style={{ display: 'none' }}
             />
-            <button className="btn-primary-maroon" onClick={() => fileInputRef.current?.click()}>
+            <button className="btn-primary-maroon" onClick={() => { navigate('/Detect') }}>
               <Upload size={16} />
               <span>{t('hero.primaryBtn')}</span>
             </button>

@@ -1,0 +1,36 @@
+{
+  "config": {
+    "confidence_threshold": 0.6,
+    "variants": ["A", "B", "C", "D", "E"],
+    "note": "Fast screening pass (detection + lattice-fit only, no trace_path/skeletonize) run for all 5 variants on synthetic val (45 images) + all 22 real photos. Full graph-construction pass was NOT run for any variant beyond this: the fast pass already shows a decisive, consistent negative result on the #1-priority metric (no-dot false-positive rate) across all 5 variants, so the more expensive graph-level check was not justified by this experiment's time budget -- see docs/M4_2_CANONICALIZATION_EVALUATION.md."
+  },
+  "variants": {
+    "A": {
+      "description": "grayscale + global Otsu threshold (== current production engine.image_io.preprocess() behavior, the baseline)",
+      "synthetic_val": {"mean_recall": 0.9990, "mean_precision": 0.9995, "mean_f1": 0.9993},
+      "real_photos_fast": {"nodot_fp_rate": 1.0, "nodot_fp": 18, "nodot_n": 18, "n_crashes": 0, "n_lattice_fit_success_inscope": 4, "mean_latency_ms": 127.3}
+    },
+    "B": {
+      "description": "grayscale + CLAHE (local contrast) + global Otsu threshold",
+      "synthetic_val": {"mean_recall": 0.9986, "mean_precision": 0.9990, "mean_f1": 0.9988},
+      "real_photos_fast": {"nodot_fp_rate": 1.0, "nodot_fp": 18, "nodot_n": 18, "n_crashes": 0, "n_lattice_fit_success_inscope": 4, "mean_latency_ms": 130.7}
+    },
+    "C": {
+      "description": "grayscale + illumination normalization (flat-field division) + global Otsu threshold",
+      "synthetic_val": {"mean_recall": 0.9984, "mean_precision": 0.9966, "mean_f1": 0.9975},
+      "real_photos_fast": {"nodot_fp_rate": 1.0, "nodot_fp": 18, "nodot_n": 18, "n_crashes": 0, "n_lattice_fit_success_inscope": 4, "mean_latency_ms": 153.4}
+    },
+    "D": {
+      "description": "grayscale + CLAHE + adaptive (local) threshold + light morphological opening",
+      "synthetic_val": {"mean_recall": 0.9992, "mean_precision": 0.6297, "mean_f1": 0.7608},
+      "real_photos_fast": {"nodot_fp_rate": 1.0, "nodot_fp": 18, "nodot_n": 18, "n_crashes": 0, "n_lattice_fit_success_inscope": 4, "mean_latency_ms": 193.5}
+    },
+    "E": {
+      "description": "grayscale + illumination normalization + adaptive (local) threshold + light morphological opening",
+      "synthetic_val": {"mean_recall": 0.9988, "mean_precision": 0.8966, "mean_f1": 0.9418},
+      "real_photos_fast": {"nodot_fp_rate": 1.0, "nodot_fp": 18, "nodot_n": 18, "n_crashes": 0, "mean_latency_ms": null}
+    }
+  },
+  "winner": null,
+  "decision": "NO variant improved the no-dot false-positive rate (all 5 = 100%, 18/18, identical to baseline). Variants D and E additionally REGRESSED synthetic precision (0.63 and 0.90 vs baseline's 0.9995). No variant is recommended for integration."
+}
