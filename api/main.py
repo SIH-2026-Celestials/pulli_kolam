@@ -52,6 +52,14 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from api.canonical import graph_to_json, motif_placements_to_json, reconstruction_to_json, validity_to_json  # noqa: E402
 from api.detectors import get_detector  # noqa: E402
+from api.schemas import (  # noqa: E402
+    AnalyzeResponse,
+    CompareDetectorsResponse,
+    DetectResponse,
+    HealthResponse,
+    ModelInfoResponse,
+    ReconstructResponse,
+)
 from engine import motifs, validity  # noqa: E402
 
 app = FastAPI(title="PULLI API", version="0.1.0")
@@ -85,18 +93,33 @@ ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp", "image/bmp"}
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 
 
+def _api_error(status_code: int, code: str, message: str) -> HTTPException:
+    """Structured error detail -- unpacked by http_exception_handler into
+    {"success": false, "error": message, "code": code}. `code` is a
+    stable machine-readable identifier for the frontend to switch on
+    (see frontend/frontend/src/lib/api/client.js); `error` stays a
+    human-readable string for backward compatibility with the existing
+    error-message display path."""
+    return HTTPException(status_code=status_code, detail={"code": code, "message": message})
+
+
+def _validate_detector_param(detector: str) -> None:
+    if detector not in ("classical", "ml"):
+        raise _api_error(422, "INVALID_DETECTOR", f"detector must be 'classical' or 'ml', got {detector!r}")
+
+
 def _save_upload_to_temp(image: UploadFile) -> str:
     if image.content_type not in ALLOWED_CONTENT_TYPES:
-        raise HTTPException(status_code=400, detail=f"unsupported content type: {image.content_type}")
+        raise _api_error(415, "UNSUPPORTED_MEDIA_TYPE", f"unsupported content type: {image.content_type}")
     suffix = os.path.splitext(image.filename or "")[1] or ".jpg"
     fd, path = tempfile.mkstemp(suffix=suffix)
     try:
         with os.fdopen(fd, "wb") as f:
             content = image.file.read(MAX_UPLOAD_BYTES + 1)
             if not content:
-                raise HTTPException(status_code=400, detail="empty image upload")
+                raise _api_error(400, "EMPTY_UPLOAD", "empty image upload")
             if len(content) > MAX_UPLOAD_BYTES:
-                raise HTTPException(status_code=400, detail=f"image exceeds {MAX_UPLOAD_BYTES // (1024 * 1024)}MB upload limit")
+                raise _api_error(413, "UPLOAD_TOO_LARGE", f"image exceeds {MAX_UPLOAD_BYTES // (1024 * 1024)}MB upload limit")
             f.write(content)
     except Exception:
         os.unlink(path)
@@ -109,16 +132,19 @@ def _run_detector(detector_name: str, image_path: str):
     try:
         return detector.detect(image_path)
     except FileNotFoundError as e:
-        raise HTTPException(status_code=400, detail=f"invalid image: {e}") from e
+        raise _api_error(400, "INVALID_IMAGE", f"invalid image: {e}") from e
     except RuntimeError as e:
         # ML detector unavailable (missing checkpoint, load failure) --
         # explicit 503, no silent fallback to classical.
-        raise HTTPException(status_code=503, detail=str(e)) from e
+        raise _api_error(503, "ML_MODEL_UNAVAILABLE", str(e)) from e
     except Exception as e:  # noqa: BLE001 -- surfaced explicitly, not swallowed
-        raise HTTPException(status_code=500, detail=f"detector failed: {type(e).__name__}: {e}") from e
+        # Server-side diagnostic only -- the client response never
+        # includes a traceback, just the exception type/message.
+        print(f"[pulli-api] detector={detector_name!r} failed: {type(e).__name__}: {e}", file=sys.stderr)
+        raise _api_error(500, "DETECTOR_FAILED", f"detector failed: {type(e).__name__}: {e}") from e
 
 
-@app.get("/api/v1/health")
+@app.get("/api/v1/health", response_model=HealthResponse)
 def health():
     ml_available = os.path.exists(
         os.path.join(os.path.dirname(__file__), "..", "experiments", "m4_2", "results", "dot_heatmap_net_v2.pt")
@@ -126,7 +152,18 @@ def health():
     return {"status": "ok", "classical_detector_available": True, "ml_detector_available": ml_available}
 
 
-@app.get("/api/v1/model")
+def _model_attribution(result) -> dict:
+    """Which detector/model produced `result` -- attached to /detect,
+    /analyze, /reconstruct responses (Phase 4/9's "every downstream
+    result must identify which detector produced it" requirement).
+    Both detectors are CPU-only; ML's name is the actual architecture
+    class, not a marketing label."""
+    if result.detector == "ml":
+        return {"name": "DotHeatmapNetV2", "version": result.model_version, "device": "cpu"}
+    return {"name": "Classical (deterministic, engine.image_io.detect_lattice)", "version": None, "device": "cpu"}
+
+
+@app.get("/api/v1/model", response_model=ModelInfoResponse)
 def model_info():
     checkpoint_path = os.path.join(
         os.path.dirname(__file__), "..", "experiments", "m4_2", "results", "dot_heatmap_net_v2.pt"
@@ -134,19 +171,37 @@ def model_info():
     exists = os.path.exists(checkpoint_path)
     from experiments.m4_2.model import MODEL_INPUT_SIZE, HEATMAP_SIZE
     from experiments.m4_2.ml_lattice_detector import MODEL_VERSION
+
+    # Reflects the ML detector singleton's ACTUAL lazy-load state (see
+    # api/detectors.py's MLDetector) -- this endpoint does not force a
+    # load just to answer a status query. `ml_loaded=False` on a fresh
+    # process with a valid checkpoint is honest: the model hasn't run
+    # yet, not "unavailable".
+    ml_detector = get_detector("ml")
+    is_loaded = ml_detector._detector is not None
+    parameter_count = None
+    if is_loaded:
+        parameter_count = sum(p.numel() for p in ml_detector._detector.model.parameters())
+
     return {
         "ml_model_version": MODEL_VERSION if exists else None,
         "ml_checkpoint_exists": exists,
         "ml_model_input_size": MODEL_INPUT_SIZE if exists else None,
         "ml_heatmap_size": HEATMAP_SIZE if exists else None,
         "classical_detector": "engine.image_io.detect_lattice (deterministic)",
+        "ml_model_name": "DotHeatmapNetV2" if exists else None,
+        "ml_parameter_count": parameter_count,
+        "ml_device": "cpu" if exists else None,
+        "ml_loaded": is_loaded,
+        "ml_inference_mode": "torch.no_grad" if is_loaded else None,
+        "classical_detector_status": "available",
+        "ml_detector_status": "available" if exists else "unavailable",
     }
 
 
-@app.post("/api/v1/detect")
+@app.post("/api/v1/detect", response_model=DetectResponse)
 def detect(image: UploadFile = File(...), detector: str = Form("classical")):
-    if detector not in ("classical", "ml"):
-        raise HTTPException(status_code=400, detail=f"detector must be 'classical' or 'ml', got {detector!r}")
+    _validate_detector_param(detector)
 
     path = _save_upload_to_temp(image)
     try:
@@ -162,13 +217,13 @@ def detect(image: UploadFile = File(...), detector: str = Form("classical")):
         "detections": [{"x": x, "y": y} for x, y in result.dots],
         "count": len(result.dots),
         "processing_ms": round(result.processing_ms, 2),
+        "model": _model_attribution(result),
     }
 
 
-@app.post("/api/v1/analyze")
+@app.post("/api/v1/analyze", response_model=AnalyzeResponse)
 def analyze(image: UploadFile = File(...), detector: str = Form("classical")):
-    if detector not in ("classical", "ml"):
-        raise HTTPException(status_code=400, detail=f"detector must be 'classical' or 'ml', got {detector!r}")
+    _validate_detector_param(detector)
 
     path = _save_upload_to_temp(image)
     try:
@@ -176,6 +231,13 @@ def analyze(image: UploadFile = File(...), detector: str = Form("classical")):
     finally:
         os.unlink(path)
 
+    # G is result.graph -- built by THIS detector's own Lattice via
+    # engine.image_io.trace_path (see api/detectors.py). Selecting
+    # detector=ml here means every downstream stage (validity, motifs)
+    # operates on the ML-derived graph, not a separately-run classical
+    # pass -- there is only ever one graph per request, owned by
+    # whichever detector was selected.
+    t_analysis_start = time.monotonic()
     G = result.graph
     dots = set(G.nodes())
     validity_result = validity.check_validity(G) if G.number_of_nodes() else {
@@ -189,6 +251,7 @@ def analyze(image: UploadFile = File(...), detector: str = Form("classical")):
         placements, _residual, _fully_covered = motifs.induce_motif_set_adaptive(
             G, interior, dots, max_radius=2, max_motifs_per_radius=50
         )
+    analysis_ms = (time.monotonic() - t_analysis_start) * 1000
 
     return {
         "success": True,
@@ -200,13 +263,18 @@ def analyze(image: UploadFile = File(...), detector: str = Form("classical")):
         "graph": graph_to_json(G),
         "motifs": motif_placements_to_json(placements),
         "validity": validity_to_json(validity_result),
+        "model": _model_attribution(result),
+        "timing_ms": {
+            "detection": round(result.processing_ms, 2),
+            "analysis": round(analysis_ms, 2),
+            "total": round(result.processing_ms + analysis_ms, 2),
+        },
     }
 
 
-@app.post("/api/v1/reconstruct")
+@app.post("/api/v1/reconstruct", response_model=ReconstructResponse)
 def reconstruct(image: UploadFile = File(...), detector: str = Form("classical")):
-    if detector not in ("classical", "ml"):
-        raise HTTPException(status_code=400, detail=f"detector must be 'classical' or 'ml', got {detector!r}")
+    _validate_detector_param(detector)
 
     path = _save_upload_to_temp(image)
     try:
@@ -214,6 +282,9 @@ def reconstruct(image: UploadFile = File(...), detector: str = Form("classical")
     finally:
         os.unlink(path)
 
+    # Same graph-ownership rule as /analyze: G is THIS detector's own
+    # result.graph -- reconstruction always operates on whichever
+    # detector was selected, never a separately-run classical pass.
     G = result.graph
     dots = set(G.nodes())
     if len(dots) < 1:
@@ -221,17 +292,21 @@ def reconstruct(image: UploadFile = File(...), detector: str = Form("classical")
             "success": True, "detector": result.detector, "model_version": result.model_version,
             "processing_ms": round(result.processing_ms, 2), "graph": graph_to_json(G),
             "reconstruction": {"note": "no dots detected -- nothing to reconstruct"},
+            "model": _model_attribution(result),
+            "timing_ms": {"detection": round(result.processing_ms, 2), "reconstruction": 0.0, "total": round(result.processing_ms, 2)},
         }
 
     from api.reconstruct_adapter import build_kolam_pattern_from_graph
     from engine import reconstruction as recon_module
 
+    t_recon_start = time.monotonic()
     source_pattern = build_kolam_pattern_from_graph(G, dots)
     interior = motifs.interior_points(dots, radius=1)
     placements, _residual, _fully_covered = motifs.induce_motif_set_adaptive(
         G, interior, dots, max_radius=2, max_motifs_per_radius=50
     )
     recon_result = recon_module.reconstruct_kolam(source_pattern, placements)
+    reconstruction_ms = (time.monotonic() - t_recon_start) * 1000
 
     return {
         "success": True,
@@ -240,10 +315,26 @@ def reconstruct(image: UploadFile = File(...), detector: str = Form("classical")
         "processing_ms": round(result.processing_ms, 2),
         "graph": graph_to_json(G),
         "reconstruction": reconstruction_to_json(recon_result),
+        "model": _model_attribution(result),
+        "timing_ms": {
+            "detection": round(result.processing_ms, 2),
+            "reconstruction": round(reconstruction_ms, 2),
+            "total": round(result.processing_ms + reconstruction_ms, 2),
+        },
     }
 
 
-@app.post("/api/v1/compare-detectors")
+def _error_message(detail) -> str:
+    """detail is always {"code": ..., "message": ...} from _api_error --
+    this extracts the human-readable string for contexts (like
+    /compare-detectors' per-side `error` field) that are typed as a
+    plain string, not the full structured error envelope."""
+    if isinstance(detail, dict):
+        return detail.get("message", str(detail))
+    return str(detail)
+
+
+@app.post("/api/v1/compare-detectors", response_model=CompareDetectorsResponse)
 def compare_detectors(image: UploadFile = File(...)):
     path = _save_upload_to_temp(image)
     try:
@@ -254,11 +345,11 @@ def compare_detectors(image: UploadFile = File(...)):
         try:
             classical_result = _run_detector("classical", path)
         except HTTPException as e:
-            classical_error = e.detail
+            classical_error = _error_message(e.detail)
         try:
             ml_result = _run_detector("ml", path)
         except HTTPException as e:
-            ml_error = e.detail
+            ml_error = _error_message(e.detail)
     finally:
         os.unlink(path)
 
@@ -301,4 +392,13 @@ def compare_detectors(image: UploadFile = File(...)):
 
 @app.exception_handler(HTTPException)
 def http_exception_handler(request, exc):
-    return JSONResponse(status_code=exc.status_code, content={"success": False, "error": exc.detail})
+    # exc.detail is {"code": ..., "message": ...} for every error raised
+    # via _api_error (all of this module's own error paths); fall back
+    # to treating it as a plain string for anything raised by FastAPI
+    # itself (e.g. request validation errors) so no caller ever sees a
+    # raw traceback either way.
+    if isinstance(exc.detail, dict) and "message" in exc.detail:
+        content = {"success": False, "error": exc.detail["message"], "code": exc.detail.get("code", "ERROR")}
+    else:
+        content = {"success": False, "error": str(exc.detail), "code": "ERROR"}
+    return JSONResponse(status_code=exc.status_code, content=content)

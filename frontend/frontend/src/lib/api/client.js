@@ -8,9 +8,9 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 const DEFAULT_TIMEOUT_MS = 30000;
 
-/** @param {string} kind @param {string} message @param {number} [status] @returns {import('./types').ApiError} */
-function apiError(kind, message, status) {
-  return { kind, message, status };
+/** @param {string} kind @param {string} message @param {number} [status] @param {string} [code] @returns {import('./types').ApiError} */
+function apiError(kind, message, status, code) {
+  return { kind, message, status, code };
 }
 
 /**
@@ -34,13 +34,26 @@ async function request(path, options = {}) {
     }
 
     if (!res.ok) {
+      // The backend attaches a stable machine-readable `code` alongside
+      // the human-readable `error` message (see api/main.py's
+      // _api_error) -- prefer switching on status code (stable contract)
+      // with `code` carried through for callers that want finer-grained
+      // handling than the `kind` bucket below provides.
+      const message = body.error || `Request failed (${res.status})`;
+      const code = body.code;
       if (res.status === 503) {
-        return { data: null, error: apiError('model_unavailable', body.error || 'Model unavailable', res.status) };
+        return { data: null, error: apiError('model_unavailable', message, res.status, code) };
       }
-      if (res.status === 400) {
-        return { data: null, error: apiError('invalid_image', body.error || 'Invalid request', res.status) };
+      if (res.status === 413) {
+        return { data: null, error: apiError('upload_too_large', message, res.status, code) };
       }
-      return { data: null, error: apiError('unknown', body.error || `Request failed (${res.status})`, res.status) };
+      if (res.status === 415 || res.status === 400) {
+        return { data: null, error: apiError('invalid_image', message, res.status, code) };
+      }
+      if (res.status === 422) {
+        return { data: null, error: apiError('invalid_request', message, res.status, code) };
+      }
+      return { data: null, error: apiError('unknown', message, res.status, code) };
     }
 
     return { data: body, error: null };
