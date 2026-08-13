@@ -4,11 +4,11 @@ import './ArchiveWall.css'
 
 // Selected real items from kolam19 dataset to exhibit
 const featuredExhibits = [
-  { id: 26, label: 'EXHIBIT 01 · PATTERN TRACE', caption: 'Kolam 26 — 725 dense polyline points, 816.8u path length' },
-  { id: 1,  label: 'EXHIBIT 02 · EULERIAN PATH', caption: 'Kolam 1 — 100% closed one-stroke continuity verified' },
-  { id: 55, label: 'EXHIBIT 03 · D4 SYMMETRY', caption: 'Kolam 55 — Dual vertical & 180° rotational invariance' },
-  { id: 118,label: 'EXHIBIT 04 · MULTIGRAPH', caption: 'Kolam 118 — Complex strand multiplicity at lattice nodes' },
-  { id: 232,label: 'EXHIBIT 05 · MOTIF SUBGRAPH', caption: 'Kolam 232 — Dihedral canonicalized recurring window' },
+  { id: 26, label: 'EXHIBIT 01 · PATTERN TRACE', caption: 'Kolam 26 - 725 dense polyline points, 816.8u path length' },
+  { id: 1,  label: 'EXHIBIT 02 · EULERIAN PATH', caption: 'Kolam 1 - 100% closed one-stroke continuity verified' },
+  { id: 55, label: 'EXHIBIT 03 · D4 SYMMETRY', caption: 'Kolam 55 - Dual vertical & 180° rotational invariance' },
+  { id: 118,label: 'EXHIBIT 04 · MULTIGRAPH', caption: 'Kolam 118 - Complex strand multiplicity at lattice nodes' },
+  { id: 232,label: 'EXHIBIT 05 · MOTIF SUBGRAPH', caption: 'Kolam 232 - Dihedral canonicalized recurring window' },
 ]
 
 export default function ArchiveWall() {

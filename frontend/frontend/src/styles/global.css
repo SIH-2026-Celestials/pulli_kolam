@@ -42,7 +42,16 @@ a {
 .container {
   width: 100%;
   max-width: var(--max-width);
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 40px;
+}
+
+.container--narrow {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
   padding: 0 40px;
 }
 
@@ -52,6 +61,27 @@ a {
 
 .section--bordered {
   border-bottom: 1px solid var(--color-card-border);
+}
+
+/* --- Shared Page Layout Wrapper to ensure full-width flex rendering --- */
+.detect-page,
+.generate-page,
+.learn-page,
+.analyze-page,
+.about-page,
+.how-it-works-page,
+.technology-page,
+.impact-page,
+.explore-page,
+.project-page,
+.kolam-detail-page,
+.module-page {
+  width: 100%;
+  min-height: calc(100vh - 128px);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-paper);
+  flex: 1;
 }
 
 /* --- Shared Typography --- */

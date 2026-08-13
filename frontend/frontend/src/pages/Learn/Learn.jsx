@@ -7,7 +7,7 @@ export default function Learn() {
     <main id="main-content" className="learn-page">
       {/* ── 1. HERO SECTION ────────────────────────────────────────────── */}
       <header className="learn-header section section--bordered">
-        <div className="container">
+        <div className="container--narrow">
           <p className="eyebrow eyebrow--accent">INDIAN KNOWLEDGE SYSTEMS (IKS)</p>
           <h1 className="heading-display heading-2 learn-title">
             LEARNING &amp; EDUCATION
@@ -19,7 +19,7 @@ export default function Learn() {
       </header>
 
       {/* ── 2. MODULE CARDS GRID ───────────────────────────────────────── */}
-      <section className="container section section--bordered">
+      <section className="container--narrow section section--bordered">
         <div className="section-title-block">
           <p className="eyebrow">Interactive Curriculum</p>
           <h2 className="heading-display heading-3">FOUR LEARNING MODULES</h2>
@@ -37,7 +37,7 @@ export default function Learn() {
 
       {/* ── 3. WHY STUDY KOLAM? (3 VALUE PILLARS) ──────────────────────── */}
       <section className="section section--bordered learn-why-section">
-        <div className="container">
+        <div className="container--narrow">
           <div className="section-title-block">
             <p className="eyebrow eyebrow--accent">Pedagogical Value</p>
             <h2 className="heading-display heading-3">WHY STUDY KOLAM MATHEMATICS?</h2>

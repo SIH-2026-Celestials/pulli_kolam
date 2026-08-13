@@ -99,7 +99,7 @@ export default function LearnModule() {
     <main id="main-content" className="module-page">
       {/* Header & Breadcrumb */}
       <header className="module-header section section--bordered">
-        <div className="container">
+        <div className="container--narrow">
           <nav className="breadcrumb label-tech" aria-label="Breadcrumb navigation">
             <Link to="/learn" className="breadcrumb__link">LEARN</Link>
             <span className="breadcrumb__sep">/</span>
@@ -115,7 +115,7 @@ export default function LearnModule() {
       </header>
 
       {/* Main Content Layout (Sidebar ToC + Content) */}
-      <section className="container section section--bordered">
+      <section className="container--narrow section section--bordered">
         <div className="module-layout">
           {/* Sticky Sidebar ToC */}
           <aside className="module-sidebar">

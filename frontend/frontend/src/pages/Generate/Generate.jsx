@@ -8,7 +8,7 @@ export default function Generate() {
   return (
     <main id="main-content" className="generate-page">
       <header className="generate-header section section--bordered">
-        <div className="container">
+        <div className="container--narrow">
           <p className="eyebrow eyebrow--accent">{t('pages.generate.eyebrow')}</p>
           <h1 className="heading-display heading-2 generate-title">
             {t('pages.generate.title')}
@@ -19,7 +19,7 @@ export default function Generate() {
         </div>
       </header>
 
-      <section className="container section generate-content">
+      <section className="container--narrow section generate-content">
         <GeneratedVariations />
       </section>
     </main>

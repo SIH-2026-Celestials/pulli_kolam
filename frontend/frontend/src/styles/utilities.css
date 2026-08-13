@@ -1,5 +1,5 @@
 /* =========================================================
-   PULLI — Shared layout, typography & component utilities
+   PULLI - Shared layout, typography & component utilities
    Used by the secondary pages (Analyze, About, Explore,
    HowItWorks, Generate, Technology, Project, KolamDetail).
    ========================================================= */
@@ -8,7 +8,16 @@
 .container {
   width: 100%;
   max-width: var(--max-width);
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 var(--gutter);
+}
+
+.container--narrow {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
   padding: 0 var(--gutter);
 }
 
@@ -135,7 +144,8 @@
 }
 
 @media (max-width: 900px) {
-  .container {
+  .container,
+  .container--narrow {
     padding: 0 var(--space-6);
   }
 

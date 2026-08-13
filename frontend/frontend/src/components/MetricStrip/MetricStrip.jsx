@@ -1,7 +1,7 @@
 import './MetricStrip.css'
 
 /**
- * MetricStrip — Restrained research metrics display.
+ * MetricStrip - Restrained research metrics display.
  * 
  * NOT colorful SaaS cards. Research-table aesthetic with
  * thin rules, typographic number + label pairs, and context.

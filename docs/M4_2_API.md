@@ -1,6 +1,6 @@
 # M4.2 REST API
 
-`api/main.py` — new FastAPI service, the first backend server in this
+`api/main.py` - new FastAPI service, the first backend server in this
 repository (verified in Phase A's audit: none existed before). Run
 locally with:
 
@@ -9,25 +9,25 @@ KMP_DUPLICATE_LIB_OK=TRUE uvicorn api.main:app --reload
 ```
 
 (`KMP_DUPLICATE_LIB_OK` is set inside `api/main.py` itself at import
-time — the `uvicorn` prefix above is redundant but harmless; see
+time - the `uvicorn` prefix above is redundant but harmless; see
 `docs/M4_2_MODEL.md`'s "Known environment requirement.")
 
 ## Conventions
 
 - All detection/analysis endpoints accept `multipart/form-data` with an
   `image` file field and an optional `detector` form field
-  (`classical` | `ml`), **defaulting to `classical`** — never `ml` by
+  (`classical` | `ml`), **defaulting to `classical`** - never `ml` by
   default, per the production-fallback rule.
 - Detected coordinates are always in the **original, as-uploaded
-  image's** pixel space — never the model-input-resized or
+  image's** pixel space - never the model-input-resized or
   heatmap-cell space, and specifically un-rotated back through
   `preprocess()`'s own deskew rotation so overlays align with the image
   the user actually sees (see `api/detectors.py`'s module docstring).
 - No silent fallback: if `detector=ml` is requested and the ML detector
   is unavailable (missing checkpoint, load failure, inference error),
-  the response is HTTP 503 with an explicit error message — never a
+  the response is HTTP 503 with an explicit error message - never a
   silent substitution of the classical result.
-- No NetworkX/engine-internal objects are ever serialized — see
+- No NetworkX/engine-internal objects are ever serialized - see
   `api/canonical.py`.
 - Uploaded images are written to a temp file for the duration of one
   request and deleted immediately after; never logged or persisted.
@@ -39,7 +39,7 @@ time — the `uvicorn` prefix above is redundant but harmless; see
 ```
 
 `ml_detector_available` reflects whether a checkpoint file exists on
-disk — not whether it has been load-tested.
+disk - not whether it has been load-tested.
 
 ## `GET /api/v1/model`
 
@@ -98,7 +98,7 @@ UNCHANGED deterministic engine (`engine.motifs`, `engine.validity`).
 ## `POST /api/v1/reconstruct`
 
 Same form fields. Builds a minimal `KolamPattern` from the detected
-graph (`api/reconstruct_adapter.py` — see its docstring for the honesty
+graph (`api/reconstruct_adapter.py` - see its docstring for the honesty
 note: this uses dot positions as a stand-in trace, NOT a real CSV
 polyline, since a photo has no such trace; `collection="uploaded"`
 marks this provenance explicitly) and runs
@@ -137,11 +137,11 @@ Form field: `image` only (runs both detectors, no `detector` field).
 ```
 
 If one detector fails, its side reports `count: 0`, empty detections,
-and a non-null `error` string — the other side's result is still
+and a non-null `error` string - the other side's result is still
 returned (partial success, not an all-or-nothing failure).
 
 ## Detector modes
 
 Only `classical` and `ml` are implemented. `auto` is deliberately NOT
-implemented — routing decisions need measurable evidence first (see
+implemented - routing decisions need measurable evidence first (see
 `docs/M4_2_EVALUATION.md`).

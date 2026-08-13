@@ -5,7 +5,7 @@ export default function Impact() {
   return (
     <main id="main-content" className="impact-page">
       <header className="impact-header section section--bordered">
-        <div className="container">
+        <div className="container--narrow">
           <p className="eyebrow eyebrow--accent">Public &amp; Institutional Value</p>
           <h1 className="heading-display heading-2 impact-title">
             Potential Impact
@@ -18,7 +18,7 @@ export default function Impact() {
         </div>
       </header>
 
-      <section className="container section section--bordered">
+      <section className="container--narrow section section--bordered">
         <div className="impact-detail-grid">
           <div className="impact-detail-card archival-frame">
             <h3 className="eyebrow eyebrow--accent">CULTURAL HERITAGE</h3>
@@ -27,7 +27,7 @@ export default function Impact() {
               Traditional Kolam patterns are typically transmitted by hand and observation rather
               than written specification. Representing patterns as coordinate traces and graph
               structures provides a documentation format that can be stored, indexed, and
-              compared computationally — supporting archival efforts alongside the original
+              compared computationally - supporting archival efforts alongside the original
               artistic practice.
             </p>
           </div>
@@ -48,7 +48,7 @@ export default function Impact() {
             <h4 className="heading-display heading-3">Pattern Systems</h4>
             <p className="body-text body-text--sm">
               The MultiGraph and multi-motif set-cover methods developed for Kolam analysis are
-              not specific to this dataset — they generalize to other continuous, structured
+              not specific to this dataset - they generalize to other continuous, structured
               visual patterns with loop-around geometry, offering a reusable computational
               framework for studying similar traditional design systems.
             </p>
@@ -59,7 +59,7 @@ export default function Impact() {
             <h4 className="heading-display heading-3">Searchable Repositories</h4>
             <p className="body-text body-text--sm">
               Structured, validated representations lay the groundwork for searchable digital
-              archives of traditional artistic designs — allowing patterns to be queried by
+              archives of traditional artistic designs - allowing patterns to be queried by
               structural properties such as symmetry class or motif composition rather than
               by filename alone.
             </p>
@@ -67,12 +67,12 @@ export default function Impact() {
         </div>
       </section>
 
-      <section className="container section impact-cta-section">
+      <section className="container--narrow section impact-cta-section">
         <div className="impact-cta-card archival-frame">
           <div>
             <h3 className="heading-display heading-3">See the Current Evidence</h3>
             <p className="body-text body-text--sm">
-              These are potential directions built on top of verified experimental results —
+              These are potential directions built on top of verified experimental results -
               not claims about deployed systems or measured adoption.
             </p>
           </div>

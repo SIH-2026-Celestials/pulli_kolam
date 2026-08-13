@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import './KolamCard.css'
 
 /**
- * KolamCard — Gallery card for a single Kolam.
+ * KolamCard - Gallery card for a single Kolam.
  * Shows the actual image with number label.
  * Hover reveals basic metadata.
  */
