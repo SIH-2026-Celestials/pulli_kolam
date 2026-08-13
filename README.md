@@ -4,7 +4,7 @@
 
 **Kolam Design-Principle Identification & Recreation**
 
-Computational study of traditional South Indian *Pulli Kolam* patterns — representing hand-drawn one-stroke designs as graphs, measuring their symmetry and motif structure, and validating their single-stroke correctness.
+Computational study of traditional South Indian *Pulli Kolam* patterns - representing hand-drawn one-stroke designs as graphs, measuring their symmetry and motif structure, and validating their single-stroke correctness.
 
 [![CI](https://github.com/Abhishek1106kr/pulli_kolam/actions/workflows/ci.yml/badge.svg)](https://github.com/Abhishek1106kr/pulli_kolam/actions/workflows/ci.yml)
 
@@ -40,7 +40,7 @@ individually, and `docs/DEPLOYMENT.md` for production deployment.
 
 ## What is a Kolam?
 
-A **Pulli Kolam** is a traditional South Indian geometric drawing made by looping a single continuous line around a grid of dots (*pulli*) without lifting the hand. The resulting patterns look intuitive and artistic, but many of them follow strict underlying rules — symmetry, repeated local motifs, and closed single-stroke (Eulerian) continuity.
+A **Pulli Kolam** is a traditional South Indian geometric drawing made by looping a single continuous line around a grid of dots (*pulli*) without lifting the hand. The resulting patterns look intuitive and artistic, but many of them follow strict underlying rules - symmetry, repeated local motifs, and closed single-stroke (Eulerian) continuity.
 
 **PULLI** treats each Kolam as a computational object: a dense coordinate trace that can be turned into a graph, measured, and checked for structural validity.
 
@@ -68,20 +68,20 @@ input pattern → infer the minimal generating grammar → prove it's correct �
 
 ```mermaid
 flowchart TD
-    A["Dataset (Kaggle — kolam19 / kolam29 / kolam109)"] --> B["CSV coordinate polyline trace"]
+    A["Dataset (Kaggle - kolam19 / kolam29 / kolam109)"] --> B["CSV coordinate polyline trace"]
     B --> C["Coordinate normalization (~0.5u resolution)"]
-    C --> D["Graph construction — NetworkX MultiGraph"]
-    D --> E["Motif induction — canonical-signature clustering"]
-    D --> F["D4 symmetry matching — 4 rotations × 2 reflections"]
-    E --> G["Validity check — Eulerian circuit / path"]
+    C --> D["Graph construction - NetworkX MultiGraph"]
+    D --> E["Motif induction - canonical-signature clustering"]
+    D --> F["D4 symmetry matching - 4 rotations × 2 reflections"]
+    E --> G["Validity check - Eulerian circuit / path"]
     F --> G
-    G --> H["Generation — stamp motif onto new dot lattice"]
+    G --> H["Generation - stamp motif onto new dot lattice"]
 
     style A fill:#F6F3EC,stroke:#171614,color:#171614
     style H fill:#F6F3EC,stroke:#A64B35,color:#A64B35,stroke-dasharray: 4 3
 ```
 
-Integer coordinates in a trace correspond to dots actually visited; half-integer coordinates are loop-around geometry where the stroke passes *between* dots. Because a stroke can run alongside a previously drawn strand, edges between the same two nodes can occur more than once — which is why the engine uses a `MultiGraph` rather than a simple graph, and why validity checking has to be multiplicity-aware rather than a plain "is it connected" test.
+Integer coordinates in a trace correspond to dots actually visited; half-integer coordinates are loop-around geometry where the stroke passes *between* dots. Because a stroke can run alongside a previously drawn strand, edges between the same two nodes can occur more than once - which is why the engine uses a `MultiGraph` rather than a simple graph, and why validity checking has to be multiplicity-aware rather than a plain "is it connected" test.
 
 ---
 
@@ -115,7 +115,7 @@ PULLI/
 ├── analyze_kolam.py, analyze_symmetry.py, plot_kolam.py, view_kolams.py
 │                              # Ad-hoc exploration scripts over the raw CSVs
 ├── validate_real_data.py, validate_adaptive.py, validate_mdl.py, validate_image_io.py
-│                              # Measurement scripts — print real, non-invented numbers
+│                              # Measurement scripts - print real, non-invented numbers
 │                              # from running the engine against the dataset
 │
 ├── requirements.txt
@@ -155,21 +155,21 @@ The frontend currently reads from a static data layer (`src/data/kolams.js`) gen
 
 ## Dataset
 
-PULLI uses the **[One-Stroke Dotted Pulli Kolam](https://www.kaggle.com/datasets/shubha1011/one-stroke-dotted-pulli-kolam)** dataset from Kaggle, which ships three CSV files — one per grid size:
+PULLI uses the **[One-Stroke Dotted Pulli Kolam](https://www.kaggle.com/datasets/shubha1011/one-stroke-dotted-pulli-kolam)** dataset from Kaggle, which ships three CSV files - one per grid size:
 
 | Dataset | Patterns | Grid |
 |---|---|---|
 | `kolam19` | 400 | 37×37 |
-| `kolam29` | — | larger lattice |
-| `kolam109` | — | larger lattice |
+| `kolam29` | - | larger lattice |
+| `kolam109` | - | larger lattice |
 
-Each row stores a dense polyline trace (`x-kolam {n}` / `y-kolam {n}` columns) sampled on a half-integer grid; every trace is a closed loop (first point equals last point). PULLI does not claim ownership of the dataset — all patterns are attributed to the original dataset maintainers.
+Each row stores a dense polyline trace (`x-kolam {n}` / `y-kolam {n}` columns) sampled on a half-integer grid; every trace is a closed loop (first point equals last point). PULLI does not claim ownership of the dataset - all patterns are attributed to the original dataset maintainers.
 
 ---
 
 ## Current findings
 
-Measured by running the engine's validation scripts against the real dataset — not invented numbers.
+Measured by running the engine's validation scripts against the real dataset - not invented numbers.
 
 | Method | Avg. edge recall | Avg. motifs / pattern |
 |---|---|---|

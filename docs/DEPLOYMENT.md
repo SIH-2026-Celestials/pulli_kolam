@@ -22,7 +22,7 @@ pip install -r requirements.txt
 python -m uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-`--reload` is for local development only — never use it in production
+`--reload` is for local development only - never use it in production
 (see section E).
 
 ### Frontend
@@ -36,7 +36,7 @@ npm run dev
 The frontend reads `VITE_API_BASE_URL` (see `.env.example`) at **build
 time** via Vite's `import.meta.env`. If unset, it defaults to
 `http://localhost:8000` (`frontend/frontend/src/lib/api/client.js`), which
-matches the default `uvicorn` command above — no configuration needed for
+matches the default `uvicorn` command above - no configuration needed for
 local development.
 
 ### CORS in local development
@@ -46,7 +46,7 @@ If unset, it falls back to the common Vite dev-server origins
 (`http://localhost:5173`, `http://127.0.0.1:5173`, `http://localhost:3000`,
 `http://127.0.0.1:3000`) so `npm run dev` talks to `uvicorn --reload`
 without any extra setup. This fallback does **not** apply outside of
-local development — see section G.
+local development - see section G.
 
 ---
 
@@ -58,15 +58,15 @@ docker build -t pulli-api .
 
 The image contains only the API runtime: `engine/`, `api/`, and the
 runtime-required subset of `experiments/m4_1`/`experiments/m4_2` (model
-definition modules + the one checkpoint the ML detector loads —
+definition modules + the one checkpoint the ML detector loads -
 `experiments/m4_2/results/dot_heatmap_net_v2.pt`). Datasets,
-training/evaluation data, the frontend, and `.git` are excluded — see
+training/evaluation data, the frontend, and `.git` are excluded - see
 the `Dockerfile` header comment and `.dockerignore` for the exact list
 and why each exclusion is safe.
 
 The image is CPU-only. `torch` is installed from PyPI's dedicated CPU
 wheel index (`https://download.pytorch.org/whl/cpu`) specifically so no
-CUDA/`nvidia-*` packages are pulled in — this project has no GPU code.
+CUDA/`nvidia-*` packages are pulled in - this project has no GPU code.
 
 ---
 
@@ -79,7 +79,7 @@ docker run --rm -p 8000:8000 \
 ```
 
 `CORS_ORIGINS` is the only environment variable the container needs.
-`KMP_DUPLICATE_LIB_OK` is set internally by `api/main.py` — do not set it
+`KMP_DUPLICATE_LIB_OK` is set internally by `api/main.py` - do not set it
 yourself.
 
 ---
@@ -98,9 +98,9 @@ present on disk:
 ```
 
 This is an existence check, not a full dependency health check
-(`docs/DEPLOYMENT_AUDIT.md` section 9) — that scope was intentionally not
+(`docs/DEPLOYMENT_AUDIT.md` section 9) - that scope was intentionally not
 expanded here (no DB/queue to check). The `Dockerfile` also declares a
-`HEALTHCHECK` that polls this same endpoint from inside the container —
+`HEALTHCHECK` that polls this same endpoint from inside the container -
 no new health logic was added.
 
 ---
@@ -120,16 +120,16 @@ FastAPI container (this Dockerfile), e.g. Render / Fly.io / Railway
    +-- classical detector   (engine/image_io.py, CPU, no ML)
    +-- ML detector          (experiments/m4_2, CPU-only PyTorch)
    +-- reconstruction       (engine/reconstruction.py)
-   +-- generation engine    (engine/generation.py — see docs/GENERATION.md
+   +-- generation engine    (engine/generation.py - see docs/GENERATION.md
                               for current capability status)
 ```
 
 There is currently no database, queue, object storage, GPU, or worker in
-this architecture, and none should be added speculatively — see
-`docs/DEPLOYMENT_AUDIT.md` sections 6–7 for the reasoning (synchronous,
+this architecture, and none should be added speculatively - see
+`docs/DEPLOYMENT_AUDIT.md` sections 6-7 for the reasoning (synchronous,
 sub-second, stateless endpoints; no job needs anything to persist).
 
-Never run `uvicorn --reload` in production — use the exact command the
+Never run `uvicorn --reload` in production - use the exact command the
 `Dockerfile` runs:
 
 ```
@@ -148,7 +148,7 @@ VITE_API_BASE_URL=https://<backend-domain> npm run build
 
 or configure it as a build-time environment variable in your static host
 (Vercel/Cloudflare Pages project settings). It cannot be changed after
-the build without rebuilding — it is baked into the static JS bundle by
+the build without rebuilding - it is baked into the static JS bundle by
 Vite, not read at runtime in the browser.
 
 ---
@@ -164,7 +164,7 @@ CORS_ORIGINS=https://<frontend-domain>
 Use the exact deployed frontend origin (scheme + host, no path, no
 trailing slash), comma-separated if there is more than one (e.g. a
 preview deployment origin alongside the production one). **Never set
-this to `*`** in a deployed environment — `api/main.py`'s dev-only
+this to `*`** in a deployed environment - `api/main.py`'s dev-only
 fallback (section A) does not apply once `CORS_ORIGINS` is set.
 
 ---
@@ -172,7 +172,7 @@ fallback (section A) does not apply once `CORS_ORIGINS` is set.
 ## H. Production upload limits
 
 `api/main.py` validates upload **content type** only
-(`ALLOWED_CONTENT_TYPES` — jpeg/png/webp/bmp); there is currently **no
+(`ALLOWED_CONTENT_TYPES` - jpeg/png/webp/bmp); there is currently **no
 application-level upload size limit**. This is a known gap, documented in
 `docs/DEPLOYMENT_AUDIT.md` section 9.
 
@@ -180,37 +180,37 @@ application-level upload size limit**. This is a known gap, documented in
 platform or reverse-proxy layer** (e.g. your hosting platform's own
 request size cap, or a reverse proxy in front of the container) before
 being exposed to untrusted traffic. This document does not specify a
-provider-specific number — check the limit your chosen platform already
+provider-specific number - check the limit your chosen platform already
 enforces by default and confirm it's reasonable for a single kolam photo
 upload; do not assume one is in place without checking.
 
 Adding an explicit application-level size check (reject oversized
 uploads before they're written to a temp file) is a reasonable future
 hardening item if the platform-level limit turns out to be absent or too
-permissive — not implemented in this pass, since it changes
+permissive - not implemented in this pass, since it changes
 `api/main.py`'s validation behavior and wasn't part of this task's scope.
 
 ---
 
 ## Troubleshooting
 
-- **`OMP: Error #15` / process crashes on first request** — `KMP_DUPLICATE_LIB_OK`
+- **`OMP: Error #15` / process crashes on first request** - `KMP_DUPLICATE_LIB_OK`
   must be set before torch or numpy is imported. It's set at the very top
-  of `api/main.py`, before any other import — if this ever moves, the
+  of `api/main.py`, before any other import - if this ever moves, the
   crash returns. Do not "fix" this by removing the line.
-- **CORS errors in the browser console** — check `CORS_ORIGINS` matches
+- **CORS errors in the browser console** - check `CORS_ORIGINS` matches
   the frontend's *exact* origin (scheme + host + port), and that you
   didn't leave a trailing slash.
-- **`/api/v1/detect` with `detector=ml` returns 503** — the ML checkpoint
+- **`/api/v1/detect` with `detector=ml` returns 503** - the ML checkpoint
   (`experiments/m4_2/results/dot_heatmap_net_v2.pt`) is missing or failed
-  to load. This is intentional (rule: no silent fallback to classical) —
+  to load. This is intentional (rule: no silent fallback to classical) -
   check `GET /api/v1/health`'s `ml_detector_available` field.
 
 ## Rollback
 
-The API is a single stateless container with no persisted state — rolling
+The API is a single stateless container with no persisted state - rolling
 back means redeploying the previous image tag on your platform. The
-frontend is a static build — rolling back means redeploying the previous
+frontend is a static build - rolling back means redeploying the previous
 `dist/` build or, on Vercel/Cloudflare Pages, promoting a previous
 deployment. Neither requires any data migration.
 

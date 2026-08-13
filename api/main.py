@@ -103,9 +103,22 @@ def _api_error(status_code: int, code: str, message: str) -> HTTPException:
     return HTTPException(status_code=status_code, detail={"code": code, "message": message})
 
 
-def _validate_detector_param(detector: str) -> None:
-    if detector not in ("classical", "ml"):
-        raise _api_error(422, "INVALID_DETECTOR", f"detector must be 'classical' or 'ml', got {detector!r}")
+def _validate_detector_param(detector: str) -> str:
+    """Validates AND normalizes -- callers use the returned value (not
+    the raw `detector` argument) for both `_run_detector` and any
+    detector-derived response field, so 'ML_GATED'/'gated_ml'/etc. all
+    resolve to the same canonical name api/detectors.py's get_detector
+    itself normalizes to. Structured error (see _api_error) rather than
+    a plain HTTPException so the frontend gets a stable `code` to switch
+    on, consistent with every other error path in this module."""
+    if not isinstance(detector, str):
+        raise _api_error(422, "INVALID_DETECTOR", f"detector must be a string, got {detector!r}")
+    normalized = detector.strip().lower().replace("_", "-")
+    if normalized in ("ml-gated", "gated-ml"):
+        return "ml-gated"
+    if normalized in ("classical", "ml"):
+        return normalized
+    raise _api_error(422, "INVALID_DETECTOR", f"detector must be 'classical', 'ml', or 'ml-gated', got {detector!r}")
 
 
 def _save_upload_to_temp(image: UploadFile) -> str:
@@ -149,17 +162,26 @@ def health():
     ml_available = os.path.exists(
         os.path.join(os.path.dirname(__file__), "..", "experiments", "m4_2", "results", "dot_heatmap_net_v2.pt")
     )
-    return {"status": "ok", "classical_detector_available": True, "ml_detector_available": ml_available}
+    return {
+        "status": "ok",
+        "classical_detector_available": True,
+        "ml_detector_available": ml_available,
+        "gated_detector_available": ml_available,
+    }
 
 
 def _model_attribution(result) -> dict:
     """Which detector/model produced `result` -- attached to /detect,
     /analyze, /reconstruct responses (Phase 4/9's "every downstream
     result must identify which detector produced it" requirement).
-    Both detectors are CPU-only; ML's name is the actual architecture
-    class, not a marketing label."""
+    All detectors are CPU-only; ML's name is the actual architecture
+    class, not a marketing label. `result.detector` is api/detectors.py's
+    own normalized name ("classical" | "ml" | "ml-gated") -- this
+    function must stay in sync with that set, not guess at it."""
     if result.detector == "ml":
         return {"name": "DotHeatmapNetV2", "version": result.model_version, "device": "cpu"}
+    if result.detector == "ml-gated":
+        return {"name": "DotHeatmapNetV2 (lattice-consistency gated)", "version": result.model_version, "device": "cpu"}
     return {"name": "Classical (deterministic, engine.image_io.detect_lattice)", "version": None, "device": "cpu"}
 
 
@@ -170,13 +192,17 @@ def model_info():
     )
     exists = os.path.exists(checkpoint_path)
     from experiments.m4_2.model import MODEL_INPUT_SIZE, HEATMAP_SIZE
-    from experiments.m4_2.ml_lattice_detector import MODEL_VERSION
+    from experiments.m4_2.ml_lattice_detector import MODEL_VERSION as UNGATED_VERSION
+    from experiments.m4_2.gated_ml_lattice_detector import MODEL_VERSION as GATED_VERSION
 
     # Reflects the ML detector singleton's ACTUAL lazy-load state (see
     # api/detectors.py's MLDetector) -- this endpoint does not force a
     # load just to answer a status query. `ml_loaded=False` on a fresh
     # process with a valid checkpoint is honest: the model hasn't run
-    # yet, not "unavailable".
+    # yet, not "unavailable". The gated detector wraps the SAME
+    # checkpoint (docs/M4_1_ML_COMPLETION_REPORT.md's "Checkpoint
+    # policy") so parameter count is identical regardless of which
+    # adapter loaded it first.
     ml_detector = get_detector("ml")
     is_loaded = ml_detector._detector is not None
     parameter_count = None
@@ -184,7 +210,8 @@ def model_info():
         parameter_count = sum(p.numel() for p in ml_detector._detector.model.parameters())
 
     return {
-        "ml_model_version": MODEL_VERSION if exists else None,
+        "ml_model_version": UNGATED_VERSION if exists else None,
+        "gated_model_version": GATED_VERSION if exists else None,
         "ml_checkpoint_exists": exists,
         "ml_model_input_size": MODEL_INPUT_SIZE if exists else None,
         "ml_heatmap_size": HEATMAP_SIZE if exists else None,
@@ -201,11 +228,11 @@ def model_info():
 
 @app.post("/api/v1/detect", response_model=DetectResponse)
 def detect(image: UploadFile = File(...), detector: str = Form("classical")):
-    _validate_detector_param(detector)
+    detector_norm = _validate_detector_param(detector)
 
     path = _save_upload_to_temp(image)
     try:
-        result = _run_detector(detector, path)
+        result = _run_detector(detector_norm, path)
     finally:
         os.unlink(path)  # never persist uploaded images
 
@@ -223,11 +250,11 @@ def detect(image: UploadFile = File(...), detector: str = Form("classical")):
 
 @app.post("/api/v1/analyze", response_model=AnalyzeResponse)
 def analyze(image: UploadFile = File(...), detector: str = Form("classical")):
-    _validate_detector_param(detector)
+    detector_norm = _validate_detector_param(detector)
 
     path = _save_upload_to_temp(image)
     try:
-        result = _run_detector(detector, path)
+        result = _run_detector(detector_norm, path)
     finally:
         os.unlink(path)
 
@@ -274,11 +301,11 @@ def analyze(image: UploadFile = File(...), detector: str = Form("classical")):
 
 @app.post("/api/v1/reconstruct", response_model=ReconstructResponse)
 def reconstruct(image: UploadFile = File(...), detector: str = Form("classical")):
-    _validate_detector_param(detector)
+    detector_norm = _validate_detector_param(detector)
 
     path = _save_upload_to_temp(image)
     try:
-        result = _run_detector(detector, path)
+        result = _run_detector(detector_norm, path)
     finally:
         os.unlink(path)
 

@@ -5,7 +5,7 @@ audit, augmentation ablation retraining, a full hybrid-detector
 redesign, a gating investigation, deployment/perf profiling). Attempting
 all of them with real rigor in one session was assessed, before
 starting, as unrealistic without producing shallow, unevidenced results
-— exactly what this task's own rules forbid. **Confirmed with the user
+- exactly what this task's own rules forbid. **Confirmed with the user
 before starting: this session's real, evidenced effort went into Phase
 6 (gating), with Phases 0/1/2/3/7/8/11/12/13 done at an audit/
 verification depth (citing and re-confirming existing evidence, not
@@ -17,10 +17,10 @@ not silently skipped.
 
 ## 1. Executive summary
 
-**Status: PARTIAL.** This session made one real, measured improvement —
+**Status: PARTIAL.** This session made one real, measured improvement -
 a lattice-geometric-consistency gate that cuts the ML detector's no-dot
 false-positive rate from **100% (18/18) to 55.6% (10/18)** at zero
-measured cost to synthetic recall/precision — but this gate is
+measured cost to synthetic recall/precision - but this gate is
 EXPERIMENTAL, not wired into the deployed API, and does not change the
 underlying production decision: **`detector=classical` remains the
 default**, unchanged since Session 16. No box in Section 13's completion
@@ -48,7 +48,7 @@ image
 ```
 
 Verified by direct code reading (`api/detectors.py`, `api/main.py`,
-`experiments/m4_2/ml_lattice_detector.py`) — every link above already
+`experiments/m4_2/ml_lattice_detector.py`) - every link above already
 existed and was already tested before this session; this session did
 not discover any broken link in this chain. What is genuinely
 experimental vs. production is listed precisely in Section 12.
@@ -57,21 +57,21 @@ experimental vs. production is listed precisely in Section 12.
 
 **Verified reproducible by code inspection, not re-run this session**
 (re-running a 30-epoch training was judged out of scope for a
-gating-focused session — the existing checkpoint's provenance is
+gating-focused session - the existing checkpoint's provenance is
 already fully recorded and was not in question):
 
 - Command: `python experiments/m4_2/generate_training_data.py` (data
   generation) then `python experiments/m4_2/train.py` (training).
 - Seed: `torch.manual_seed(42)`, set at the top of `train.py::main()`
-  (verified by direct reading — `SEED = 42` module constant).
+  (verified by direct reading - `SEED = 42` module constant).
 - Config: 30 epochs, Adam, lr=1e-3, batch_size=8 (verified: matches
   `train.py`'s `main()` defaults AND the recorded
   `experiments/m4_2/results/training_log.json`'s own `n_epochs`/`lr`/
-  `batch_size`/`seed` fields exactly — the checkpoint's OWN training log
+  `batch_size`/`seed` fields exactly - the checkpoint's OWN training log
   confirms the command that produced it, not just the current source).
 - Preprocessing discipline: trains on `image_io.preprocess(path).binary`
   (the SAME Otsu-binarized, deskewed mask the frozen contract hands the
-  detector at inference), not the raw photo — verified in
+  detector at inference), not the raw photo - verified in
   `DotHeatmapDatasetV2.__init__`.
 - Train/val split: pattern-level disjoint (verified previously,
   Session 16; not re-verified this session since no data/split code
@@ -88,27 +88,27 @@ Cited from `docs/M4_2_MODEL.md`/`docs/M4_2_GENERATION.md` (already
 measured in Session 16, re-confirmed by re-reading this session, not
 re-measured):
 
-- 135 source CSV patterns (kolam19 + kolam29; kolam109 excluded —
+- 135 source CSV patterns (kolam19 + kolam29; kolam109 excluded -
   measured ~6800-7000 dots/pattern, only 2.1% recoverable at 128×128).
 - 505 rendered synthetic images (400 train / 45 val / 60 test).
 - `degrade_v3` augmentation calibrated against the FULL real-photo
   corpus's measured gray statistics (22 photos: mean range
-  [62.5, 154.6], median 121.4; std range [21.6, 63.4], median 45.9) —
+  [62.5, 154.6], median 121.4; std range [21.6, 63.4], median 45.9) -
   generated median gray-mean 124.6, a close match on this ONE summary
   statistic.
 - **Domain gap, quantified precisely, not asserted**: this session's own
   gating experiment (Section 10) measured the ML detector's raw
   (ungated) confidence on real no-dot photos reaching as high as **0.93
-  and 0.98** (see the two probe examples below) — well above the 0.6
-  production threshold — meaning the model is not merely "slightly
+  and 0.98** (see the two probe examples below) - well above the 0.6
+  production threshold - meaning the model is not merely "slightly
   uncertain" on real photos, it is CONFIDENTLY wrong on texture/lighting
   patterns the synthetic corpus's gray-statistic-matching augmentation
   did not capture. Matching mean/std alone (a 2-number summary) is
-  evidently insufficient to close this gap — a finding already flagged
+  evidently insufficient to close this gap - a finding already flagged
   in `docs/M4_2_EVALUATION.md` and confirmed again here from a different
   angle (raw confidence distribution, not just detection counts).
 - **No ground truth exists for the 22 real photos** (unchanged fact,
-  `docs/M4_EVALUATION_PROTOCOL.md`) — this report never computes
+  `docs/M4_EVALUATION_PROTOCOL.md`) - this report never computes
   precision/recall against them, only raw detection counts and
   no-dot firing rate, consistent with every prior session's discipline.
 
@@ -135,21 +135,21 @@ hurting synthetic recall.
 
 ## 6. Real-photo evaluation (re-confirmed + extended)
 
-Same threshold sweep, real photos (no ground truth — raw firing rate
+Same threshold sweep, real photos (no ground truth - raw firing rate
 only):
 
 | threshold | no-dot FP rate (18 photos) |
 |---|---:|
-| 0.6 (production) | 100.0% (18/18) — unchanged from Session 16 |
+| 0.6 (production) | 100.0% (18/18) - unchanged from Session 16 |
 | 0.7 | 100.0% (18/18) |
 | 0.8 | 100.0% (18/18) |
 | 0.9 | 100.0% (18/18) |
 | 0.95 | 88.9% (16/18) |
-| 0.99 | 0.0% (0/18) — but synthetic recall is 0.97% here, useless |
+| 0.99 | 0.0% (0/18) - but synthetic recall is 0.97% here, useless |
 
 **Confirms and sharpens Session 16's finding**: raising confidence
 threshold alone cannot solve the false-positive problem at any USABLE
-operating point — the only threshold that eliminates false positives
+operating point - the only threshold that eliminates false positives
 (0.99) also eliminates virtually all true positives on synthetic data.
 This is not a new problem; it is now measured across a wider,
 more conclusive range than before.
@@ -157,21 +157,21 @@ more conclusive range than before.
 ## 7. Domain-gap analysis
 
 The domain gap is NOT primarily a confidence-calibration problem (the
-model isn't just "a little too confident everywhere" — it is highly
+model isn't just "a little too confident everywhere" - it is highly
 confident, up to 0.93-0.98, on SPECIFIC no-dot photos while correctly
 near-certain on synthetic data). This is consistent with Session 16's
 conclusion (real-photo transfer needs real-photo-derived training data
 or augmentation statistics, not just gray-mean/std matching) and is
-NOT resolved by this session's gating work — the gate is a
+NOT resolved by this session's gating work - the gate is a
 POST-HOC geometric filter, not a fix to the underlying representation
 gap. It measurably helps (Section 10) but does not close the gap.
 
 ## 8. Augmentation experiments
 
-**NOT ATTEMPTED this session** — explicitly out of scope per the
+**NOT ATTEMPTED this session** - explicitly out of scope per the
 gating-only focus confirmed with the user before starting (Phase 4
 requires new training runs, each a multi-hour+ commitment with its own
-ablation design). This remains a real, open avenue — see Section 18.
+ablation design). This remains a real, open avenue - see Section 18.
 
 ## 9. Hybrid detector experiment
 
@@ -179,7 +179,7 @@ ablation design). This remains a real, open avenue — see Section 18.
 lattice-consistency gate (Section 10) is a PARTIAL, narrow instance of
 "classical confirmation" (it reuses `engine.image_io._fit_lattice_coords`,
 the same geometric-fitting code the classical detector itself uses, as
-a post-hoc plausibility check on ML output) — this is real overlap with
+a post-hoc plausibility check on ML output) - this is real overlap with
 Phase 5's spirit, but it is not the full "classical proposes / ML
 confirms" or "ML proposes / classical verifies" architecture the phase
 specified. Documented here as partial coverage, not claimed as a
@@ -187,10 +187,10 @@ complete hybrid-detector investigation.
 
 ## 10. Gating experiment (this session's real, new work)
 
-**Hypothesis**: a geometric-plausibility check — does the raw ML
+**Hypothesis**: a geometric-plausibility check - does the raw ML
 detection set fit a regular affine lattice, using the exact same
 `_fit_lattice_coords` function the classical detector already relies on
-— can distinguish real dot-grid detections from texture/noise false
+- can distinguish real dot-grid detections from texture/noise false
 positives, since a genuine lattice should fit tightly (low residual)
 and scattered spurious peaks should not.
 
@@ -212,7 +212,7 @@ SAME threshold sweep.
 | Synthetic val precision | 0.9995 | 0.9995 (unchanged) |
 | Synthetic val F1 | 0.9993 | 0.9993 (unchanged) |
 
-**A real, measured, zero-synthetic-cost improvement** — the gate never
+**A real, measured, zero-synthetic-cost improvement** - the gate never
 incorrectly rejected a true synthetic detection in this benchmark
 (residual on synthetic images' regular grids is reliably low).
 
@@ -223,11 +223,11 @@ ML detections entirely (`kolam2_tshrinivasan.jpg`,
 all go from `n_detected > 0` to `n_detected = 0`; only
 `muggu_kollam_sirensongs.jpg`, residual 9.14px, survives). Their
 residuals (9.1, 12.8, 17.2, 19.8px) OVERLAP with several no-dot photos'
-residuals in the same range — geometric consistency correlates with
+residuals in the same range - geometric consistency correlates with
 plausibility but does not cleanly separate the two populations. Given
 that ML's real in-scope detections were ALREADY known (Session 16) to
 wildly over-detect (58-563 vs. human estimates of 4-150), losing 3 of 4
-is a real but arguably small practical loss — reported honestly, not
+is a real but arguably small practical loss - reported honestly, not
 minimized.
 
 **Residual-threshold sensitivity** (re-filtering the same 22 measured
@@ -243,7 +243,7 @@ residuals, no re-inference needed):
 | 30 | 83.3% (15/18) | 4/4 |
 
 **No threshold achieves both "keep all real positives" and "eliminate
-most false positives"** — 10px was selected as the value that maximizes
+most false positives"** - 10px was selected as the value that maximizes
 FP reduction while the SYNTHETIC cost (the metric with actual ground
 truth) stays exactly zero; it is not the value that best preserves the
 already-unreliable in-scope detections. This tradeoff is stated
@@ -254,7 +254,7 @@ best combined FP reduction without collapsing synthetic recall is
 threshold=0.8 + gate: FP rate 38.9% (7/18), synthetic recall 0.9987 (a
 0.03-point cost). Pushing further (0.9+gate: FP 33.3%, recall 0.9153;
 0.95+gate: FP 16.7%, recall 0.523) trades meaningfully more synthetic
-recall for smaller further FP gains — diminishing returns, not pursued
+recall for smaller further FP gains - diminishing returns, not pursued
 further this session.
 
 ## 11. End-to-end structural evaluation
@@ -264,48 +264,48 @@ the FULL existing pipeline (`is_traceable` → `trace_path` → `nx.MultiGraph`)
 on real photos, not just synthetic fixtures:
 
 - `kolam_india09_mckaysavage.jpg` (no-dot, gated): 0 pixel positions, 0
-  graph nodes, 0 edges — no crash, correct empty-collapse.
+  graph nodes, 0 edges - no crash, correct empty-collapse.
 - `muggu_kollam_sirensongs.jpg` (in-scope, passes gate): 151 pixel
-  positions, 151 graph nodes, 1523 edges — no crash, real graph
+  positions, 151 graph nodes, 1523 edges - no crash, real graph
   produced.
-- `kolam_attur1_infofarmer.jpg` (in-scope, rejected by gate): 0/0/0 —
+- `kolam_attur1_infofarmer.jpg` (in-scope, rejected by gate): 0/0/0 -
   no crash, correct empty-collapse (the honest cost from Section 10,
   visible here at the graph level too).
 
 `trace_path` and the Session-17 `is_traceable` gate were **not
-modified** — verified by `git diff` showing zero changes to
+modified** - verified by `git diff` showing zero changes to
 `engine/image_io.py` this session (confirmed below, Section 19-equivalent
 git status).
 
 ## 12. API integration
 
 **Verified unchanged and still passing** (`api/tests/test_api.py`, part
-of the 239 passing tests) — `detector=classical`/`ml`/`compare` all
+of the 239 passing tests) - `detector=classical`/`ml`/`compare` all
 continue to work exactly as documented in `docs/M4_2_API.md`.
 **The gate is NOT wired into `api/main.py` or `api/detectors.py` this
-session** — `detector=ml` via the deployed API still uses the UNGATED
+session** - `detector=ml` via the deployed API still uses the UNGATED
 `LearnedLatticeDetectorV2` exactly as before. This was a deliberate
 scope decision (schema/route changes were judged unnecessary for an
-experiment not yet recommended for production — see Section 15), not an
+experiment not yet recommended for production - see Section 15), not an
 oversight. `GatedLearnedLatticeDetectorV2` exists as a tested,
 contract-conforming, ready-to-integrate module for a future session.
 
 ## 13. Performance
 
 Measured directly this session (`muggu_kollam_sirensongs.jpg`, one real
-photo, single run — indicative, not a statistically rigorous benchmark):
+photo, single run - indicative, not a statistically rigorous benchmark):
 
 | | latency |
 |---|---:|
 | Classical | 157.8ms |
 | ML (ungated) | 241.1ms |
-| ML (gated) | 226.9ms — gate adds negligible overhead (one cheap affine-fit residual computation) |
+| ML (gated) | 226.9ms - gate adds negligible overhead (one cheap affine-fit residual computation) |
 | Model load time | 31.4ms |
 
-Checkpoint file size: 1.56MB (`dot_heatmap_net_v2.pt`) — the ~1.84GB
+Checkpoint file size: 1.56MB (`dot_heatmap_net_v2.pt`) - the ~1.84GB
 container size is dominated by the CPU PyTorch wheel itself, not the
 model. Reducing it would mean removing/replacing torch entirely (e.g. a
-non-PyTorch inference runtime) — a substantial infra change, **not
+non-PyTorch inference runtime) - a substantial infra change, **not
 attempted this session** (explicitly out of the gating-only scope
 confirmed with the user).
 
@@ -314,20 +314,20 @@ confirmed with the user).
 Not re-run this session (Docker build/API smoke tests were already
 verified working in Session 16's PROJECT_STATE.md record; nothing in
 this session's changes touches `Dockerfile`, `api/main.py`, or
-`requirements*.txt`'s ML dependencies). `python -m pytest -q` — the
-closest available smoke test — passes at 239/239 including all existing
+`requirements*.txt`'s ML dependencies). `python -m pytest -q` - the
+closest available smoke test - passes at 239/239 including all existing
 `api/tests/test_api.py` cases.
 
 ## 15. Production decision
 
 **Unchanged: `detector=classical` remains default.** This session's
 evidence does not change Session 16's pre-committed decision rule
-outcome — the gate is a measured, promising, EXPERIMENTAL mitigation,
+outcome - the gate is a measured, promising, EXPERIMENTAL mitigation,
 not a production-ready replacement for the whole no-dot-FP problem
 (55.6% residual FP rate is still far worse than classical's own 33.3%
 no-dot FP rate, cited in `docs/M4_2_EVALUATION.md`). Classical remaining
 default is the correct, evidence-based conclusion here, not a failure
-to find something that worked — the gate genuinely helps and is
+to find something that worked - the gate genuinely helps and is
 recommended as a concrete next integration step (Section 18), not
 discarded.
 
@@ -336,10 +336,10 @@ discarded.
 | Classical | 0.1998† | 0.1998† | 33.3% | 157.8ms | **DEFAULT** |
 | ML (ungated, t=0.6) | 0.9990 | 0.9993 | 100.0% | 241.1ms | Experimental (`detector=ml`) |
 | ML (gated, t=0.6, residual≤10px) | 0.9990 | 0.9993 | **55.6%** | 226.9ms | Experimental, NOT deployed |
-| Hybrid (full, separate architecture) | — | — | — | — | Not attempted |
+| Hybrid (full, separate architecture) | - | - | - | - | Not attempted |
 
 †Classical's synthetic recall/F1 on M4.2's harsher `degrade_v3` test set
-is confounded (see `docs/M4_2_EVALUATION.md`) — its real, uncontaminated
+is confounded (see `docs/M4_2_EVALUATION.md`) - its real, uncontaminated
 performance on gentler synthetic degradation is 1.0/0.9997, unchanged
 since Session 11. Cited here exactly as Session 16 reported it, not
 altered.
@@ -348,11 +348,11 @@ altered.
 
 - Gate does not close the domain gap, only filters a subset of its
   symptoms (Section 10's residual-overlap finding).
-- Gate reduces real in-scope "usefulness" alongside false positives —
+- Gate reduces real in-scope "usefulness" alongside false positives -
   net benefit depends on which failure mode matters more to a given use
   case; not a clean win.
 - Augmentation and full hybrid-architecture experiments (Phases 4, 5)
-  not attempted — genuinely open.
+  not attempted - genuinely open.
 - Performance/container-size work (Phase 9) not attempted.
 - Single-photo latency measurement (Section 13) is indicative, not a
   rigorous multi-run benchmark.
@@ -378,13 +378,13 @@ Per Phase 13's checklist:
 - [x] ML inference is deterministic (existing + new gated-detector
       tests both verify this directly).
 - [x] Failure modes are graceful (no crash on malformed input, no-dot
-      image, or gate rejection — all collapse to the existing safe
+      image, or gate rejection - all collapse to the existing safe
       empty convention).
 - [x] End-to-end image → structural representation works (Section 11).
 - [x] Production/default detector decision is evidence-based (Section 15).
 - [x] Canonical checkpoint is identified (Section "Checkpoint policy" below).
 - [x] Tests pass (239/239).
-- [ ] **Deployment smoke tests pass** — NOT re-run this session (Docker/API
+- [ ] **Deployment smoke tests pass** - NOT re-run this session (Docker/API
       live smoke test), only inferred from passing unit/integration tests.
 - [x] No unresolved ML crash exists in the supported path.
 
@@ -423,7 +423,7 @@ honestly unresolved.
 ## 18. Next step
 
 **Not M5** (per this task's explicit instruction and the still-standing
-answer from `docs/M4_2_PARITY_EVALUATION.md`'s M5 gate — an unrelated
+answer from `docs/M4_2_PARITY_EVALUATION.md`'s M5 gate - an unrelated
 milestone, not affected by this session).
 
 **Exactly one highest-value ML blocker**: **wire the gate into
@@ -431,7 +431,7 @@ milestone, not affected by this session).
 `detector=ml-gated` or a query parameter), run it through
 `evaluate_m4_2.py`'s full decision-rule framework (not just this
 session's threshold/FP-rate slice) to see whether it changes the
-pre-committed decision outcome, and — separately — investigate WHY the
+pre-committed decision outcome, and - separately - investigate WHY the
 in-scope/no-dot residual distributions overlap** (Section 10) as a
 follow-up domain-gap diagnostic, since a cleaner-separating signal
 (rather than a bigger residual-threshold search) is what would let the

@@ -5,7 +5,7 @@ export default function Project() {
   return (
     <main id="main-content" className="project-page">
       <header className="project-header section section--bordered">
-        <div className="container">
+        <div className="container--narrow">
           <p className="eyebrow eyebrow--accent">Project Background &amp; Scope</p>
           <h1 className="heading-display heading-2 project-title">
             Project Overview: PULLI
@@ -17,7 +17,7 @@ export default function Project() {
       </header>
 
       {/* Problem Statement */}
-      <section className="container section section--bordered">
+      <section className="container--narrow section section--bordered">
         <div className="project-section-grid">
           <div className="grid-col-left">
             <h2 className="eyebrow">BACKGROUND</h2>
@@ -35,7 +35,7 @@ export default function Project() {
       </section>
 
       {/* Three Pillars */}
-      <section className="container section section--bordered">
+      <section className="container--narrow section section--bordered">
         <h2 className="eyebrow eyebrow--accent" style={{ marginBottom: '2rem' }}>THREE CORE PILLARS</h2>
         <div className="pillars-detail-grid">
           <div className="pillar-detail-card archival-frame">
@@ -65,7 +65,7 @@ export default function Project() {
       </section>
 
       {/* Call to action */}
-      <section className="container section">
+      <section className="container--narrow section">
         <div className="project-cta-card archival-frame">
           <div>
             <h3 className="heading-display heading-3">Explore the Technology &amp; Pipeline</h3>

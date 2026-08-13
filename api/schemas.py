@@ -7,13 +7,16 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel
 
-DetectorName = Literal["classical", "ml"]
+DetectorName = Literal["classical", "ml", "ml-gated"]
 
 
 class HealthResponse(BaseModel):
     status: str
     classical_detector_available: bool
     ml_detector_available: bool
+    # ml-gated wraps the SAME checkpoint as ml (see api/detectors.py's
+    # GatedMLDetector) -- availability tracks the same checkpoint file.
+    gated_detector_available: bool = False
 
 
 class ModelInfoResponse(BaseModel):
@@ -23,6 +26,10 @@ class ModelInfoResponse(BaseModel):
     ml_model_input_size: Optional[int]
     ml_heatmap_size: Optional[int]
     classical_detector: str
+    # experimental lattice-consistency-gated variant (see
+    # docs/M4_1_ML_COMPLETION_REPORT.md Section 10) -- same checkpoint,
+    # different post-detection filtering; distinct MODEL_VERSION string.
+    gated_model_version: Optional[str] = None
     # Additive fields (Phase 9): richer, honest model metadata. No
     # accuracy/quality claim is included here -- see docs/M4_1_ML_INVESTIGATION.md
     # and docs/M4_2_EVALUATION.md for the actual (documented, not

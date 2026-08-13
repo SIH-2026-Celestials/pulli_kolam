@@ -16,7 +16,7 @@ export default function Analyze() {
   return (
     <main id="main-content" className="analyze-page">
       <header className="analyze-header section section--bordered">
-        <div className="container">
+        <div className="container--narrow">
           <p className="eyebrow eyebrow--accent">{t('pages.analyze.eyebrow')}</p>
           <h1 className="heading-display heading-hero analyze-title">
             {t('pages.analyze.titlePrefix', { id: currentKolam.id })}
@@ -44,7 +44,7 @@ export default function Analyze() {
       </header>
 
       {/* Linear Scientific Breakdown: TRACE -> GRAPH -> MOTIF -> VALIDITY -> GENERATION */}
-      <section className="container section analyze-pipeline-section">
+      <section className="container--narrow section analyze-pipeline-section">
         <div className="pipeline-walkthrough">
           {/* STEP 1: TRACE */}
           <article className="step-block archival-frame">

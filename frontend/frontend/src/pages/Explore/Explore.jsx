@@ -32,7 +32,7 @@ export default function Explore() {
   return (
     <main id="main-content" className="explore-page">
       <header className="explore-header section">
-        <div className="container">
+        <div className="container--narrow">
           <p className="eyebrow">{t('pages.gallery.eyebrow')}</p>
           <h1 className="heading-display heading-2 explore-title">
             {t('pages.gallery.title')}
@@ -78,7 +78,7 @@ export default function Explore() {
       </header>
 
       {/* Grid gallery */}
-      <section className="explore-gallery-section container">
+      <section className="explore-gallery-section container--narrow">
         {filteredKolams.length === 0 ? (
           <div className="explore-empty">
             <p className="heading-display heading-4">{t('pages.gallery.noMatch')}</p>

@@ -9,7 +9,7 @@ export default function KolamDetail() {
 
   if (!kolam) {
     return (
-      <main id="main-content" className="container section">
+      <main id="main-content" className="container--narrow section">
         <div className="detail-not-found">
           <h1 className="heading-display heading-3">Kolam #{id} not found</h1>
           <p className="body-text">The requested pattern ID does not exist in the current dataset (kolam19).</p>
@@ -26,9 +26,8 @@ export default function KolamDetail() {
 
   return (
     <main id="main-content" className="kolam-detail-page">
-      {/* Detail header / breadcrumb */}
       <div className="detail-bar">
-        <div className="container detail-bar__inner">
+        <div className="container--narrow detail-bar__inner">
           <nav className="detail-breadcrumb label-tech" aria-label="Breadcrumb">
             <Link to="/explore" className="detail-breadcrumb__link">Explore</Link>
             <span className="detail-breadcrumb__sep">/</span>
@@ -57,7 +56,7 @@ export default function KolamDetail() {
       </div>
 
       {/* Main split research view */}
-      <section className="container detail-content section">
+      <section className="container--narrow detail-content section">
         <div className="detail-grid">
           {/* Left: Large Kolam image viewer */}
           <div className="detail-visual-panel">
@@ -102,7 +101,7 @@ export default function KolamDetail() {
                     <span className="detail-val">{kolam.width} × {kolam.height}</span>
                   </div>
                   <div className="detail-row">
-                    <span className="detail-key">Start–End distance</span>
+                    <span className="detail-key">Start-End distance</span>
                     <span className="detail-val">{kolam.startEndDistance.toFixed(1)} (Closed)</span>
                   </div>
                 </div>

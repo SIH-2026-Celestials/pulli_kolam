@@ -1,4 +1,4 @@
-# PULLI Major Milestone Report — M4.1 / M4.2 / M5
+# PULLI Major Milestone Report - M4.1 / M4.2 / M5
 
 **Written honestly, per this campaign's own explicit rule: a milestone
 is not complete because code exists for it.** This report synthesizes
@@ -12,16 +12,16 @@ before starting) rather than shallowly touching all three.
 - Real-photo baseline (`validate_real_photos.py`, 22 photos): 13
   `NO_DOT_DETECTION`, 3 `INSUFFICIENT_LATTICE_POINTS`, 6 `SUCCESS`, 0
   crashes (the previously-documented `trace_path` `IndexError` on
-  `kolam_india12_mckaysavage.jpg` was already gated in Session 17 — see
+  `kolam_india12_mckaysavage.jpg` was already gated in Session 17 - see
   `PROJECT_STATE.md` Session 17).
 - M4.1 (ML investigation): already complete as of Session 16, with a
-  documented mixed result (`docs/M4_2_EVALUATION.md`) — classical
+  documented mixed result (`docs/M4_2_EVALUATION.md`) - classical
   detector remains production default.
 - Generation: M3.7's `engine.novel_generation` existed (`generate_novel_kolam`,
   `select_novel_placements`) with a known, documented limitation (0/5
   valid candidates at the time, no connectivity-seeking strategy).
 
-## 2. M4.1 — ML investigation
+## 2. M4.1 - ML investigation
 
 **Not re-run.** Confirmed with the user before starting: re-running
 M4.1-A through M4.1-F would either duplicate sessions 13-16's already-
@@ -57,9 +57,9 @@ for production dot detection. The 128×128 ML detector
 (`experiments/m4_2/model.py`) remains available behind `detector=ml`/
 `detector=compare` in `api/` for continued experimentation.
 
-## 5. M4.2 — generation results (this session's real, new work)
+## 5. M4.2 - generation results (this session's real, new work)
 
-**Status: PARTIAL** — infrastructure complete and tested; the
+**Status: PARTIAL** - infrastructure complete and tested; the
 generator's own output validity does not yet pass the gate.
 
 - `engine/generation_api.py`, `engine/novelty.py`, `engine/render.py`
@@ -67,7 +67,7 @@ generator's own output validity does not yet pass the gate.
 - Benchmark (`experiments/m4_2_generation/run_benchmark.py`): 120 real
   candidates, deterministic config, full results in
   `experiments/m4_2_generation/results/benchmark.json`.
-- **Validity: 0/120 (0.0%).** A real, measured negative result — not
+- **Validity: 0/120 (0.0%).** A real, measured negative result - not
   new (M3.7 already found 0/5), now confirmed at a much larger,
   systematically-varied sample. Root cause unchanged from M3.7:
   `select_novel_placements` has no global connectivity objective.
@@ -86,11 +86,11 @@ From the same 120-candidate benchmark (`engine.novelty.novelty_report`):
 | Exact coordinate duplicate (60 layout-comparable pairs) | 0/60 (0.0%) |
 | Near-duplicate (similarity ≥ 0.9) | 0/60 (0.0%) |
 
-**This generator does not produce copies of its source patterns** — a
+**This generator does not produce copies of its source patterns** - a
 genuinely positive, measured finding, reported alongside the validity
 negative rather than in place of it.
 
-## 7. M5 — structural grammar results
+## 7. M5 - structural grammar results
 
 **Status: NOT STARTED**, by deliberate scope decision (confirmed with
 the user). `docs/M5_STRUCTURAL_GRAMMAR.md` documents what already exists
@@ -106,7 +106,7 @@ generator, or search mechanism exists.
 |---|---|---|
 | M4.2 generation benchmark, this session | 0 | 120 |
 | M3.7 novel generation, session history | 0 | 5 |
-| Reconstruction (`engine.reconstruction.reconstruct_kolam`) | always valid by construction (residual fallback) | n/a — different question, see `docs/RECONSTRUCTION.md` |
+| Reconstruction (`engine.reconstruction.reconstruct_kolam`) | always valid by construction (residual fallback) | n/a - different question, see `docs/RECONSTRUCTION.md` |
 
 The distinction matters: reconstruction always succeeds because it can
 fall back to copying real source residual edges; novel generation
@@ -117,14 +117,14 @@ complete valid structure needs.
 ## 9. Performance
 
 - Generation benchmark: 120 candidates in 30.2s (mean 0.25s/candidate)
-  — fast enough that connectivity-aware search (a likely next step,
+  - fast enough that connectivity-aware search (a likely next step,
   see Section 12) has real time budget to explore multiple candidates
   per request.
 - Rendering: SVG generation is pure string formatting (sub-millisecond);
   PNG generation via PIL, no measured bottleneck at this session's
   pattern sizes (up to 500 dots).
 - No profiling of large photographs / 24k+ trace points / `kolam109`-scale
-  patterns was done this session — nothing in this session's new code
+  patterns was done this session - nothing in this session's new code
   touches that path (see Section 5 of `PROJECT_STATE.md`'s Session 18
   entry, "What was explicitly NOT done").
 
@@ -139,18 +139,18 @@ complete valid structure needs.
 
 ## 11. Known limitations
 
-- **Generation validity (M4.2)**: 0/120 in this session's benchmark —
+- **Generation validity (M4.2)**: 0/120 in this session's benchmark -
   the single most important open item, see Section 12.
-- **M5 not started** — see `docs/M5_STRUCTURAL_GRAMMAR.md`.
+- **M5 not started** - see `docs/M5_STRUCTURAL_GRAMMAR.md`.
 - **Real-photo ML domain gap (M4.1, unchanged from Session 16)**: no-dot
   false-positive rate still 100% for the ML detector; classical remains
   default.
 - **`degrade_v3` classical-recall-collapse confound (M4.1, unchanged)**:
   still unresolved, flagged in `docs/M4_2_EVALUATION.md`.
 - **`GenerationConstraints`'s `symmetry`/`complexity`/`stroke_count`
-  fields are not real constraints** — no search loop exists yet to
+  fields are not real constraints** - no search loop exists yet to
   satisfy them; this is explicitly M5-E's job, not started.
-- **No frontend/API surface for the new M4.2 generation code** — by
+- **No frontend/API surface for the new M4.2 generation code** - by
   deliberate scope decision (the task's own instruction against
   spending the majority of effort on frontend polish).
 
@@ -167,7 +167,7 @@ of whether the result ends up as one connected component; a next
 session should investigate either (a) a connectivity-aware scoring term
 (e.g. reward placements that bridge currently-separate components), or
 (b) a post-placement bridging pass that adds minimal extra structure to
-merge components before the Eulerian check — the second option risks
+merge components before the Eulerian check - the second option risks
 looking like "repairing an invalid graph," so it would need to be
 implemented as a distinct, clearly-labeled step (e.g. a
 `generate_kolam_candidate(..., allow_bridging=True)` opt-in that reports

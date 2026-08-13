@@ -17,7 +17,7 @@ export default function HowItWorks() {
   return (
     <main id="main-content" className="how-it-works-page">
       <header className="how-header section section--bordered">
-        <div className="container">
+        <div className="container--narrow">
           <p className="eyebrow eyebrow--accent">{t('pages.howItWorks.eyebrow')}</p>
           <h1 className="heading-display heading-2 how-title">
             {t('pages.howItWorks.title')}
@@ -29,12 +29,12 @@ export default function HowItWorks() {
       </header>
 
       {/* Visual Pipeline Grid */}
-      <section className="container section section--bordered">
+      <section className="container--narrow section section--bordered">
         <div className="pipeline-grid">
           {steps.map((step) => (
             <div key={step.num} className={`pipeline-card archival-frame ${step.isFuture ? 'pipeline-card--future' : ''}`}>
               <div className="card-top">
-                <span className="step-tag label-tech">{step.num} — {step.subtitle}</span>
+                <span className="step-tag label-tech">{step.num} - {step.subtitle}</span>
                 {step.isFuture && <span className="future-tag label-tech">{t('pages.howItWorks.inProgress')}</span>}
               </div>
               <h2 className="heading-display heading-4 step-heading">{step.title}</h2>
@@ -45,7 +45,7 @@ export default function HowItWorks() {
       </section>
 
       {/* Deep-Dive Technical Detail */}
-      <section className="container section">
+      <section className="container--narrow section">
         <div className="tech-explain-grid">
           <div>
             <p className="eyebrow">{t('pages.howItWorks.graphRepresentation')}</p>

@@ -27,6 +27,7 @@ def test_health():
     body = r.json()
     assert body["status"] == "ok"
     assert body["classical_detector_available"] is True
+    assert "gated_detector_available" in body
 
 
 def test_model_info():
@@ -35,6 +36,7 @@ def test_model_info():
     body = r.json()
     assert "classical_detector" in body
     assert "ml_checkpoint_exists" in body
+    assert "gated_model_version" in body
 
 
 def test_detect_classical_default():
@@ -57,6 +59,16 @@ def test_detect_explicit_detector_selection():
         r = client.post("/api/v1/detect", files={"image": ("k.jpg", f, "image/jpeg")}, data={"detector": "classical"})
     assert r.status_code == 200
     assert r.json()["detector"] == "classical"
+
+
+def test_detect_ml_gated():
+    """Verify /detect accepts detector=ml-gated and propagates it correctly."""
+    with open(SYNTH_IMAGE, "rb") as f:
+        r = client.post("/api/v1/detect", files={"image": ("k.jpg", f, "image/jpeg")}, data={"detector": "ml-gated"})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["success"] is True
+    assert body["detector"] == "ml-gated"
 
 
 def test_detect_invalid_detector_name():
@@ -154,6 +166,16 @@ def test_analyze_returns_graph_motifs_validity():
     json.dumps(body)  # raises if anything non-serializable slipped through
 
 
+def test_analyze_ml_gated():
+    """Verify /analyze supports detector=ml-gated through the full pipeline."""
+    with open(SYNTH_IMAGE, "rb") as f:
+        r = client.post("/api/v1/analyze", files={"image": ("k.jpg", f, "image/jpeg")}, data={"detector": "ml-gated"})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["success"] is True
+    assert body["detector"] == "ml-gated"
+
+
 def test_reconstruct_returns_structured_result():
     with open(SYNTH_IMAGE, "rb") as f:
         r = client.post("/api/v1/reconstruct", files={"image": ("k.jpg", f, "image/jpeg")})
@@ -163,6 +185,16 @@ def test_reconstruct_returns_structured_result():
     assert "reconstruction" in body
     import json
     json.dumps(body)
+
+
+def test_reconstruct_ml_gated():
+    """Verify /reconstruct supports detector=ml-gated."""
+    with open(SYNTH_IMAGE, "rb") as f:
+        r = client.post("/api/v1/reconstruct", files={"image": ("k.jpg", f, "image/jpeg")}, data={"detector": "ml-gated"})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["success"] is True
+    assert body["detector"] == "ml-gated"
 
 
 def test_compare_detectors_reports_both_sides():
@@ -338,3 +370,31 @@ def test_compare_mode_runs_both_detectors_independently_not_merged():
     assert body["ml"]["count"] > 0
     assert body["agreement"]["classical_count"] == 0
     assert body["agreement"]["ml_count"] == body["ml"]["count"]
+
+
+def test_no_silent_fallback_on_ml_gated_failure(monkeypatch):
+    """CRITICAL RULE: When detector=ml-gated fails (missing checkpoint/inference error),
+    the API MUST return HTTP 503 and NEVER silently fall back to classical."""
+    from api.detectors import _ML_GATED, _CLASSICAL
+
+    classical_called = False
+    original_detect = _CLASSICAL.detect
+
+    def mock_classical_detect(*args, **kwargs):
+        nonlocal classical_called
+        classical_called = True
+        return original_detect(*args, **kwargs)
+
+    def mock_gated_detect(*args, **kwargs):
+        raise RuntimeError("ML model checkpoint missing")
+
+    monkeypatch.setattr(_CLASSICAL, "detect", mock_classical_detect)
+    monkeypatch.setattr(_ML_GATED, "detect", mock_gated_detect)
+
+    with open(SYNTH_IMAGE, "rb") as f:
+        r = client.post("/api/v1/detect", files={"image": ("k.jpg", f, "image/jpeg")}, data={"detector": "ml-gated"})
+
+    assert r.status_code == 503
+    assert r.json()["success"] is False
+    assert "ML model checkpoint missing" in r.json()["error"]
+    assert classical_called is False, "CRITICAL ERROR: API silently fell back to classical!"
