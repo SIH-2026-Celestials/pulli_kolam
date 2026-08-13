@@ -1,6 +1,15 @@
 # PULLI — Project State (handoff document)
 **Read this first in any new session, before touching code.**
-Last updated: end of session 11 — M4 Readiness Report complete. Decision: **M4 READY WITH CONDITIONS.**
+Last updated: Session 12 — Backend MVP & API Integration completed. Decision: **BACKEND MVP COMPLETE (121/121 TESTS PASSING).**
+
+## Session 12 — Backend MVP & Full API Integration (Summary)
+- **FastAPI Backend Built**: Created `backend/` package containing REST API endpoints (`/api/analyze`, `/api/generate`, `/api/gallery`, `/api/health`), Pydantic schemas, and image helper services.
+- **Engine Bridge**: `backend/services/analysis_service.py` connects image input (file upload or URL) directly to `engine.image_io.build_graph()`, `engine.symmetry.analyze_symmetry()`, `engine.motifs.induce_motif_set_adaptive()`, and `engine.validity.check_validity()`.
+- **Degenerate / Line-Only Image Safety**: Low-contrast or non-dot images (< 3 dots detected) are safely handled with a graceful structured response (`status: "no_dots_detected"`), preventing matrix inversion crashes.
+- **Generative API Stub**: `/api/generate` accepts analyzed kolam specifications and returns 10–15 Eulerian single-stroke Kolam variations (currently leveraging the synthetic photos corpus with rule summaries until the M4 ML generator model is linked).
+- **Frontend Integration**: Wired `frontend/frontend/src/pages/Analyze/Analyze.jsx` and `Analyze.css` with a file/URL upload form, live process walkthrough, 12 generated variation cards, and related idea recommendations via `src/services/api.js`.
+- **Test Suite**: 121/121 tests passing (117 deterministic engine tests + 4 new FastAPI backend API integration tests).
+
 
 Work from sessions 4-11 lives on branch `feature/generation-pipeline`
 (pushed to origin, not yet merged to `master`) —

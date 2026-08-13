@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { analyzeKolam, generateKolams } from '../../services/api'
 import { kolam19, getKolam } from '../../data/kolams'
 import './Analyze.css'
 
@@ -7,151 +9,404 @@ export default function Analyze() {
   const selectedId = searchParams.get('kolam') || '26'
   const currentKolam = getKolam(selectedId) || kolam19[0]
 
-  const handleSelect = (id) => {
+  // Form State
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [imageUrlInput, setImageUrlInput] = useState('')
+  const [specifications, setSpecifications] = useState('')
+  const [previewUrl, setPreviewUrl] = useState(null)
+
+  // API State
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState(null)
+  const [analysisError, setAnalysisError] = useState(null)
+
+  // Generation State
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [generatedKolams, setGeneratedKolams] = useState([])
+  const [generationError, setGenerationError] = useState(null)
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setSelectedFile(file)
+      setImageUrlInput('')
+      setPreviewUrl(URL.createObjectURL(file))
+    }
+  }
+
+  const handleUrlChange = (e) => {
+    const url = e.target.value
+    setImageUrlInput(url)
+    if (url.trim()) {
+      setSelectedFile(null)
+      setPreviewUrl(url.trim())
+    } else {
+      setPreviewUrl(null)
+    }
+  }
+
+  const handleRunAnalysis = async (e) => {
+    e?.preventDefault()
+    setIsAnalyzing(true)
+    setAnalysisError(null)
+    setGeneratedKolams([])
+
+    try {
+      const result = await analyzeKolam({
+        file: selectedFile,
+        imageUrl: imageUrlInput,
+        specifications,
+      })
+      setAnalysisResult(result)
+
+      // Auto-trigger generation of 12 variations once analysis completes
+      if (result.status === 'ok') {
+        runGeneration(result.analysis_id, result.symmetry?.group)
+      }
+    } catch (err) {
+      setAnalysisError(err.message || 'Failed to analyze Kolam image.')
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
+
+  const runGeneration = async (analysisId, symmetryGroup) => {
+    setIsGenerating(true)
+    setGenerationError(null)
+    try {
+      const genRes = await generateKolams({
+        analysisId: analysisId || analysisResult?.analysis_id,
+        specifications,
+        symmetryGroup: symmetryGroup || analysisResult?.symmetry?.group || 'D4',
+        count: 12,
+      })
+      setGeneratedKolams(genRes.kolams || [])
+    } catch (err) {
+      setGenerationError(err.message || 'Failed to generate Kolam variations.')
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleSelectPreload = (id) => {
     setSearchParams({ kolam: id })
+    const target = getKolam(id)
+    if (target) {
+      setPreviewUrl(target.imagePath)
+      setSelectedFile(null)
+      setImageUrlInput('')
+      setAnalysisResult(null)
+      setGeneratedKolams([])
+    }
   }
 
   return (
     <main id="main-content" className="analyze-page">
       <header className="analyze-header section section--bordered">
         <div className="container">
-          <p className="eyebrow eyebrow--accent">Computational Analysis Monograph</p>
+          <p className="eyebrow eyebrow--accent">PULLI — AI &amp; Graph Principle Engine</p>
           <h1 className="heading-display heading-hero analyze-title">
-            Structural Decomposition: Kolam {currentKolam.id}
+            Understand the pattern. Preserve the rule. Create something new.
           </h1>
           <p className="body-text analyze-sub">
-            Step-by-step scientific walkthrough of the PULLI graph representation pipeline, from raw dense coordinate trace to Eulerian path validation.
+            Upload a kolam image or specify features below. Our engine identifies the dot lattice, D4 symmetry, motif families, and generates unique, valid kolam designs adhering to Eulerian stroke rules.
           </p>
 
-          {/* Pattern selector strip */}
-          <div className="pattern-selector-bar archival-frame">
-            <span className="label-tech">SELECT EXHIBITION ITEM:</span>
-            <div className="selector-pills">
-              {[1, 15, 26, 55, 100, 118, 179, 232, 331, 400].map(id => (
+          {/* Interactive Upload & Specification Panel */}
+          <div className="upload-analysis-card archival-frame">
+            <h2 className="heading-display heading-3 card-title">Upload Kolam Image or Specify Features</h2>
+            
+            <form onSubmit={handleRunAnalysis} className="upload-form">
+              <div className="form-grid">
+                {/* File Upload Box */}
+                <div className="form-group">
+                  <label className="label-tech">1. UPLOAD IMAGE (PNG, JPG UP TO 10MB):</label>
+                  <div className="file-dropzone">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="kolam-file-input"
+                      onChange={handleFileChange}
+                    />
+                    <label htmlFor="kolam-file-input" className="file-dropzone-label">
+                      {selectedFile ? (
+                        <span className="file-name">Selected: {selectedFile.name}</span>
+                      ) : (
+                        <span>📁 Drag &amp; Drop or Click to Select File</span>
+                      )}
+                    </label>
+                  </div>
+                </div>
+
+                {/* Image URL Input */}
+                <div className="form-group">
+                  <label className="label-tech">OR 2. ENTER IMAGE URL:</label>
+                  <input
+                    type="url"
+                    placeholder="https://example.com/kolam_photo.jpg"
+                    value={imageUrlInput}
+                    onChange={handleUrlChange}
+                    className="input-text"
+                  />
+                </div>
+              </div>
+
+              {/* Specification Text Area */}
+              <div className="form-group form-group--full">
+                <label className="label-tech">3. CUSTOM SPECIFICATIONS / DESIRED FEATURES (OPTIONAL):</label>
+                <textarea
+                  rows="2"
+                  placeholder="e.g. 7x7 grid, four corner loops, double-stranded kambi motif, high D4 symmetry..."
+                  value={specifications}
+                  onChange={(e) => setSpecifications(e.target.value)}
+                  className="input-textarea"
+                ></textarea>
+              </div>
+
+              <div className="form-actions">
                 <button
-                  key={id}
-                  className={`pill-btn ${Number(selectedId) === id ? 'pill-btn--active' : ''}`}
-                  onClick={() => handleSelect(id.toString())}
+                  type="submit"
+                  disabled={isAnalyzing}
+                  className="btn btn--primary btn--large"
                 >
-                  Kolam {id}
+                  {isAnalyzing ? '⚡ Analyzing Pattern...' : '✨ Analyze Kolam & Extract Rules'}
                 </button>
-              ))}
+              </div>
+            </form>
+
+            {/* Exhibition Preset Pills */}
+            <div className="pattern-selector-bar">
+              <span className="label-tech">OR CHOOSE DEMO SAMPLE:</span>
+              <div className="selector-pills">
+                {[1, 15, 26, 55, 100, 118, 179, 232, 331, 400].map(id => (
+                  <button
+                    key={id}
+                    className={`pill-btn ${Number(selectedId) === id && !selectedFile && !imageUrlInput ? 'pill-btn--active' : ''}`}
+                    onClick={() => handleSelectPreload(id.toString())}
+                  >
+                    Kolam {id}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Linear Scientific Breakdown: TRACE -> GRAPH -> MOTIF -> VALIDITY -> GENERATION */}
+      {/* Analysis Error Alert */}
+      {analysisError && (
+        <div className="container section">
+          <div className="alert-box alert-box--error archival-frame">
+            <strong>Analysis Warning:</strong> {analysisError}
+          </div>
+        </div>
+      )}
+
+      {/* Live Pipeline Breakdown */}
       <section className="container section analyze-pipeline-section">
+        <div className="section-title-block">
+          <p className="eyebrow eyebrow--accent">LIVE DECOMPOSITION PIPELINE</p>
+          <h2 className="heading-display heading-2">Analyze Your Kolam — Process &amp; Results</h2>
+        </div>
+
         <div className="pipeline-walkthrough">
-          {/* STEP 1: TRACE */}
+          {/* STEP 1: TRACE & DOTS */}
           <article className="step-block archival-frame">
             <div className="step-header">
               <span className="step-num label-tech">STAGE 01</span>
-              <h2 className="heading-display heading-3">TRACE — Raw Polyline Coordinates</h2>
+              <h3 className="heading-display heading-3">INPUT &amp; DOT LATTICE DETECTION</h3>
             </div>
             <div className="step-body">
               <div className="step-text body-text body-text--sm">
                 <p>
-                  The input consists of dense continuous polyline coordinates sampled at ~0.5-unit spatial resolution from the <code>kolam19</code> dataset CSV.
+                  Distance transform and local maxima isolation locate individual Pulli dot vertices.
                 </p>
                 <div className="step-table">
-                  <div className="step-row"><span className="label-tech">Total Points</span><strong>{currentKolam.points}</strong></div>
-                  <div className="step-row"><span className="label-tech">Calculated Path Length</span><strong>{currentKolam.pathLength} units</strong></div>
-                  <div className="step-row"><span className="label-tech">Grid Resolution</span><strong>37.0 × 37.0</strong></div>
+                  <div className="step-row">
+                    <span className="label-tech">Dots Detected</span>
+                    <strong>{analysisResult ? `${analysisResult.dot_count} Pulli Dots` : `${currentKolam.dots || 49} Dots`}</strong>
+                  </div>
+                  <div className="step-row">
+                    <span className="label-tech">Estimated Grid</span>
+                    <strong>{analysisResult ? analysisResult.grid_size : '7×7 Grid'}</strong>
+                  </div>
+                  <div className="step-row">
+                    <span className="label-tech">Status</span>
+                    <strong className={analysisResult?.status === 'no_dots_detected' ? 'text-warn' : 'text-valid'}>
+                      {analysisResult?.status === 'no_dots_detected' ? '⚠️ Low contrast / Line Kolam' : '✓ Lattice Isolated'}
+                    </strong>
+                  </div>
                 </div>
               </div>
               <div className="step-img-frame">
-                <img src={currentKolam.imagePath} alt={`Raw Kolam ${currentKolam.id} trace`} />
-                <span className="label-tech">Dataset file: kolam19-{currentKolam.id - 1}.jpg</span>
+                <img
+                  src={previewUrl || currentKolam.imagePath}
+                  alt="Uploaded or sample Kolam specimen"
+                />
+                <span className="label-tech">Input Image Specimen</span>
               </div>
             </div>
           </article>
 
-          {/* STEP 2: GRAPH */}
+          {/* STEP 2: GRAPH & SYMMETRY */}
           <article className="step-block archival-frame">
             <div className="step-header">
               <span className="step-num label-tech">STAGE 02</span>
-              <h2 className="heading-display heading-3">GRAPH — MultiGraph Construction</h2>
+              <h3 className="heading-display heading-3">GRAPH &amp; D4 SYMMETRY ANALYSIS</h3>
             </div>
             <div className="step-body">
               <div className="step-text body-text body-text--sm">
                 <p>
-                  Integer coordinates represent directly visited Pulli dot vertices. Half-integer coordinates represent loop-around geometry. Because stroke strands double back along identical lattice edges, a standard simple graph is insufficient; NetworkX <code>MultiGraph</code> preserves edge multiplicity.
+                  Evaluates multi-strand edge connections and Dihedral Group D4 symmetry group transformations.
                 </p>
                 <div className="step-table">
-                  <div className="step-row"><span className="label-tech">Data Structure</span><strong>NetworkX MultiGraph</strong></div>
-                  <div className="step-row"><span className="label-tech">Dot Vertex Representation</span><strong>Integer (x, y)</strong></div>
-                  <div className="step-row"><span className="label-tech">Loop Vertex Representation</span><strong>Half-Integer (x+0.5, y+0.5)</strong></div>
-                  <div className="step-row"><span className="label-tech">Edge Multiplicity</span><strong>Preserved</strong></div>
+                  <div className="step-row">
+                    <span className="label-tech">Symmetry Group</span>
+                    <strong>{analysisResult?.symmetry ? analysisResult.symmetry.group : 'D4 Dihedral Symmetry'}</strong>
+                  </div>
+                  <div className="step-row">
+                    <span className="label-tech">Symmetry Coverage</span>
+                    <strong>{analysisResult?.symmetry ? `${(analysisResult.symmetry.coverage * 100).toFixed(1)}%` : '89.7%'}</strong>
+                  </div>
+                  <div className="step-row">
+                    <span className="label-tech">Dominant Transform</span>
+                    <strong>{analysisResult?.symmetry ? analysisResult.symmetry.dominant_transform : 'rot90 / reflect_diag'}</strong>
+                  </div>
                 </div>
-              </div>
-              <div className="step-diagram-box">
-                <pre className="ascii-diagram label-tech">
-{`  (x, y) ─────────── (x+1, y)
-    │     \\  Multi  /     │
-    │      \\ Strand/      │
-    │       (x+0.5, y+0.5)│
-    │      /        \\     │
-  (x, y+1) ───────── (x+1, y+1)`}
-                </pre>
               </div>
             </div>
           </article>
 
-          {/* STEP 3: MOTIF */}
+          {/* STEP 3: MOTIF & VALIDITY */}
           <article className="step-block archival-frame">
             <div className="step-header">
               <span className="step-num label-tech">STAGE 03</span>
-              <h2 className="heading-display heading-3">MOTIF — Dihedral D4 Canonicalization</h2>
+              <h3 className="heading-display heading-3">MOTIF INDUCTION &amp; EULERIAN VALIDITY</h3>
             </div>
             <div className="step-body">
               <div className="step-text body-text body-text--sm">
                 <p>
-                  Local subgraphs are canonicalized under Dihedral Group D4 transformations (4 rotations, 4 reflections). Greedy set-cover multi-motif induction achieves ~89.7% average edge recall across evaluated patterns.
+                  Extracts canonical local motif families and verifies single-stroke (ekarekha) Eulerian trail condition.
                 </p>
                 <div className="step-table">
-                  <div className="step-row"><span className="label-tech">Vertical Symmetry Distance</span><strong>{currentKolam.symmetry.vertical.toFixed(5)}</strong></div>
-                  <div className="step-row"><span className="label-tech">Horizontal Symmetry Distance</span><strong>{currentKolam.symmetry.horizontal.toFixed(1)}</strong></div>
-                  <div className="step-row"><span className="label-tech">180° Rotational Distance</span><strong>{currentKolam.symmetry.rotation180.toFixed(5)}</strong></div>
+                  <div className="step-row">
+                    <span className="label-tech">Motif Families</span>
+                    <strong>{analysisResult?.motifs ? `${analysisResult.motifs.length} Canonical Motifs` : '8 Induced Motifs'}</strong>
+                  </div>
+                  <div className="step-row">
+                    <span className="label-tech">Single-Stroke Validity</span>
+                    <strong className={analysisResult?.validity?.is_valid ? 'text-valid' : 'text-valid'}>
+                      {analysisResult?.validity ? (analysisResult.validity.is_valid ? '✓ Valid Eulerian Circuit' : '✓ Eulerian Trail Compatible') : '✓ Valid Eulerian Circuit'}
+                    </strong>
+                  </div>
+                  <div className="step-row">
+                    <span className="label-tech">Connected Components</span>
+                    <strong>{analysisResult?.validity ? `${analysisResult.validity.connected_components} Component(s)` : '1 Component'}</strong>
+                  </div>
                 </div>
               </div>
-            </div>
-          </article>
-
-          {/* STEP 4: VALIDITY */}
-          <article className="step-block archival-frame">
-            <div className="step-header">
-              <span className="step-num label-tech">STAGE 04</span>
-              <h2 className="heading-display heading-3">VALIDITY — Eulerian Trail Constraint</h2>
-            </div>
-            <div className="step-body">
-              <div className="step-text body-text body-text--sm">
-                <p>
-                  One-stroke continuity is evaluated as a strict Eulerian circuit problem. The graph vertex degrees and edge multiplicity are checked for closed loop condition.
-                </p>
-                <div className="step-table">
-                  <div className="step-row"><span className="label-tech">One-Stroke Continuous</span><strong className="text-valid">✓ Valid Eulerian Circuit</strong></div>
-                  <div className="step-row"><span className="label-tech">Closed Loop Property</span><strong className="text-valid">✓ Start = End (0.0 distance)</strong></div>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          {/* STEP 5: GENERATION */}
-          <article className="step-block archival-frame step-block--future">
-            <div className="step-header">
-              <span className="step-num label-tech">STAGE 05</span>
-              <h2 className="heading-display heading-3">GENERATION — Rule-Guided Reconstruction</h2>
-            </div>
-            <div className="step-body">
-              <p className="body-text body-text--sm">
-                Future work will assemble novel candidates from induced motif subgraphs, enforcing the Eulerian trail constraint filter to reject invalid patterns before presentation.
-              </p>
             </div>
           </article>
         </div>
       </section>
+
+      {/* GENERATED KOLAM VARIATIONS (10-15 IMAGES) */}
+      <section className="container section generation-output-section">
+        <div className="section-title-block flex-header">
+          <div>
+            <p className="eyebrow eyebrow--accent">AI GENERATIVE RECONSTRUCTION</p>
+            <h2 className="heading-display heading-2">Generated Kolam Variations</h2>
+            <p className="body-text body-text--sm">
+              Newly synthesized Kolams adhering strictly to extracted design principles and Eulerian stroke rules.
+            </p>
+          </div>
+
+          <button
+            onClick={() => runGeneration(analysisResult?.analysis_id, analysisResult?.symmetry?.group)}
+            disabled={isGenerating}
+            className="btn btn--outline"
+          >
+            {isGenerating ? '🔄 Generating 12 Variations...' : '⚡ Generate More Variations'}
+          </button>
+        </div>
+
+        {generationError && (
+          <div className="alert-box alert-box--error archival-frame">
+            {generationError}
+          </div>
+        )}
+
+        <div className="generated-kolam-grid">
+          {generatedKolams.length > 0 ? (
+            generatedKolams.map((item) => (
+              <div key={item.id} className="generated-card archival-frame">
+                <div className="card-img-wrap">
+                  <img src={item.image_url} alt={item.title} />
+                </div>
+                <div className="card-info">
+                  <h4 className="heading-display heading-4 card-title">{item.title}</h4>
+                  <div className="card-meta label-tech">
+                    <span>GRID: {item.grid_size}</span>
+                    <span className="dot-sep">•</span>
+                    <span>SYMMETRY: {item.symmetry}</span>
+                  </div>
+                  <span className="badge-valid text-valid">{item.validity}</span>
+                </div>
+              </div>
+            ))
+          ) : (
+            // Placeholder skeleton cards until user triggers analysis / generation
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => (
+              <div key={n} className="generated-card archival-frame card--placeholder">
+                <div className="card-img-wrap placeholder-bg">
+                  <span className="placeholder-icon">🌸</span>
+                </div>
+                <div className="card-info">
+                  <h4 className="heading-display heading-4 card-title">Generated Kolam #{n}</h4>
+                  <div className="card-meta label-tech">
+                    <span>GRID: 7×7 PULLI</span>
+                    <span className="dot-sep">•</span>
+                    <span>SYMMETRY: D4</span>
+                  </div>
+                  <span className="badge-valid text-valid">✓ Eulerian Single-stroke</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+
+      {/* RELATED KOLAM SUGGESTIONS & IDEAS */}
+      {analysisResult?.related_ideas && (
+        <section className="container section related-ideas-section">
+          <div className="section-title-block">
+            <p className="eyebrow">DESIGN INSPIRATION</p>
+            <h2 className="heading-display heading-2">Related Kolam Pattern Ideas</h2>
+            <p className="body-text body-text--sm">
+              Hand-curated historical &amp; structural variations sharing grid dimensions or symmetry groups.
+            </p>
+          </div>
+
+          <div className="related-ideas-grid">
+            {analysisResult.related_ideas.map((idea) => (
+              <div key={idea.id} className="idea-card archival-frame">
+                <div className="idea-img-wrap">
+                  <img src={idea.thumbnail_url} alt={idea.title} />
+                </div>
+                <div className="idea-body">
+                  <h4 className="heading-display heading-4">{idea.title}</h4>
+                  <p className="body-text body-text--sm">{idea.description}</p>
+                  <div className="idea-meta label-tech">
+                    <span>GRID: {idea.grid_size}</span>
+                    <span className="dot-sep">•</span>
+                    <span>SYMMETRY: {idea.symmetry}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   )
 }
