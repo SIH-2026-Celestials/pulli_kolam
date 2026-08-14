@@ -1,10 +1,28 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { auth, db } from '../lib/firebase'
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  onAuthStateChanged
+} from 'firebase/auth'
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit,
+  serverTimestamp
+} from 'firebase/firestore'
 
 const AuthContext = createContext()
 
 const LOCAL_STORAGE_RECENT_KEY = 'pulli_recent_kolams'
 const LOCAL_STORAGE_GUEST_KEY = 'pulli_guest_mode'
+const AUTH_PROVIDER = import.meta.env.VITE_AUTH_PROVIDER || 'firebase' // 'firebase' | 'supabase'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -15,77 +33,109 @@ export function AuthProvider({ children }) {
   const [recentKolams, setRecentKolams] = useState([])
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
-  // Initialize Supabase Auth Session
+  // Initialize Auth Listener (Firebase or Supabase)
   useEffect(() => {
-    async function initAuth() {
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
+    if (AUTH_PROVIDER === 'firebase') {
+      const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+        if (firebaseUser) {
+          setUser(firebaseUser)
+          setIsGuest(false)
+          localStorage.removeItem(LOCAL_STORAGE_GUEST_KEY)
+        } else {
+          setUser(null)
+        }
+        setAuthLoading(false)
+      })
+      return () => unsubscribe()
+    } else {
+      // Supabase listener fallback
+      async function initAuth() {
+        try {
+          const { data: { session } } = await supabase.auth.getSession()
+          if (session?.user) {
+            setUser(session.user)
+            setIsGuest(false)
+            localStorage.removeItem(LOCAL_STORAGE_GUEST_KEY)
+          }
+        } catch (err) {
+          console.warn('Supabase auth init warning:', err.message)
+        } finally {
+          setAuthLoading(false)
+        }
+      }
+      initAuth()
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
         if (session?.user) {
           setUser(session.user)
           setIsGuest(false)
           localStorage.removeItem(LOCAL_STORAGE_GUEST_KEY)
+        } else {
+          setUser(null)
         }
-      } catch (err) {
-        console.warn('Supabase auth init warning:', err.message)
-      } finally {
-        setAuthLoading(false)
-      }
+      })
+      return () => subscription.unsubscribe()
     }
-
-    initAuth()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setUser(session.user)
-        setIsGuest(false)
-        localStorage.removeItem(LOCAL_STORAGE_GUEST_KEY)
-      } else {
-        setUser(null)
-      }
-    })
-
-    return () => subscription.unsubscribe()
   }, [])
-
-  // Returns the recent-kolams list without touching state itself -- the
-  // caller (the effect below, or any future caller) applies
-  // setRecentKolams, so this function is safe to call directly from an
-  // effect without triggering react-hooks/set-state-in-effect (that rule
-  // flags any effect that reaches a component-scope function which
-  // itself calls a setState setter, even chained via .then()).
-  async function fetchRecentKolams() {
-    if (user) {
-      // Authenticated User: Load from Supabase DB table
-      try {
-        const { data, error } = await supabase
-          .from('kolam_history')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(20)
-
-        if (!error && data) return data
-      } catch (e) {
-        console.warn('Supabase DB load warning, fallback to local storage:', e.message)
-      }
-    }
-
-    // Unauthenticated / Guest Mode: Load from LocalStorage
-    try {
-      const stored = localStorage.getItem(LOCAL_STORAGE_RECENT_KEY)
-      return stored ? JSON.parse(stored) : []
-    } catch {
-      return []
-    }
-  }
 
   // Load Recent Kolams on mount or when user/guest mode changes
   useEffect(() => {
-    let cancelled = false
-    fetchRecentKolams().then((list) => {
-      if (!cancelled) setRecentKolams(list)
-    })
-    return () => { cancelled = true }
+    loadRecentKolams()
   }, [user, isGuest])
+
+  async function loadRecentKolams() {
+    if (user) {
+      if (AUTH_PROVIDER === 'firebase') {
+        try {
+          const q = query(
+            collection(db, 'kolam_history'),
+            where('user_id', '==', user.uid),
+            orderBy('created_at', 'desc'),
+            limit(20)
+          )
+          const querySnapshot = await getDocs(q)
+          const fetched = []
+          querySnapshot.forEach((doc) => {
+            fetched.push({ id: doc.id, ...doc.data() })
+          })
+          if (fetched.length > 0) {
+            setRecentKolams(fetched)
+            return
+          }
+        } catch (e) {
+          console.warn('Firestore load warning, fallback to local storage:', e.message)
+        }
+      } else {
+        // Supabase DB load
+        try {
+          const { data, error } = await supabase
+            .from('kolam_history')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(20)
+
+          if (!error && data) {
+            setRecentKolams(data)
+            return
+          }
+        } catch (e) {
+          console.warn('Supabase DB load warning:', e.message)
+        }
+      }
+    }
+
+    // Guest Mode / LocalStorage Fallback
+    try {
+      const stored = localStorage.getItem(LOCAL_STORAGE_RECENT_KEY)
+      if (stored) {
+        setRecentKolams(JSON.parse(stored))
+      } else {
+        setRecentKolams([])
+      }
+    } catch (e) {
+      setRecentKolams([])
+    }
+  }
 
   // Add a newly generated or analyzed Kolam to recent history
   async function addRecentKolam(kolamItem) {
@@ -100,7 +150,7 @@ export function AuthProvider({ children }) {
       is_guest: !user,
     }
 
-    // Update Local Storage for Guest Mode / Fallback
+    // Update Local Storage for Guest Mode / Immediate Feedback
     try {
       const stored = localStorage.getItem(LOCAL_STORAGE_RECENT_KEY)
       const list = stored ? JSON.parse(stored) : []
@@ -111,21 +161,37 @@ export function AuthProvider({ children }) {
       console.warn('LocalStorage error:', e)
     }
 
-    // If logged in, also persist to Supabase database
+    // If logged in, persist to database
     if (user) {
-      try {
-        await supabase.from('kolam_history').insert([
-          {
-            user_id: user.id,
+      if (AUTH_PROVIDER === 'firebase') {
+        try {
+          await addDoc(collection(db, 'kolam_history'), {
+            user_id: user.uid,
             title: newItem.title,
             image_url: newItem.image_url,
             grid_size: newItem.grid_size,
             symmetry: newItem.symmetry,
             validity: newItem.validity,
-          }
-        ])
-      } catch (e) {
-        console.warn('Supabase insert warning:', e.message)
+            created_at: serverTimestamp(),
+          })
+        } catch (e) {
+          console.warn('Firestore insert warning:', e.message)
+        }
+      } else {
+        try {
+          await supabase.from('kolam_history').insert([
+            {
+              user_id: user.id,
+              title: newItem.title,
+              image_url: newItem.image_url,
+              grid_size: newItem.grid_size,
+              symmetry: newItem.symmetry,
+              validity: newItem.validity,
+            }
+          ])
+        } catch (e) {
+          console.warn('Supabase insert warning:', e.message)
+        }
       }
     }
   }
@@ -142,8 +208,6 @@ export function AuthProvider({ children }) {
     let em = rawEmail.trim().toLowerCase()
     if (!em.includes('@')) {
       em = `${em}@gmail.com`
-    } else if (em.endsWith('@example.com') || em.endsWith('@test.com') || em.endsWith('@sample.com')) {
-      em = em.replace(/@(example|test|sample)\.com$/, '@gmail.com')
     }
     return em
   }
@@ -156,31 +220,55 @@ export function AuthProvider({ children }) {
   async function login(rawEmail, rawPassword) {
     const email = normalizeEmail(rawEmail)
     const password = normalizePassword(rawPassword)
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) throw error
-    setUser(data.user)
-    setIsGuest(false)
-    localStorage.removeItem(LOCAL_STORAGE_GUEST_KEY)
-    setIsAuthModalOpen(false)
-    return data
+
+    if (AUTH_PROVIDER === 'firebase') {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      setUser(userCredential.user)
+      setIsGuest(false)
+      localStorage.removeItem(LOCAL_STORAGE_GUEST_KEY)
+      setIsAuthModalOpen(false)
+      return userCredential
+    } else {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) throw error
+      setUser(data.user)
+      setIsGuest(false)
+      localStorage.removeItem(LOCAL_STORAGE_GUEST_KEY)
+      setIsAuthModalOpen(false)
+      return data
+    }
   }
 
   async function signup(rawEmail, rawPassword) {
     const email = normalizeEmail(rawEmail)
     const password = normalizePassword(rawPassword)
-    const { data, error } = await supabase.auth.signUp({ email, password })
-    if (error) throw error
-    if (data?.user) {
-      setUser(data.user)
+
+    if (AUTH_PROVIDER === 'firebase') {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      setUser(userCredential.user)
       setIsGuest(false)
       localStorage.removeItem(LOCAL_STORAGE_GUEST_KEY)
+      setIsAuthModalOpen(false)
+      return userCredential
+    } else {
+      const { data, error } = await supabase.auth.signUp({ email, password })
+      if (error) throw error
+      if (data?.user) {
+        setUser(data.user)
+        setIsGuest(false)
+        localStorage.removeItem(LOCAL_STORAGE_GUEST_KEY)
+      }
+      setIsAuthModalOpen(false)
+      return data
     }
-    setIsAuthModalOpen(false)
-    return data
   }
 
   async function logout() {
-    await supabase.auth.signOut()
+    if (AUTH_PROVIDER === 'firebase') {
+      await firebaseSignOut(auth)
+    } else {
+      await supabase.auth.signOut()
+    }
     setUser(null)
     setIsGuest(false)
     localStorage.removeItem(LOCAL_STORAGE_GUEST_KEY)
@@ -207,10 +295,6 @@ export function AuthProvider({ children }) {
   )
 }
 
-// useAuth must live alongside its Provider (standard React context
-// pattern); a consumer hook has no meaningful separate "component" file
-// to move to.
-// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext)
   if (!context) {
