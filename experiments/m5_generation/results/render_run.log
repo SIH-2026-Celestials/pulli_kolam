@@ -1,0 +1,24 @@
+motif library size: 29 from [('kolam19', 323), ('kolam19', 387), ('kolam29', 51), ('kolam19', 163), ('kolam19', 51)]
+[1] VALID #0 layout=kolam19#387 seed=900001 components=1 odd=0
+[2] VALID #1 layout=kolam29#51 seed=900002 components=1 odd=0
+[3] VALID #2 layout=kolam19#163 seed=900003 components=1 odd=0
+[4] VALID #3 layout=kolam19#51 seed=900004 components=1 odd=0
+[6] VALID #4 layout=kolam19#109 seed=900006 components=1 odd=0
+[8] VALID #5 layout=kolam19#370 seed=900008 components=1 odd=0
+[9] VALID #6 layout=kolam19#95 seed=900009 components=1 odd=0
+[10] VALID #7 layout=kolam19#333 seed=900010 components=1 odd=2
+[11] VALID #8 layout=kolam19#89 seed=900011 components=1 odd=0
+[13] VALID #9 layout=kolam29#82 seed=900013 components=1 odd=0
+[14] VALID #10 layout=kolam19#348 seed=900014 components=1 odd=0
+[15] VALID #11 layout=kolam19#374 seed=900015 components=1 odd=0
+[18] VALID #12 layout=kolam19#205 seed=900018 components=1 odd=0
+[19] VALID #13 layout=kolam19#386 seed=900019 components=1 odd=0
+[20] VALID #14 layout=kolam19#139 seed=900020 components=1 odd=0
+[21] VALID #15 layout=kolam19#162 seed=900021 components=1 odd=0
+[22] VALID #16 layout=kolam19#5 seed=900022 components=1 odd=0
+[23] VALID #17 layout=kolam19#344 seed=900023 components=1 odd=0
+[25] VALID #18 layout=kolam29#37 seed=900025 components=1 odd=0
+[26] VALID #19 layout=kolam19#192 seed=900026 components=1 odd=0
+
+n_valid=20  n_attempts=27  total_time=728.2s
+Wrote C:\Users\chauh\OneDrive\Desktop\PULLI\experiments\m5_generation\results\generation_artifacts_report.json

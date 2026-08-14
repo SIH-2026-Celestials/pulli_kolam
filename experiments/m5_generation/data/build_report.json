@@ -1,0 +1,24 @@
+{
+  "train": {
+    "n_patterns_used": 350,
+    "n_examples": 528175,
+    "n_positive": 105635,
+    "n_negative": 422540,
+    "positive_rate": 0.20000000298023224
+  },
+  "val": {
+    "n_patterns_used": 75,
+    "n_examples": 108690,
+    "n_positive": 21738,
+    "n_negative": 86952,
+    "positive_rate": 0.20000000298023224
+  },
+  "test": {
+    "n_patterns_used": 75,
+    "n_examples": 122675,
+    "n_positive": 24535,
+    "n_negative": 98140,
+    "positive_rate": 0.20000000298023224
+  },
+  "elapsed_seconds": 562.5
+}
