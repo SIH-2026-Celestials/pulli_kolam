@@ -52,10 +52,13 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from api.canonical import graph_to_json, motif_placements_to_json, reconstruction_to_json, validity_to_json  # noqa: E402
 from api.detectors import get_detector  # noqa: E402
+from api.generation_service import get_generation_service  # noqa: E402
 from api.schemas import (  # noqa: E402
     AnalyzeResponse,
     CompareDetectorsResponse,
     DetectResponse,
+    GenerateRequest,
+    GenerateResponse,
     HealthResponse,
     ModelInfoResponse,
     ReconstructResponse,
@@ -414,6 +417,109 @@ def compare_detectors(image: UploadFile = File(...)):
         "classical": _side(classical_result, classical_error, "classical"),
         "ml": _side(ml_result, ml_error, "ml"),
         "agreement": agreement,
+    }
+
+
+MAX_GENERATE_COUNT = 5  # bounds worst-case request latency (each candidate runs up to N_RESTARTS search passes)
+
+
+@app.post("/api/v1/generate", response_model=GenerateResponse)
+def generate(request: GenerateRequest):
+    """M5: learned-scorer-guided structural generation (engine.learned_generation),
+    NOT the M3.7/M4.2 greedy pipeline -- see docs/M4_2_GENERATION.md for
+    why that pipeline was replaced (0/120 to 1/120 measured valid).
+    Candidates are built from held-out (test-split) source patterns'
+    motif libraries and dot layouts, exactly as benchmarked in
+    experiments/m5_generation/run_benchmark.py -- this endpoint runs the
+    SAME code path, not a separate reimplementation.
+
+    No fabricated statistics: every field in the response comes directly
+    from engine.validity/engine.learned_generation's own returned
+    structures, same discipline as every other endpoint in this module.
+    """
+    service = get_generation_service()
+    if not service.available:
+        raise _api_error(503, "GENERATION_MODEL_UNAVAILABLE", service.load_error or "generation model unavailable")
+
+    count = request.count if request.count is not None else 1
+    if not isinstance(count, int) or count < 1:
+        raise _api_error(422, "INVALID_REQUEST", f"count must be a positive integer, got {request.count!r}")
+    if count > MAX_GENERATE_COUNT:
+        raise _api_error(422, "INVALID_REQUEST", f"count must be <= {MAX_GENERATE_COUNT}, got {count}")
+
+    base_seed = request.seed if request.seed is not None else int.from_bytes(os.urandom(4), "big")
+
+    from engine.learned_generation import generate_novel_kolam_learned
+    from engine.render import render_generated_kolam_svg
+    from engine.symmetry import analyze_symmetry
+
+    t_start = time.monotonic()
+    candidates_json = []
+    layout_name = None
+    n_dots_first = 0
+    for i in range(count):
+        seed = base_seed + i
+        layout_name, dots = service.layout_for_seed(seed)
+        n_dots_first = len(dots)
+        t0 = time.monotonic()
+        run_result = generate_novel_kolam_learned(
+            service.motif_library, dots, scorer=service.scorer, seed=seed,
+        )
+        latency_ms = (time.monotonic() - t0) * 1000
+        candidate = run_result.candidate
+        diag = candidate.diagnosis
+
+        try:
+            _motif, symmetry_coverage, _tp = analyze_symmetry(candidate.graph, dots=set(candidate.dot_points), radius=1)
+        except Exception:
+            symmetry_coverage = None
+
+        mult_violations = sum(1 for v in candidate.edge_multiplicity.values() if v > 2)
+
+        candidates_json.append(
+            {
+                "seed": seed,
+                "is_valid": candidate.is_valid,
+                "n_dots": candidate.n_dots,
+                "n_distinct_edges": candidate.n_distinct_edges,
+                "n_edge_instances": candidate.n_edge_instances,
+                "connected_components": diag["connected_components"],
+                "n_odd_degree_nodes": diag["n_odd_degree_nodes"],
+                "n_nodes_outside_largest_component": diag["n_nodes_outside_largest_component"],
+                "multiplicity_violations": mult_violations,
+                "symmetry_coverage": symmetry_coverage,
+                "novelty_note": (
+                    "structurally distinct from the source patterns whose motifs seeded generation "
+                    "(no ground-truth comparison performed per-request; see /docs or the M5 benchmark "
+                    "report for aggregate novelty measurement)"
+                ),
+                "n_restarts_used": len(run_result.restarts),
+                "repair_edges_applied": len(run_result.repair_applied),
+                "generation_latency_ms": round(latency_ms, 2),
+                "render_svg": render_generated_kolam_svg(candidate),
+                "dot_trace_length": len(candidate.dot_trace) if candidate.dot_trace else None,
+            }
+        )
+
+    total_latency_ms = (time.monotonic() - t_start) * 1000
+    lattice_width, lattice_height = service.reference_lattice_dims()
+    return {
+        "success": True,
+        "model": {
+            "name": "PlacementScorer (learned, imitation-trained MLP) + multi-restart guided search",
+            "version": service.scorer.metadata.get("seed"),
+            "n_parameters": service.scorer.metadata.get("n_parameters"),
+            "checkpoint": "experiments/m5_generation/checkpoints/placement_scorer.pt",
+        },
+        "constraints": {
+            "lattice_width": lattice_width,
+            "lattice_height": lattice_height,
+            "n_dots": n_dots_first,
+            "motif_source_collection": service.library_sources[0][0] if service.library_sources else "",
+            "motif_library_size": len(service.motif_library) if service.motif_library else 0,
+        },
+        "candidates": candidates_json,
+        "total_latency_ms": round(total_latency_ms, 2),
     }
 
 

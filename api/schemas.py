@@ -127,3 +127,47 @@ class ErrorResponse(BaseModel):
     error: str
     code: Optional[str] = None
     detail: Optional[str] = None
+
+
+class GenerateRequest(BaseModel):
+    seed: Optional[int] = None
+    temperature: Optional[float] = None  # reserved: current search is deterministic-per-seed, see api/main.py
+    count: Optional[int] = 1
+
+
+class GenerationConstraintsInfo(BaseModel):
+    """What request this candidate was generated against -- lattice size,
+    motif source patterns -- so a caller can tell WHAT it asked for, not
+    just what came back."""
+    lattice_width: int
+    lattice_height: int
+    n_dots: int
+    motif_source_collection: str
+    motif_library_size: int
+
+
+class GeneratedCandidate(BaseModel):
+    seed: int
+    is_valid: bool
+    n_dots: int
+    n_distinct_edges: int
+    n_edge_instances: int
+    connected_components: int
+    n_odd_degree_nodes: int
+    n_nodes_outside_largest_component: int
+    multiplicity_violations: int
+    symmetry_coverage: Optional[float]
+    novelty_note: str
+    n_restarts_used: int
+    repair_edges_applied: int
+    generation_latency_ms: float
+    render_svg: str
+    dot_trace_length: Optional[int]
+
+
+class GenerateResponse(BaseModel):
+    success: bool
+    model: dict
+    constraints: GenerationConstraintsInfo
+    candidates: list[GeneratedCandidate]
+    total_latency_ms: float
