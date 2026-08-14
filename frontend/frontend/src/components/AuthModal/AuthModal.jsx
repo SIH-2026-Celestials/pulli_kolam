@@ -69,6 +69,11 @@ export default function AuthModal() {
         {error && (
           <div className="auth-error-box label-tech">
             ⚠️ {error}
+            {error.toLowerCase().includes('rate limit') && (
+              <div style={{ marginTop: '6px', fontSize: '0.68rem', color: '#8b0000' }}>
+                💡 Tip: Click <strong>"Bypass Login"</strong> below to test immediately in Guest Mode!
+              </div>
+            )}
           </div>
         )}
 
