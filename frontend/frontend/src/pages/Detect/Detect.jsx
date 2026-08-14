@@ -264,7 +264,7 @@ export default function Detect() {
             <p className="label-tech model-status-line">
               ML MODEL: {modelStatus === 'loading' && '…'}
               {modelStatus === 'available' && (
-                <span className="text-valid">● Available{modelInfo?.ml_model_version ? ` — ${modelInfo.ml_model_version}` : ''} (CPU)</span>
+                <span className="text-valid">● Available{modelInfo?.ml_model_version ? `  -  ${modelInfo.ml_model_version}` : ''} (CPU)</span>
               )}
               {modelStatus === 'unavailable' && <span>○ Unavailable</span>}
             </p>
@@ -344,7 +344,7 @@ export default function Detect() {
                 <h2 className="heading-display heading-3">Structural Analysis</h2>
                 {analysis.dot_count > 0 && !analysis.validity.is_eulerian_circuit && !analysis.validity.has_eulerian_path && (
                   <p className="body-text body-text--sm detect-placeholder">
-                    Detection succeeded — structural validation failed. The detected graph is not a valid
+                    Detection succeeded  -  structural validation failed. The detected graph is not a valid
                     single-stroke (Eulerian) structure; this is a property of the detected structure, not a
                     request failure.
                   </p>
@@ -390,7 +390,7 @@ export default function Detect() {
                       <p className="body-text body-text--sm detect-placeholder">
                         The classical detector found too few dots to fit a lattice on this
                         image. Try switching to the <strong>ML</strong> mode above and
-                        re-running — it typically detects substantially more dots on real
+                        re-running  -  it typically detects substantially more dots on real
                         photographs.
                       </p>
                     )}
@@ -400,7 +400,7 @@ export default function Detect() {
                   <>
                     {!reconstruction.reconstruction.is_valid && (
                       <p className="detect-error" role="status">
-                        Detection succeeded — reconstruction validation failed (the motif/residual
+                        Detection succeeded  -  reconstruction validation failed (the motif/residual
                         decomposition does not reproduce a valid single-stroke structure).
                       </p>
                     )}

@@ -1,12 +1,12 @@
 /**
- * useKolamAnalysis — React hook that manages the full lifecycle of a
+ * useKolamAnalysis  -  React hook that manages the full lifecycle of a
  * streaming Kolam analysis job.
  *
  * Responsibilities:
  *  - POST image to /api/v1/analyze-stream/start → receive job_id
  *  - Open SSE connection to /api/v1/analyze-stream/{job_id}/events
  *  - Parse stage_started / stage_completed / stage_failed / pipeline_* events
- *  - Update stage state — NO fake timers, backend events are the only
+ *  - Update stage state  -  NO fake timers, backend events are the only
  *    thing that advances stage status
  *  - Collect intermediate per-stage results
  *  - Close SSE connection on completion, failure, or unmount
@@ -167,7 +167,7 @@ export function useKolamAnalysis() {
         return {
           ...prev,
           status: 'failed',
-          error: 'Lost connection to the analysis server. The pipeline may still be running — try refreshing.',
+          error: 'Lost connection to the analysis server. The pipeline may still be running  -  try refreshing.',
           activeMessage: null,
         };
       });

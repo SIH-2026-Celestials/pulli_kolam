@@ -1,4 +1,4 @@
-# M5.1 Phase 1 — pipeline audit
+# M5.1 Phase 1  -  pipeline audit
 
 Traced from actual code (not assumed), current as of the M5 final
 benchmark. Every claim below cites the exact file/function.
@@ -7,7 +7,7 @@ benchmark. Every claim below cites the exact file/function.
 
 A target dot lattice: `set[tuple[int, int]]` (integer lattice
 coordinates), plus a **motif library**: `list[Motif]` where
-`Motif = tuple[RelEdge, ...]` (`engine/motifs.py`) — abstract, relative-
+`Motif = tuple[RelEdge, ...]` (`engine/motifs.py`)  -  abstract, relative-
 coordinate edge shapes with no absolute position, induced from real
 patterns via `engine.motifs.induce_motif_set_adaptive`
 (`engine/generation_api.py::motif_library_from_sources`). No source
@@ -21,7 +21,7 @@ graph anywhere in this module's placement logic").
 nx.MultiGraph`, `placements: list[MotifPlacement]`,
 `edge_multiplicity: dict[frozenset, int]`, `validity_result`,
 `diagnosis`, `dot_trace: list[Point] | None`. No provenance fields
-(distinct from `KolamPattern`, which carries `pattern_id`/`collection` —
+(distinct from `KolamPattern`, which carries `pattern_id`/`collection`  - 
 see `engine/generated_kolam.py`'s own docstring on why this
 distinction is deliberate).
 
@@ -34,7 +34,7 @@ distinction is deliberate).
 
 ## 4. Graph representation
 
-`nx.MultiGraph` throughout — never `nx.Graph`. Parallel edges (real
+`nx.MultiGraph` throughout  -  never `nx.Graph`. Parallel edges (real
 strand multiplicity) are load-bearing: `engine/motifs.py`'s module
 docstring: "two dots with a genuine double strand between them are
 distinguished from two dots with a single strand." Edge identity for
@@ -64,7 +64,7 @@ stops early the moment any restart is fully valid.
 
 `engine.learned_scoring.PlacementScorer`: MLP, 16→32→16→1, 1,089
 params. Input: a 16-dim hand-engineered feature vector per CANDIDATE
-EDIT (`extract_features` — motif length, touched-node growth/existing
+EDIT (`extract_features`  -  motif length, touched-node growth/existing
 split, local parity delta, connectivity effect via incremental
 union-find, global parity effect, contribution strand count, progress
 fraction, global odd-degree fraction). Output: sigmoid probability,
@@ -78,13 +78,13 @@ trivial baseline, AUC 0.962
 
 `engine.learned_generation.repair_multiplicity`: Chinese-Postman-style
 route doubling. Only runs if the search-phase candidate is invalid AND
-already fully connected (0 nodes outside the largest component) — never
+already fully connected (0 nodes outside the largest component)  -  never
 attempts to merge separate components (would require inventing an edge
 with no motif justification, explicitly refused). Walks
 `diagnose_validity`'s minimum-weight odd-node pairing
 (`nx.min_weight_matching` over shortest-path distances) and increments
 each correction path edge's strand count, bounded by
-`max_repair_multiplicity` (default 3 — **see Phase 3/M5_1_CONSTRAINT_SPEC.md
+`max_repair_multiplicity` (default 3  -  **see Phase 3/M5_1_CONSTRAINT_SPEC.md
 for why this specific bound is the root cause of the multiplicity
 finding**).
 
@@ -93,7 +93,7 @@ finding**).
 Two INDEPENDENT caps exist in the current pipeline:
 `engine.novel_generation.DEFAULT_MAX_MULTIPLICITY = 2` (search phase,
 matches real data) and `engine.learned_generation.DEFAULT_REPAIR_MAX_MULTIPLICITY = 3`
-(repair phase, does NOT match real data — see Phase 3). No single
+(repair phase, does NOT match real data  -  see Phase 3). No single
 source of truth for "what multiplicity is allowed" currently exists;
 this split-cap design is itself part of the M5.1 finding.
 
@@ -103,7 +103,7 @@ this split-cap design is itself part of the M5.1 finding.
 `render_trace_svg`/`render_trace_png` take `dot_points` + an optional
 ordered `trace`; `render_generated_kolam_svg/png` wrap these for a
 `GeneratedKolam`, labeling an invalid candidate "INVALID" rather than
-silently omitting its stroke. Straight-line segments only — no
+silently omitting its stroke. Straight-line segments only  -  no
 loop-around curve reconstruction (documented limitation, not attempted).
 
 ## 11. Validation pipeline
@@ -129,7 +129,7 @@ duplicate rate (only meaningful when layouts match).
 `engine.symmetry.D4_TRANSFORMS` (8 lambdas: identity + 3 rotations + 4
 reflections). `analyze_symmetry`/`induce_motif_symmetric`: clusters
 local windows by their D4-canonical signature and reports the DOMINANT
-motif's coverage fraction — a descriptive measurement, not a generation
+motif's coverage fraction  -  a descriptive measurement, not a generation
 constraint. Nothing in the current search/repair pipeline actively
 steers toward higher symmetry; M5's own measured average symmetry
 coverage (21.6%, `benchmark_report.json`) is emergent, not targeted.

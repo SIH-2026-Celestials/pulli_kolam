@@ -746,7 +746,7 @@ def _run_pipeline_in_thread(job_id: str, image_path: str, detector: str, loop: a
         stage_started("trace_stroke", 2, "Tracing stroke from dot arrangement…")
         G = det_result.graph
         edge_count = G.number_of_edges()
-        stage_completed("trace_stroke", 2, f"Stroke traced — {edge_count} edges.", {
+        stage_completed("trace_stroke", 2, f"Stroke traced  -  {edge_count} edges.", {
             "edge_count": edge_count,
         })
 
@@ -771,7 +771,7 @@ def _run_pipeline_in_thread(job_id: str, image_path: str, detector: str, loop: a
             "largest_component_covers_all_nodes": val_result.get("largest_component_covers_all_nodes", False),
         }
         stage_completed("detect_symmetry", 4,
-            f"Symmetry analysis done — {sym_data['connected_components']} component(s).", sym_data)
+            f"Symmetry analysis done  -  {sym_data['connected_components']} component(s).", sym_data)
 
         # ── STAGE 5: find_motifs ──────────────────────────────────────
         stage_started("find_motifs", 5, "Identifying motif patterns…")

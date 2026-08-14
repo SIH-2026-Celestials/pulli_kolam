@@ -89,7 +89,7 @@ const te = {
     seedPlaceholder: 'Random',
     countLabel: 'Candidates',
     download: 'Download SVG',
-    empty: 'No valid candidates in this batch — try Generate More.',
+    empty: 'No valid candidates in this batch  -  try Generate More.',
   },
   home: {
     illustrativeBadge: 'ఉదాహరణ మాత్రమే',

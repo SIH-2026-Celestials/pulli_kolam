@@ -29,7 +29,7 @@ API health:
 http://localhost:8000/api/v1/health
 
 This single command starts the FastAPI backend (classical CV + both ML
-detectors, all served in-process — see `api/detectors.py`) and the
+detectors, all served in-process  -  see `api/detectors.py`) and the
 React/Vite frontend together, prefixing each process's output
 (`[API]`, `[FRONTEND]`, `[ML]`). It requires Python (with
 `pip install -r requirements.txt` already run once) and Node on `PATH`;
@@ -42,7 +42,7 @@ deployment.
 ## System architecture
 
 PULLI today is a real (not simulated) three-layer system: a React/Vite
-frontend, a FastAPI backend, and a deterministic Python engine — with
+frontend, a FastAPI backend, and a deterministic Python engine  -  with
 three interchangeable detectors sitting behind one API contract.
 
 ```mermaid
@@ -94,19 +94,19 @@ flowchart TB
 ```
 
 **Design rules the diagram encodes, enforced in code, not just documented:**
-- Whichever detector is selected owns the *entire* downstream pipeline for that request — analysis and reconstruction never silently run against a different detector's output than the one you asked for.
+- Whichever detector is selected owns the *entire* downstream pipeline for that request  -  analysis and reconstruction never silently run against a different detector's output than the one you asked for.
 - No silent fallback: if `detector=ml` or `detector=ml-gated` is requested and the model can't load or run, the API returns an explicit `503`, never a quiet substitution of classical results.
-- The engine (`engine/`) has zero PyTorch/FastAPI dependency — it is pure NumPy/SciPy/OpenCV/NetworkX, testable and reproducible on its own.
+- The engine (`engine/`) has zero PyTorch/FastAPI dependency  -  it is pure NumPy/SciPy/OpenCV/NetworkX, testable and reproducible on its own.
 
 ### Detectors at a glance
 
 | Detector | What it is | Real-photo no-dot false-positive rate | Production default |
 |---|---|---|---|
-| `classical` | Deterministic CV — Otsu binarize, distance-transform dot detection, affine lattice fit | 33.3% | ✅ Yes |
+| `classical` | Deterministic CV  -  Otsu binarize, distance-transform dot detection, affine lattice fit | 33.3% | ✅ Yes |
 | `ml` | `DotHeatmapNetV2`, a 382,769-param U-Net, 128×128 native heatmap output | 100% (documented domain gap) | ❌ Experimental |
 | `ml-gated` | Same checkpoint + a post-detection lattice-consistency filter | 55.6% | ❌ Experimental |
 
-Both ML variants are exposed for comparison and research, never as a silent substitute for the classical default — see `docs/M4_1_ML_COMPLETION_REPORT.md` and `docs/M4_2_EVALUATION.md` for the full, honest evaluation behind these numbers.
+Both ML variants are exposed for comparison and research, never as a silent substitute for the classical default  -  see `docs/M4_1_ML_COMPLETION_REPORT.md` and `docs/M4_2_EVALUATION.md` for the full, honest evaluation behind these numbers.
 
 ### Deployment
 
@@ -158,17 +158,31 @@ flowchart TD
     A["Dataset (Kaggle - kolam19 / kolam29 / kolam109)"] --> B["CSV coordinate polyline trace"]
     B --> C["Coordinate normalization (~0.5u resolution)"]
     C --> D["Graph construction - NetworkX MultiGraph"]
-    D --> E["Motif induction - canonical-signature clustering"]
+    D --> T["Topology classifier\nanalyze_kolam_type()"]
+    T --> |"SIKKU_LOOP"| E["Motif induction - canonical-signature clustering"]
+    T --> |"MULTI_LOOP_SIKKU"| DM["decompose_multi_loop_graph()\n→ per-loop sub-graphs"]
+    T --> |"KAMBI_DIRECT_LINE"| E
+    DM --> E
     D --> F["D4 symmetry matching - 4 rotations × 2 reflections"]
     E --> G["Validity check - Eulerian circuit / path"]
     F --> G
     G --> H["Generation - stamp motif onto new dot lattice"]
 
     style A fill:#F6F3EC,stroke:#171614,color:#171614
+    style T fill:#FFF8E7,stroke:#A64B35,color:#171614
+    style DM fill:#FFF8E7,stroke:#A64B35,color:#171614
     style H fill:#F6F3EC,stroke:#A64B35,color:#A64B35,stroke-dasharray: 4 3
 ```
 
-Integer coordinates in a trace correspond to dots actually visited; half-integer coordinates are loop-around geometry where the stroke passes *between* dots. Because a stroke can run alongside a previously drawn strand, edges between the same two nodes can occur more than once - which is why the engine uses a `MultiGraph` rather than a simple graph, and why validity checking has to be multiplicity-aware rather than a plain "is it connected" test.
+Integer coordinates in a trace correspond to dots actually visited; half-integer coordinates are loop-around geometry where the stroke passes *between* dots. Because a stroke can run alongside a previously drawn strand, edges between the same two nodes can occur more than once  -  which is why the engine uses a `MultiGraph` rather than a simple graph, and why validity checking has to be multiplicity-aware rather than a plain "is it connected" test.
+
+**Topology routing** (`engine/image_io.py`): every graph is classified before downstream analysis.
+
+| `analyze_kolam_type()` return value | Meaning | Routing |
+|---|---|---|
+| `SIKKU_LOOP` | Single connected Sikku graph with half-integer detour nodes | Normal motif + validity pipeline |
+| `MULTI_LOOP_SIKKU` | Multiple disjoint Sikku loops in one graph | Decomposed by `decompose_multi_loop_graph()` into per-loop sub-graphs, each processed independently |
+| `KAMBI_DIRECT_LINE` | Integer-only lattice graph (Kambi style) | Normal motif + validity pipeline |
 
 ---
 
@@ -179,6 +193,8 @@ PULLI/
 ├── engine/                   # Core deterministic Python engine (no FastAPI/torch dependency)
 │   ├── graph_io.py           #   CSV trace -> nx.MultiGraph
 │   ├── image_io.py           #   Photo -> nx.MultiGraph (classical CV: preprocess/detect/trace)
+│   │                         #   + analyze_kolam_type()   -  topology classifier (SIKKU_LOOP / MULTI_LOOP_SIKKU / KAMBI_DIRECT_LINE)
+│   │                         #   + decompose_multi_loop_graph()  -  splits multi-loop graphs into per-loop sub-graphs
 │   ├── motifs.py             #   Local-motif induction via canonical-signature clustering
 │   ├── symmetry.py           #   D4-symmetry-aware motif matching
 │   ├── validity.py           #   Eulerian circuit/path validity checks
@@ -187,7 +203,7 @@ PULLI/
 │   ├── novel_generation.py   #   Novel-pattern generation (experimental, see docs/M4_2_GENERATION.md)
 │   └── ml_contract.py        #   Frozen ML-detector <-> engine interface contract
 │
-├── api/                       # FastAPI backend (api/main.py) — the only backend server
+├── api/                       # FastAPI backend (api/main.py)  -  the only backend server
 │   ├── main.py                #   /api/v1/{health,model,detect,analyze,reconstruct,compare-detectors}
 │   ├── detectors.py           #   Classical / ML / ML-gated detector implementations
 │   ├── schemas.py             #   Pydantic response models
@@ -245,7 +261,7 @@ npm run build     # production build
 npm run lint
 ```
 
-The frontend calls the FastAPI backend directly through a centralized client (`src/lib/api/`) — no static/mock data layer for detection, analysis, or reconstruction. `src/data/kolams.js` remains a static dataset layer only for the Explore/Gallery pages, which browse the bundled `kolam19` dataset rather than live-querying it.
+The frontend calls the FastAPI backend directly through a centralized client (`src/lib/api/`)  -  no static/mock data layer for detection, analysis, or reconstruction. `src/data/kolams.js` remains a static dataset layer only for the Explore/Gallery pages, which browse the bundled `kolam19` dataset rather than live-querying it.
 
 ---
 
@@ -261,7 +277,19 @@ PULLI uses the **[One-Stroke Dotted Pulli Kolam](https://www.kaggle.com/datasets
 
 Each row stores a dense polyline trace (`x-kolam {n}` / `y-kolam {n}` columns) sampled on a half-integer grid; every trace is a closed loop (first point equals last point). PULLI does not claim ownership of the dataset - all patterns are attributed to the original dataset maintainers.
 
+### PULLI Multi-Topology Dataset Specifications (Task 8)
+
+| Dataset Variant | Count / Patterns | Resolution | Coordinate Schema | Topology |
+|---|---|---|---|---|
+| **Sikku Loop Set** | 600 patterns | Half-integer (0.5u) | Continuous trace array | Closed Eulerian Loop |
+| **Multi-Loop Sikku Set** | 400 patterns | Half-integer (0.5u) | Multi-loop edge list (k > 1) | Disjoint Closed Sub-Loops |
+| **Kambi Line Set** | 600 patterns | Integer lattice (1u) | Direct Adjacency Edge List | Polygonal / Planar |
+| **Real Floor Photos** | 150+ field photos | Raster (RGB) | Perspective-warped floors | Noisy / Natural |
+| **Synthetic Corpus** | 1,000 generated | Variable | Gaussian noise & blur | Controlled Benchmarks |
+
+
 ---
+
 
 ## Current findings
 
@@ -290,12 +318,14 @@ These are experimental results from the current evaluation sample, not universal
 | Symmetry analysis (D4 group) | ✅ Done |
 | Motif analysis (fixed + adaptive radius) | ✅ Done |
 | Structural validation (Eulerian constraints) | ✅ Done |
-| FastAPI backend + live frontend integration | ✅ Done — real upload → detect → analyze → reconstruct, no simulated data |
+| Topology classifier (`analyze_kolam_type`)  -  SIKKU_LOOP / MULTI_LOOP_SIKKU / KAMBI_DIRECT_LINE | ✅ Done |
+| Multi-loop decomposition (`decompose_multi_loop_graph`) | ✅ Done |
+| FastAPI backend + live frontend integration | ✅ Done  -  real upload → detect → analyze → reconstruct, no simulated data |
 | Classical detector (production default) | ✅ Done |
-| ML detector (`DotHeatmapNetV2`) | 🔶 Experimental — strong on synthetic data, documented real-photo domain gap |
-| ML-gated detector (lattice-consistency filter) | 🔶 Experimental — partial mitigation of the domain gap |
+| ML detector (`DotHeatmapNetV2`) | 🔶 Experimental  -  strong on synthetic data, documented real-photo domain gap |
+| ML-gated detector (lattice-consistency filter) | 🔶 Experimental  -  partial mitigation of the domain gap |
 | Reconstruction (same-pattern structural decomposition) | ✅ Done, reliable |
-| Novel-pattern generation | 🔶 Experimental — 1/120 valid candidates on the current benchmark, not exposed in the UI |
+| Novel-pattern generation | 🔶 Experimental  -  1/120 valid candidates on the current benchmark, not exposed in the UI |
 | Docker / single-command local launcher | ✅ Done |
 | M5 structural grammar | ⬜ Not started |
 

@@ -72,7 +72,7 @@
   text-decoration: underline;
 }
 
-/* Reset button variant — same visual as the link CTA but rendered as a <button> */
+/* Reset button variant  -  same visual as the link CTA but rendered as a <button> */
 .illustrative-cta--reset {
   background: none;
   border: none;
