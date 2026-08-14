@@ -71,6 +71,8 @@ const ml = {
     complexity: 'സങ്കീർണ്ണത',
     strokeVal: 'ഒറ്റ തുടർച്ചയായ',
     complexityVal: 'മധ്യേ',
+    generating: 'ജനറേറ്റ് ചെയ്യുന്നു…',
+    errorPrefix: 'ജനറേഷൻ പരാജയപ്പെട്ടു:',
   },
   multilingual: {
     title: 'ബഹുഭാഷാ പിന്തുണ',

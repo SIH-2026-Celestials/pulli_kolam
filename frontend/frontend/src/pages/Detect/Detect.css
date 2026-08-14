@@ -180,3 +180,17 @@
   margin-right: 4px;
   background-color: currentColor;
 }
+
+/* --- Analysis pipeline / generated variations section (same components
+   Home.jsx uses) --- */
+
+.detect-pipeline-section {
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-8);
+}
+
+@media (max-width: 900px) {
+  .detect-pipeline-section .main-content-grid {
+    grid-template-columns: 1fr;
+  }
+}

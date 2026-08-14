@@ -57,8 +57,47 @@
   border-color: #CFC5B8;
 }
 
+.btn-generate-more:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .refresh-icon {
   color: var(--color-text-dark);
+}
+
+.refresh-icon.spinning {
+  animation: pulli-spin 0.9s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .refresh-icon.spinning {
+    animation: none;
+  }
+}
+
+@keyframes pulli-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.generated-error {
+  background-color: #FBEAE6;
+  border: 1px solid #E3B7AC;
+  color: #8A3324;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.generated-loading {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-text-muted);
+  padding: 20px 0;
+  text-align: center;
 }
 
 /* 4 THUMBNAILS GRID */
@@ -70,6 +109,7 @@
 }
 
 .variation-thumb-box {
+  position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
   border-radius: 10px;
@@ -84,6 +124,34 @@
 
 .variation-thumb-box:hover {
   transform: translateY(-2px);
+}
+
+.variation-svg-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.variation-svg-wrap svg {
+  width: 100%;
+  height: 100%;
+}
+
+.variation-invalid-badge {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background-color: rgba(138, 51, 36, 0.85);
+  color: #FFFFFF;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 /* DESIGN RULE SUMMARY */

@@ -71,6 +71,8 @@ const ta = {
     complexity: 'சிக்கலான தன்மை',
     strokeVal: 'ஒற்றை தொடர்ச்சியான',
     complexityVal: 'நடுத்தரம்',
+    generating: 'உருவாக்குகிறது…',
+    errorPrefix: 'உருவாக்கம் தோல்வியடைந்தது:',
   },
   multilingual: {
     title: 'பலமொழி ஆதரவு',
