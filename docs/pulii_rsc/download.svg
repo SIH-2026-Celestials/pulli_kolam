@@ -1,0 +1,35 @@
+<svg width="170" height="168" viewBox="0 0 170 168" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Top-left bracket -->
+  <path d="M28 48V32C28 29.8 29.8 28 32 28H48" stroke="#49382E" stroke-width="3" stroke-linecap="round"></path>
+
+  <!-- Top-right bracket -->
+  <path d="M122 28H138C140.2 28 142 29.8 142 32V48" stroke="#49382E" stroke-width="3" stroke-linecap="round"></path>
+
+  <!-- Bottom-left bracket -->
+  <path d="M28 120V136C28 138.2 29.8 140 32 140H48" stroke="#49382E" stroke-width="3" stroke-linecap="round"></path>
+
+  <!-- Bottom-right bracket -->
+  <path d="M122 140H138C140.2 140 142 138.2 142 136V120" stroke="#49382E" stroke-width="3" stroke-linecap="round"></path>
+
+  <!-- Eye -->
+  <path d="M39 84
+           C51 69 64 61 85 61
+           C106 61 119 69 131 84
+           C119 99 106 107 85 107
+           C64 107 51 99 39 84Z" stroke="#49382E" stroke-width="3" stroke-linejoin="round"></path>
+
+  <!-- Iris -->
+  <circle cx="85" cy="84" r="18" stroke="#49382E" stroke-width="5"></circle>
+
+  <!-- Pupil -->
+  <circle cx="85" cy="84" r="7" fill="#49382E"></circle>
+
+  <!-- Left eye extension -->
+  <path d="M39 84L23 84" stroke="#49382E" stroke-width="3" stroke-linecap="round"></path>
+
+  <!-- Right eye extension -->
+  <path d="M131 84L147 84" stroke="#49382E" stroke-width="3" stroke-linecap="round"></path>
+
+  <!-- Small top accent -->
+  <path d="M85 52V47" stroke="#49382E" stroke-width="3" stroke-linecap="round"></path>
+</svg>

@@ -1,0 +1,95 @@
+<svg width="170" height="168" viewBox="0 0 170 168" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="#49382E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Main interlaced diagonal -->
+    <path d="
+      M30 43
+      C37 35 45 35 51 41
+      L119 109
+      C125 115 133 115 140 107
+    "></path>
+
+    <path d="
+      M140 43
+      C133 35 125 35 119 41
+      L51 109
+      C45 115 37 115 30 107
+    "></path>
+
+    <!-- Opposite diagonal weave -->
+    <path d="
+      M30 107
+      C37 115 45 115 51 109
+      L119 41
+      C125 35 133 35 140 43
+    "></path>
+
+    <path d="
+      M140 107
+      C133 115 125 115 119 109
+      L51 41
+      C45 35 37 35 30 43
+    "></path>
+
+    <!-- Top-left loop -->
+    <path d="
+      M51 41
+      C43 33 36 29 30 34
+      C24 39 27 47 34 52
+      C39 55 45 54 51 48
+    "></path>
+
+    <!-- Top-right loop -->
+    <path d="
+      M119 41
+      C127 33 134 29 140 34
+      C146 39 143 47 136 52
+      C131 55 125 54 119 48
+    "></path>
+
+    <!-- Bottom-left loop -->
+    <path d="
+      M51 109
+      C43 117 36 121 30 116
+      C24 111 27 103 34 98
+      C39 95 45 96 51 102
+    "></path>
+
+    <!-- Bottom-right loop -->
+    <path d="
+      M119 109
+      C127 117 134 121 140 116
+      C146 111 143 103 136 98
+      C131 95 125 96 119 102
+    "></path>
+
+    <!-- Left middle loops -->
+    <path d="
+      M35 62
+      C28 55 21 55 18 60
+      C15 65 19 70 25 70
+      C29 70 32 68 35 65
+    "></path>
+
+    <path d="
+      M35 103
+      C28 110 21 110 18 105
+      C15 100 19 95 25 95
+      C29 95 32 97 35 100
+    "></path>
+
+    <!-- Right middle loops -->
+    <path d="
+      M135 62
+      C142 55 149 55 152 60
+      C155 65 151 70 145 70
+      C141 70 138 68 135 65
+    "></path>
+
+    <path d="
+      M135 103
+      C142 110 149 110 152 105
+      C155 100 151 95 145 95
+      C141 95 138 97 135 100
+    "></path>
+  </g>
+</svg>

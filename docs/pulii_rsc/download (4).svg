@@ -1,0 +1,54 @@
+<svg width="170" height="168" viewBox="0 0 170 168" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="#49382E" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+
+    <!-- Small finial -->
+    <circle cx="85" cy="21" r="3.5"></circle>
+
+    <!-- Dome -->
+    <path d="
+      M47 62
+      C47 46 55 35 66 31
+      C73 28 79 27 85 27
+      C91 27 97 28 104 31
+      C115 35 123 46 123 62
+    "></path>
+
+    <!-- Dome base -->
+    <path d="M47 62H123"></path>
+
+    <!-- Central dome ornament -->
+    <path d="
+      M77 48
+      C80 44 84 43 87 46
+      C90 43 94 44 95 48
+      C92 51 89 53 85 56
+      C81 53 78 51 77 48Z
+    "></path>
+
+    <path d="M85 56V61"></path>
+
+    <!-- Main entablature -->
+    <path d="M30 62H140"></path>
+    <path d="M30 62V68H140V62"></path>
+
+    <!-- Columns -->
+    <path d="M39 68V113"></path>
+    <path d="M51 68V113"></path>
+    <path d="M64 68V113"></path>
+    <path d="M77 68V113"></path>
+    <path d="M90 68V113"></path>
+    <path d="M103 68V113"></path>
+    <path d="M116 68V113"></path>
+    <path d="M128 68V113"></path>
+
+    <!-- Subtle column bases -->
+    <path d="M36 113H131"></path>
+
+    <!-- Bottom platform -->
+    <path d="M31 113H139"></path>
+    <path d="M26 120H144"></path>
+    <path d="M31 113V120"></path>
+    <path d="M139 113V120"></path>
+
+  </g>
+</svg>
