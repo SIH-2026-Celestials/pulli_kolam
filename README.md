@@ -4,7 +4,7 @@
 
 **Kolam Design-Principle Identification & Recreation**
 
-Computational study of traditional South Indian *Pulli Kolam* patterns — representing hand-drawn one-stroke designs as graphs, measuring their symmetry and motif structure, and validating their single-stroke correctness.
+Computational study of traditional South Indian *Pulli Kolam* patterns - representing hand-drawn one-stroke designs as graphs, measuring their symmetry and motif structure, and validating their single-stroke correctness.
 
 [![CI](https://github.com/Abhishek1106kr/pulli_kolam/actions/workflows/ci.yml/badge.svg)](https://github.com/Abhishek1106kr/pulli_kolam/actions/workflows/ci.yml)
 
@@ -12,9 +12,122 @@ Computational study of traditional South Indian *Pulli Kolam* patterns — repre
 
 ---
 
+## Run PULLI locally
+
+```
+npm install
+npm run dev
+```
+
+Frontend:
+http://localhost:5173
+
+Backend:
+http://localhost:8000
+
+API health:
+http://localhost:8000/api/v1/health
+
+This single command starts the FastAPI backend (classical CV + both ML
+detectors, all served in-process — see `api/detectors.py`) and the
+React/Vite frontend together, prefixing each process's output
+(`[API]`, `[FRONTEND]`, `[ML]`). It requires Python (with
+`pip install -r requirements.txt` already run once) and Node on `PATH`;
+see `package.json` for what each `npm run dev:*` script does
+individually, and `docs/DEPLOYMENT.md` for Docker / production
+deployment.
+
+---
+
+## System architecture
+
+PULLI today is a real (not simulated) three-layer system: a React/Vite
+frontend, a FastAPI backend, and a deterministic Python engine — with
+three interchangeable detectors sitting behind one API contract.
+
+```mermaid
+flowchart TB
+    subgraph client["Browser"]
+        UI["React + Vite\nDetect · Analyze · Explore · Gallery"]
+    end
+
+    subgraph api["FastAPI  ·  api/main.py"]
+        direction TB
+        EP["/api/v1/health\n/api/v1/model\n/api/v1/detect\n/api/v1/analyze\n/api/v1/reconstruct\n/api/v1/compare-detectors"]
+    end
+
+    subgraph det["Detector layer  ·  api/detectors.py"]
+        direction LR
+        CL["Classical\ndeterministic CV\n(production default)"]
+        ML["ML\nDotHeatmapNetV2\n128×128 U-Net"]
+        MLG["ML-gated\n+ lattice-consistency\nfilter (experimental)"]
+    end
+
+    subgraph engine["engine/  ·  deterministic core"]
+        direction LR
+        G["Graph construction\nNetworkX MultiGraph"]
+        MO["Motif induction"]
+        SY["D4 symmetry"]
+        VA["Validity\n(Eulerian check)"]
+        RE["Reconstruction"]
+    end
+
+    UI -- "multipart image upload" --> EP
+    EP -- "detector=classical|ml|ml-gated" --> det
+    CL --> G
+    ML --> G
+    MLG --> G
+    G --> MO
+    G --> SY
+    G --> VA
+    G --> RE
+    MO --> EP
+    SY --> EP
+    VA --> EP
+    RE --> EP
+    EP -- "JSON: dots · graph · validity · reconstruction" --> UI
+
+    style client fill:#F6F3EC,stroke:#171614,color:#171614
+    style api fill:#FFFFFF,stroke:#171614,color:#171614
+    style det fill:#FFFFFF,stroke:#A64B35,color:#171614
+    style engine fill:#F6F3EC,stroke:#171614,color:#171614
+```
+
+**Design rules the diagram encodes, enforced in code, not just documented:**
+- Whichever detector is selected owns the *entire* downstream pipeline for that request — analysis and reconstruction never silently run against a different detector's output than the one you asked for.
+- No silent fallback: if `detector=ml` or `detector=ml-gated` is requested and the model can't load or run, the API returns an explicit `503`, never a quiet substitution of classical results.
+- The engine (`engine/`) has zero PyTorch/FastAPI dependency — it is pure NumPy/SciPy/OpenCV/NetworkX, testable and reproducible on its own.
+
+### Detectors at a glance
+
+| Detector | What it is | Real-photo no-dot false-positive rate | Production default |
+|---|---|---|---|
+| `classical` | Deterministic CV — Otsu binarize, distance-transform dot detection, affine lattice fit | 33.3% | ✅ Yes |
+| `ml` | `DotHeatmapNetV2`, a 382,769-param U-Net, 128×128 native heatmap output | 100% (documented domain gap) | ❌ Experimental |
+| `ml-gated` | Same checkpoint + a post-detection lattice-consistency filter | 55.6% | ❌ Experimental |
+
+Both ML variants are exposed for comparison and research, never as a silent substitute for the classical default — see `docs/M4_1_ML_COMPLETION_REPORT.md` and `docs/M4_2_EVALUATION.md` for the full, honest evaluation behind these numbers.
+
+### Deployment
+
+```mermaid
+flowchart LR
+    Dev["npm run dev\n(root launcher)"] --> Local["localhost:5173 + :8000\nconcurrently · cross-env"]
+    Docker["Dockerfile\n(api only, CPU-only torch)"] --> Container["pulli-api container\n:8000"]
+    Static["npm run build\n(frontend/frontend)"] --> Static2["static dist/\nVercel / Cloudflare Pages"]
+
+    style Dev fill:#F6F3EC,stroke:#171614,color:#171614
+    style Docker fill:#F6F3EC,stroke:#171614,color:#171614
+    style Static fill:#F6F3EC,stroke:#171614,color:#171614
+```
+
+See `docs/DEPLOYMENT.md` and `docs/DEPLOYMENT_AUDIT.md` for exact commands, environment variables, and the demo-vs-production topology.
+
+---
+
 ## What is a Kolam?
 
-A **Pulli Kolam** is a traditional South Indian geometric drawing made by looping a single continuous line around a grid of dots (*pulli*) without lifting the hand. The resulting patterns look intuitive and artistic, but many of them follow strict underlying rules — symmetry, repeated local motifs, and closed single-stroke (Eulerian) continuity.
+A **Pulli Kolam** is a traditional South Indian geometric drawing made by looping a single continuous line around a grid of dots (*pulli*) without lifting the hand. The resulting patterns look intuitive and artistic, but many of them follow strict underlying rules - symmetry, repeated local motifs, and closed single-stroke (Eulerian) continuity.
 
 **PULLI** treats each Kolam as a computational object: a dense coordinate trace that can be turned into a graph, measured, and checked for structural validity.
 
@@ -42,20 +155,20 @@ input pattern → infer the minimal generating grammar → prove it's correct �
 
 ```mermaid
 flowchart TD
-    A["Dataset (Kaggle — kolam19 / kolam29 / kolam109)"] --> B["CSV coordinate polyline trace"]
+    A["Dataset (Kaggle - kolam19 / kolam29 / kolam109)"] --> B["CSV coordinate polyline trace"]
     B --> C["Coordinate normalization (~0.5u resolution)"]
-    C --> D["Graph construction — NetworkX MultiGraph"]
-    D --> E["Motif induction — canonical-signature clustering"]
-    D --> F["D4 symmetry matching — 4 rotations × 2 reflections"]
-    E --> G["Validity check — Eulerian circuit / path"]
+    C --> D["Graph construction - NetworkX MultiGraph"]
+    D --> E["Motif induction - canonical-signature clustering"]
+    D --> F["D4 symmetry matching - 4 rotations × 2 reflections"]
+    E --> G["Validity check - Eulerian circuit / path"]
     F --> G
-    G --> H["Generation — stamp motif onto new dot lattice"]
+    G --> H["Generation - stamp motif onto new dot lattice"]
 
     style A fill:#F6F3EC,stroke:#171614,color:#171614
     style H fill:#F6F3EC,stroke:#A64B35,color:#A64B35,stroke-dasharray: 4 3
 ```
 
-Integer coordinates in a trace correspond to dots actually visited; half-integer coordinates are loop-around geometry where the stroke passes *between* dots. Because a stroke can run alongside a previously drawn strand, edges between the same two nodes can occur more than once — which is why the engine uses a `MultiGraph` rather than a simple graph, and why validity checking has to be multiplicity-aware rather than a plain "is it connected" test.
+Integer coordinates in a trace correspond to dots actually visited; half-integer coordinates are loop-around geometry where the stroke passes *between* dots. Because a stroke can run alongside a previously drawn strand, edges between the same two nodes can occur more than once - which is why the engine uses a `MultiGraph` rather than a simple graph, and why validity checking has to be multiplicity-aware rather than a plain "is it connected" test.
 
 ---
 
@@ -63,48 +176,57 @@ Integer coordinates in a trace correspond to dots actually visited; half-integer
 
 ```
 PULLI/
-├── engine/                  # Core Python analysis engine
-│   ├── graph_io.py          #   CSV trace -> nx.MultiGraph
-│   ├── image_io.py          #   Photo/drawing -> nx.MultiGraph (same node/edge format)
-│   ├── motifs.py            #   Local-motif induction via canonical-signature clustering
-│   ├── symmetry.py          #   D4-symmetry-aware motif matching
-│   ├── validity.py          #   Eulerian circuit/path validity checks
-│   └── generation.py        #   Stamp an induced motif onto a new dot lattice
+├── engine/                   # Core deterministic Python engine (no FastAPI/torch dependency)
+│   ├── graph_io.py           #   CSV trace -> nx.MultiGraph
+│   ├── image_io.py           #   Photo -> nx.MultiGraph (classical CV: preprocess/detect/trace)
+│   ├── motifs.py             #   Local-motif induction via canonical-signature clustering
+│   ├── symmetry.py           #   D4-symmetry-aware motif matching
+│   ├── validity.py           #   Eulerian circuit/path validity checks
+│   ├── reconstruction.py     #   Motif/residual decomposition + reconstruction
+│   ├── generation.py         #   Stamp an induced motif onto a new dot lattice
+│   ├── novel_generation.py   #   Novel-pattern generation (experimental, see docs/M4_2_GENERATION.md)
+│   └── ml_contract.py        #   Frozen ML-detector <-> engine interface contract
 │
-├── tests/                   # pytest suite (35 tests across 5 modules)
+├── api/                       # FastAPI backend (api/main.py) — the only backend server
+│   ├── main.py                #   /api/v1/{health,model,detect,analyze,reconstruct,compare-detectors}
+│   ├── detectors.py           #   Classical / ML / ML-gated detector implementations
+│   ├── schemas.py             #   Pydantic response models
+│   └── tests/                 #   API integration + acceptance tests
 │
-├── kolam_data/               # Kaggle "one-stroke-dotted-pulli-kolam" dataset
-│   ├── Kolam CSV files/       #   kolam19.csv, kolam29.csv, kolam109.csv
-│   ├── Kolam19 Images/        #   400 rendered patterns
-│   ├── Kolam29 Images/
-│   └── Kolam109 Images/
+├── experiments/                # ML research (training, evaluation, checkpoints)
+│   ├── m4_1/, m4_2/            #   DotHeatmapNetV2 architecture, training, evaluation
+│   └── m4_2/results/dot_heatmap_net_v2.pt   # trained checkpoint (382,769 params)
 │
-├── frontend/frontend/        # React + Vite web application
+├── frontend/frontend/          # React 19 + Vite web application
 │   └── src/
-│       ├── pages/             #   Home, Project, HowItWorks, Explore, KolamDetail,
-│       │                      #   Analyze, Technology, Impact, About
-│       ├── components/        #   Header, Footer, KolamCard, ResearchPipeline, ...
-│       └── data/kolams.js     #   Static data layer (400-pattern dataset, replaceable by an API)
+│       ├── pages/               #   Home, Detect, Explore, Analyze, Gallery, About, ...
+│       ├── components/          #   Header, Footer, KolamCard, ResearchPipeline, ...
+│       └── lib/api/             #   Centralized FastAPI client (client.js, kolam.js)
 │
-├── analyze_kolam.py, analyze_symmetry.py, plot_kolam.py, view_kolams.py
-│                              # Ad-hoc exploration scripts over the raw CSVs
-├── validate_real_data.py, validate_adaptive.py, validate_mdl.py, validate_image_io.py
-│                              # Measurement scripts — print real, non-invented numbers
-│                              # from running the engine against the dataset
+├── scripts/                   # Root dev-launcher helper scripts (preflight, health check)
+├── docs/                      # Architecture, deployment, and ML evaluation reports
+├── tests/                     # Core engine pytest suite
+├── kolam_data/                 # Kaggle "one-stroke-dotted-pulli-kolam" dataset
+├── real_photos/                # Real (Wikimedia-licensed) evaluation photographs
 │
-├── requirements.txt
-└── .github/workflows/ci.yml  # Python tests + frontend lint/build on every push
+├── package.json                # Root single-command dev launcher (npm run dev)
+├── Dockerfile                  # API-only production image (CPU-only)
+├── requirements*.txt           # Split engine/ml/api dependency layers
+└── .github/workflows/ci.yml    # Python tests + frontend lint/build on every push
 ```
 
 ---
 
 ## Getting started
 
-### Python engine
+The fastest path is the root launcher (see [Run PULLI locally](#run-pulli-locally) above). The steps below are for running each piece independently.
+
+### Python engine + API
 
 ```bash
 pip install -r requirements.txt
-pytest tests/ -v
+python -m pytest -q                                     # full suite: 277 passing
+python -m uvicorn api.main:app --host 0.0.0.0 --port 8000  # backend only
 ```
 
 Run a measurement script directly against the dataset, e.g.:
@@ -118,32 +240,32 @@ python validate_real_data.py
 ```bash
 cd frontend/frontend
 npm install
-npm run dev       # local dev server
+npm run dev       # local dev server, reads VITE_API_BASE_URL (see .env.example)
 npm run build     # production build
 npm run lint
 ```
 
-The frontend currently reads from a static data layer (`src/data/kolams.js`) generated from the analysis CSVs, and is structured so that layer can later be swapped for a FastAPI backend without touching the page components.
+The frontend calls the FastAPI backend directly through a centralized client (`src/lib/api/`) — no static/mock data layer for detection, analysis, or reconstruction. `src/data/kolams.js` remains a static dataset layer only for the Explore/Gallery pages, which browse the bundled `kolam19` dataset rather than live-querying it.
 
 ---
 
 ## Dataset
 
-PULLI uses the **[One-Stroke Dotted Pulli Kolam](https://www.kaggle.com/datasets/shubha1011/one-stroke-dotted-pulli-kolam)** dataset from Kaggle, which ships three CSV files — one per grid size:
+PULLI uses the **[One-Stroke Dotted Pulli Kolam](https://www.kaggle.com/datasets/shubha1011/one-stroke-dotted-pulli-kolam)** dataset from Kaggle, which ships three CSV files - one per grid size:
 
 | Dataset | Patterns | Grid |
 |---|---|---|
 | `kolam19` | 400 | 37×37 |
-| `kolam29` | — | larger lattice |
-| `kolam109` | — | larger lattice |
+| `kolam29` | - | larger lattice |
+| `kolam109` | - | larger lattice |
 
-Each row stores a dense polyline trace (`x-kolam {n}` / `y-kolam {n}` columns) sampled on a half-integer grid; every trace is a closed loop (first point equals last point). PULLI does not claim ownership of the dataset — all patterns are attributed to the original dataset maintainers.
+Each row stores a dense polyline trace (`x-kolam {n}` / `y-kolam {n}` columns) sampled on a half-integer grid; every trace is a closed loop (first point equals last point). PULLI does not claim ownership of the dataset - all patterns are attributed to the original dataset maintainers.
 
 ---
 
 ## Current findings
 
-Measured by running the engine's validation scripts against the real dataset — not invented numbers.
+Measured by running the engine's validation scripts against the real dataset - not invented numbers.
 
 | Method | Avg. edge recall | Avg. motifs / pattern |
 |---|---|---|
@@ -152,7 +274,7 @@ Measured by running the engine's validation scripts against the real dataset —
 
 - Evaluated across a 15-pattern sample from `kolam19`.
 - Single-motif models explain only a fraction of a real pattern; multi-motif set-cover induction is what gets recall into the 90%+ range.
-- The `pytest` suite (35 tests across `test_generation`, `test_image_io`, `test_motifs`, `test_symmetry`, `test_validity`) currently passes in full.
+- The full `pytest` suite currently passes **277/277**, spanning the core engine, the ML detector/API integration layer, and the deployment launcher.
 
 These are experimental results from the current evaluation sample, not universal claims about the dataset or method.
 
@@ -168,16 +290,24 @@ These are experimental results from the current evaluation sample, not universal
 | Symmetry analysis (D4 group) | ✅ Done |
 | Motif analysis (fixed + adaptive radius) | ✅ Done |
 | Structural validation (Eulerian constraints) | ✅ Done |
-| Computational generation | 🔶 In progress |
-| FastAPI backend / live analysis | 🔶 Not yet connected |
+| FastAPI backend + live frontend integration | ✅ Done — real upload → detect → analyze → reconstruct, no simulated data |
+| Classical detector (production default) | ✅ Done |
+| ML detector (`DotHeatmapNetV2`) | 🔶 Experimental — strong on synthetic data, documented real-photo domain gap |
+| ML-gated detector (lattice-consistency filter) | 🔶 Experimental — partial mitigation of the domain gap |
+| Reconstruction (same-pattern structural decomposition) | ✅ Done, reliable |
+| Novel-pattern generation | 🔶 Experimental — 1/120 valid candidates on the current benchmark, not exposed in the UI |
+| Docker / single-command local launcher | ✅ Done |
+| M5 structural grammar | ⬜ Not started |
 
 ---
 
 ## Tech stack
 
 **Engine:** Python, NetworkX (`MultiGraph`), Pandas, NumPy, SciPy, scikit-image, OpenCV, Matplotlib
+**ML:** PyTorch (CPU-only), a 382,769-param U-Net (`DotHeatmapNetV2`)
+**Backend:** FastAPI, Uvicorn, Pydantic
 **Frontend:** React 19, Vite, React Router, plain CSS
-**Planned:** FastAPI, to connect the frontend to live engine output instead of the static data layer
+**Deployment:** Docker (API-only image), `concurrently` + `cross-env` (single-command local dev launcher)
 
 ---
 

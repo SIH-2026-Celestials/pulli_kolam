@@ -1,0 +1,16 @@
+# CPU-only ML lattice detector (experiments/m4_1, experiments/m4_2).
+# Adds torch on top of the engine dependencies. This project has no
+# GPU/CUDA code anywhere (see docs/DEPLOYMENT_AUDIT.md section 7).
+#
+# IMPORTANT: on Linux, `pip install torch` from the default PyPI index
+# pulls in the CUDA build plus several hundred MB of nvidia-*
+# dependency packages -- even though this project never uses a GPU.
+# The Dockerfile installs this file with
+# `--index-url https://download.pytorch.org/whl/cpu` to get the small
+# CPU-only wheel instead. Installing this file directly with plain
+# `pip install -r requirements-ml.txt` (e.g. on Windows dev machines,
+# where the default wheel is already CPU-only) still works.
+
+-r requirements-engine.txt
+
+torch==2.11.0

@@ -1,10 +1,27 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { ChevronDown, Sun, User } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
+import { LANGUAGES } from '../../i18n/index'
 import './Header.css'
 
 export default function Header() {
+  const { lang, setLanguage, t } = useLanguage()
   const [langOpen, setLangOpen] = useState(false)
+  const dropdownRef = useRef(null)
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handle(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setLangOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
+  }, [])
+
+  const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0]
 
   return (
     <header className="navbar-clone">
@@ -36,32 +53,62 @@ export default function Header() {
         {/* Center: Navigation Links */}
         <nav className="navbar-nav">
           <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            Home
+            {t('nav.home')}
           </NavLink>
           <NavLink to="/analyze" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            Analyze
+            {t('nav.analyze')}
           </NavLink>
-          <NavLink to="/generate" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            Generate
+          <NavLink to="/detect" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+            {t('nav.detect')}
           </NavLink>
+          {/* <NavLink to="/generate" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+            {t('nav.generate')}
+          </NavLink> */}
           <NavLink to="/explore" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            Gallery
+            {t('nav.gallery')}
+          </NavLink>
+          <NavLink to="/learn" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+            Learn
           </NavLink>
           <NavLink to="/about" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            About
+            {t('nav.about')}
           </NavLink>
           <NavLink to="/how-it-works" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            How it Works
+            {t('nav.howItWorks')}
           </NavLink>
         </nav>
 
         {/* Right: Controls */}
         <div className="navbar-controls">
-          <div className="lang-dropdown">
-            <button className="btn-lang" onClick={() => setLangOpen(!langOpen)}>
-              <span>English</span>
-              <ChevronDown size={14} />
+          <div className="lang-dropdown" ref={dropdownRef}>
+            <button
+              className="btn-lang"
+              onClick={() => setLangOpen(o => !o)}
+              aria-haspopup="listbox"
+              aria-expanded={langOpen}
+            >
+              <span>{currentLang.nativeName}</span>
+              <ChevronDown size={14} className={langOpen ? 'chevron-open' : ''} />
             </button>
+            {langOpen && (
+              <ul className="lang-menu" role="listbox" aria-label="Select language">
+                {LANGUAGES.map(l => (
+                  <li
+                    key={l.code}
+                    role="option"
+                    aria-selected={l.code === lang}
+                    className={`lang-option${l.code === lang ? ' selected' : ''}`}
+                    onClick={() => { setLanguage(l.code); setLangOpen(false) }}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setLanguage(l.code); setLangOpen(false) } }}
+                    tabIndex={0}
+                  >
+                    <span className="lang-script">{l.script}</span>
+                    <span>{l.nativeName}</span>
+                    {l.code === lang && <span className="lang-check">✓</span>}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <button className="btn-theme" aria-label="Toggle Theme">

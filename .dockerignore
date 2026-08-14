@@ -1,0 +1,54 @@
+# Dockerfile uses explicit COPY paths for engine/, api/, and a curated
+# subset of experiments/ -- but Docker still uploads the whole build
+# context before filtering, so this file keeps that upload small and
+# keeps large/irrelevant trees out of it entirely.
+#
+# Inspected imports before writing this (api/main.py, api/detectors.py,
+# api/reconstruct_adapter.py, experiments/m4_2/ml_lattice_detector.py)
+# to confirm what's actually required at runtime -- see the Dockerfile
+# header comment for the resulting file list.
+
+.git
+.github
+.claude
+.pytest_cache
+__pycache__/
+**/__pycache__/
+*.pyc
+.vscode
+.idea
+
+# Frontend -- not part of the API image
+frontend/
+node_modules/
+frontend/frontend/node_modules/
+frontend/frontend/dist/
+
+# Datasets and evaluation corpora -- not needed at inference time
+kolam_data/
+real_photos/
+synthetic_photos/
+synthetic_photos_heldout/
+diagnostics/
+experiments/m4_1/data/
+experiments/m4_2/data/
+experiments/m4_1/diagnostics/
+experiments/m4_2_generation/
+
+# Training-only / research-only experiment code and artifacts -- not
+# imported by api/ (only model.py, ml_lattice_detector.py, peak_detect.py,
+# and the __init__.py package markers are, and those are COPY'd
+# explicitly in the Dockerfile regardless of this file)
+experiments/m4_1/tests/
+experiments/m4_2/tests/
+experiments/m4_1/results/dot_heatmap_net.pt
+
+# Misc large/irrelevant root-level files
+one-stroke-dotted-pulli-kolam.zip
+artifacts/
+*.md
+!README.md
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,11 +1,13 @@
 import { useState, useMemo } from 'react'
 import KolamCard from '../../components/KolamCard/KolamCard'
+import { useLanguage } from '../../context/LanguageContext'
 import { kolam19 } from '../../data/kolams'
 import './Explore.css'
 
 const ITEMS_PER_PAGE = 36
 
 export default function Explore() {
+  const { t } = useLanguage()
   const [search, setSearch] = useState('')
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE)
 
@@ -30,14 +32,13 @@ export default function Explore() {
   return (
     <main id="main-content" className="explore-page">
       <header className="explore-header section">
-        <div className="container">
-          <p className="eyebrow">Kolam Explorer</p>
+        <div className="container--narrow">
+          <p className="eyebrow">{t('pages.gallery.eyebrow')}</p>
           <h1 className="heading-display heading-2 explore-title">
-            Explore dataset: kolam19
+            {t('pages.gallery.title')}
           </h1>
           <p className="body-text explore-sub">
-            400 one-stroke Pulli Kolam patterns constructed around a 37×37 dot grid.
-            Select any Kolam to view its geometric properties, validity analysis, and symmetry metrics.
+            {t('pages.gallery.sub')}
           </p>
 
           {/* Search / Filter bar */}
@@ -47,7 +48,7 @@ export default function Explore() {
               <input
                 type="text"
                 className="explore-search-input"
-                placeholder="Filter by Kolam number (e.g. 26, 105)..."
+                placeholder={t('pages.gallery.searchPlaceholder')}
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value)
@@ -70,18 +71,18 @@ export default function Explore() {
             </div>
 
             <div className="explore-meta label-tech">
-              Showing {visibleKolams.length} of {filteredKolams.length} patterns
+              {t('pages.gallery.showing', { shown: visibleKolams.length, total: filteredKolams.length })}
             </div>
           </div>
         </div>
       </header>
 
       {/* Grid gallery */}
-      <section className="explore-gallery-section container">
+      <section className="explore-gallery-section container--narrow">
         {filteredKolams.length === 0 ? (
           <div className="explore-empty">
-            <p className="heading-display heading-4">No matching Kolam found.</p>
-            <p className="body-text">Try searching for a number between 1 and 400.</p>
+            <p className="heading-display heading-4">{t('pages.gallery.noMatch')}</p>
+            <p className="body-text">{t('pages.gallery.tryNumber')}</p>
           </div>
         ) : (
           <>
@@ -93,11 +94,11 @@ export default function Explore() {
 
             {visibleCount < filteredKolams.length && (
               <div className="explore-load-more">
-                <button 
+                <button
                   onClick={handleLoadMore}
                   className="btn btn--outline"
                 >
-                  Load More Patterns ({filteredKolams.length - visibleCount} remaining)
+                  {t('pages.gallery.loadMore', { remaining: filteredKolams.length - visibleCount })}
                 </button>
               </div>
             )}

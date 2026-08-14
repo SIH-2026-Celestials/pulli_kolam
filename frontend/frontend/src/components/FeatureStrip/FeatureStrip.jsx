@@ -1,32 +1,35 @@
 import { ScanSearch, Repeat, Sparkles, ShieldCheck, Landmark } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
 import './FeatureStrip.css'
 
 export default function FeatureStrip() {
+  const { t } = useLanguage()
+
   const features = [
     {
       icon: <ScanSearch size={22} className="strip-icon" />,
-      title: 'AI Powered Analysis',
-      desc: 'Detects dots, symmetry, motifs and stroke structure.'
+      title: t('features.aiAnalysis'),
+      desc: t('features.aiAnalysisDesc')
     },
     {
       icon: <Repeat size={22} className="strip-icon" />,
-      title: 'Rule Based Understanding',
-      desc: 'Extracts the mathematical rules behind the kolam.'
+      title: t('features.ruleBased'),
+      desc: t('features.ruleBasedDesc')
     },
     {
       icon: <Sparkles size={22} className="strip-icon" />,
-      title: 'Unique Regeneration',
-      desc: 'Generates new, never-seen-before kolams using learned rules.'
+      title: t('features.uniqueRegen'),
+      desc: t('features.uniqueRegenDesc')
     },
     {
       icon: <ShieldCheck size={22} className="strip-icon" />,
-      title: 'Authentic & Valid',
-      desc: 'Ensures single-stroke validity through Eulerian verification.'
+      title: t('features.authentic'),
+      desc: t('features.authenticDesc')
     },
     {
       icon: <Landmark size={22} className="strip-icon" />,
-      title: 'Preserve Heritage',
-      desc: "Technology for the protection of India's rich cultural art."
+      title: t('features.heritage'),
+      desc: t('features.heritageDesc')
     }
   ]
 

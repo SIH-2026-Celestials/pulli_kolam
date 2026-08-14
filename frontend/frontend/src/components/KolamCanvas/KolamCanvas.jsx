@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import './KolamCanvas.css'
 
 /**
- * KolamCanvas — SVG animated Kolam visualization for the hero.
+ * KolamCanvas - SVG animated Kolam visualization for the hero.
  * 
  * Renders a pulli dot-grid and draws a traditional-style Kolam
  * pattern progressively using SVG stroke-dashoffset animation.
@@ -22,13 +22,13 @@ export default function KolamCanvas({ className = '' }) {
         className="kolam-canvas__svg"
         aria-hidden="true"
       >
-        {/* Dot grid — the Pulli (dots) */}
+        {/* Dot grid - the Pulli (dots) */}
         <PulliGrid />
 
-        {/* Main Kolam stroke — animated drawing */}
+        {/* Main Kolam stroke - animated drawing */}
         <KolamStroke />
 
-        {/* Symmetry axes — subtle */}
+        {/* Symmetry axes - subtle */}
         <SymmetryAxes />
 
         {/* Corner annotation */}
@@ -65,7 +65,7 @@ function PulliGrid() {
 }
 
 function KolamStroke() {
-  // A traditional 5×5 Kolam pattern — continuous one-stroke path
+  // A traditional 5×5 Kolam pattern - continuous one-stroke path
   // Drawn around the dot grid with loops between dots
   const cx = 150
   const cy = 150

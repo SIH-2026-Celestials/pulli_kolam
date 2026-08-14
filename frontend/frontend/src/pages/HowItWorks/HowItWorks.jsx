@@ -1,69 +1,41 @@
 import { Link } from 'react-router-dom'
+import { useLanguage } from '../../context/LanguageContext'
 import './HowItWorks.css'
 
-const steps = [
-  {
-    num: '01',
-    title: 'DATASET COLLECTION',
-    subtitle: 'Selection & Ingestion',
-    desc: 'Kolam patterns are collected from authentic, curated datasets (kolam19, kolam29, kolam109). Each design is drawn around a structured dot matrix field.',
-  },
-  {
-    num: '02',
-    title: 'DIGITAL TRACE',
-    subtitle: 'Polyline Coordinates',
-    desc: 'Each pattern is represented as an ordered sequence of 2D geometric coordinates sampled at ~0.5-unit spatial resolution, storing exact stroke order.',
-  },
-  {
-    num: '03',
-    title: 'GRAPH MODELLING',
-    subtitle: 'NetworkX MultiGraph',
-    desc: 'The drawing structure is converted into a graph representation preserving edge multiplicity for repeated stroke strands at lattice intersection nodes.',
-  },
-  {
-    num: '04',
-    title: 'PATTERN ANALYSIS',
-    subtitle: 'Symmetry & Motif Extraction',
-    desc: 'The system studies reflection/rotation under Dihedral D4 symmetry groups and extracts recurring local subgraphs via fixed and adaptive radius set-cover induction.',
-  },
-  {
-    num: '05',
-    title: 'STRUCTURAL VALIDATION',
-    subtitle: 'Eulerian Trail Verification',
-    desc: 'Candidate patterns are evaluated against one-stroke closed loop constraints (Eulerian path verification) with 28 automated test suite assertions.',
-  },
-  {
-    num: '06',
-    title: 'RECONSTRUCTION',
-    subtitle: 'Generative Synthesis (Research Phase)',
-    desc: 'Discovered motif rules and symmetry constraints provide the foundation for future computational generation of valid new Kolam patterns.',
-    isFuture: true,
-  },
-]
-
 export default function HowItWorks() {
+  const { t } = useLanguage()
+
+  const steps = [
+    { num: '01', title: t('pages.howItWorks.step1Title'), subtitle: t('pages.howItWorks.step1Subtitle'), desc: t('pages.howItWorks.step1Desc') },
+    { num: '02', title: t('pages.howItWorks.step2Title'), subtitle: t('pages.howItWorks.step2Subtitle'), desc: t('pages.howItWorks.step2Desc') },
+    { num: '03', title: t('pages.howItWorks.step3Title'), subtitle: t('pages.howItWorks.step3Subtitle'), desc: t('pages.howItWorks.step3Desc') },
+    { num: '04', title: t('pages.howItWorks.step4Title'), subtitle: t('pages.howItWorks.step4Subtitle'), desc: t('pages.howItWorks.step4Desc') },
+    { num: '05', title: t('pages.howItWorks.step5Title'), subtitle: t('pages.howItWorks.step5Subtitle'), desc: t('pages.howItWorks.step5Desc') },
+    { num: '06', title: t('pages.howItWorks.step6Title'), subtitle: t('pages.howItWorks.step6Subtitle'), desc: t('pages.howItWorks.step6Desc'), isFuture: true },
+  ]
+
   return (
     <main id="main-content" className="how-it-works-page">
       <header className="how-header section section--bordered">
-        <div className="container">
-          <p className="eyebrow eyebrow--accent">Technical Pipeline Walkthrough</p>
+        <div className="container--narrow">
+          <p className="eyebrow eyebrow--accent">{t('pages.howItWorks.eyebrow')}</p>
           <h1 className="heading-display heading-2 how-title">
-            HOW IT WORKS
+            {t('pages.howItWorks.title')}
           </h1>
           <p className="body-text how-sub">
-            The 6-stage visual pipeline transforming traditional one-stroke Kolam drawings into verified graph structures and mathematical representations.
+            {t('pages.howItWorks.sub')}
           </p>
         </div>
       </header>
 
       {/* Visual Pipeline Grid */}
-      <section className="container section section--bordered">
+      <section className="container--narrow section section--bordered">
         <div className="pipeline-grid">
           {steps.map((step) => (
             <div key={step.num} className={`pipeline-card archival-frame ${step.isFuture ? 'pipeline-card--future' : ''}`}>
               <div className="card-top">
-                <span className="step-tag label-tech">{step.num} — {step.subtitle}</span>
-                {step.isFuture && <span className="future-tag label-tech">IN PROGRESS</span>}
+                <span className="step-tag label-tech">{step.num} - {step.subtitle}</span>
+                {step.isFuture && <span className="future-tag label-tech">{t('pages.howItWorks.inProgress')}</span>}
               </div>
               <h2 className="heading-display heading-4 step-heading">{step.title}</h2>
               <p className="body-text body-text--sm step-text">{step.desc}</p>
@@ -73,24 +45,24 @@ export default function HowItWorks() {
       </section>
 
       {/* Deep-Dive Technical Detail */}
-      <section className="container section">
+      <section className="container--narrow section">
         <div className="tech-explain-grid">
           <div>
-            <p className="eyebrow">GRAPH REPRESENTATION</p>
+            <p className="eyebrow">{t('pages.howItWorks.graphRepresentation')}</p>
             <h2 className="heading-display heading-3" style={{ marginTop: '0.5rem' }}>
-              Why MultiGraph Over Simple Graph?
+              {t('pages.howItWorks.whyMultiGraph')}
             </h2>
           </div>
           <div className="body-text">
             <p>
-              In traditional Kolam drawing, strokes frequently loop back alongside previously drawn strands between adjacent dots. A standard simple graph cannot capture multiple parallel edges between the same pair of nodes.
+              {t('pages.howItWorks.whyP1')}
             </p>
             <p style={{ marginTop: '1rem' }}>
-              PULLI utilizes NetworkX <code>MultiGraph</code> to store edge multiplicity explicitly. This allows Eulerian trail checks to evaluate the exact stroke traversal order.
+              {t('pages.howItWorks.whyP2')}
             </p>
             <div style={{ marginTop: '1.5rem' }}>
               <Link to="/technology" className="btn btn--primary">
-                View Full Technology Specifications →
+                {t('pages.howItWorks.viewSpecs')}
               </Link>
             </div>
           </div>

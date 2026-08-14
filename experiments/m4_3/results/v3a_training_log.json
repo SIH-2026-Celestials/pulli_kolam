@@ -1,0 +1,29 @@
+{
+  "n_epochs": 2,
+  "lr": 0.001,
+  "batch_size": 8,
+  "seed": 42,
+  "model_parameters": 382769,
+  "best_val_loss": 0.23567073472908565,
+  "n_train_images": 500,
+  "n_val_images": 56,
+  "data_loading_seconds": 63.89645529999689,
+  "training_seconds": 141.38356770000246,
+  "total_seconds": 205.28002299999935,
+  "history": [
+    {
+      "epoch": 0,
+      "train_loss": 0.46386878681182864,
+      "val_loss": 0.3757565362112863
+    },
+    {
+      "epoch": 1,
+      "train_loss": 0.27870895791053774,
+      "val_loss": 0.23567073472908565
+    }
+  ],
+  "checkpoints": {
+    "best": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m4_3\\checkpoints\\v3a_best.pt",
+    "final": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m4_3\\checkpoints\\v3a_final.pt"
+  }
+}

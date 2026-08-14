@@ -1,4 +1,5 @@
 @import './tokens.css';
+@import './utilities.css';
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -36,3 +37,103 @@ a {
   text-decoration: none;
   color: inherit;
 }
+
+/* --- Shared Layout & Grid Helpers --- */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 40px;
+}
+
+.container--narrow {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 40px;
+}
+
+.section {
+  padding: 48px 0;
+}
+
+.section--bordered {
+  border-bottom: 1px solid var(--color-card-border);
+}
+
+/* --- Shared Page Layout Wrapper to ensure full-width flex rendering --- */
+.detect-page,
+.generate-page,
+.learn-page,
+.analyze-page,
+.about-page,
+.how-it-works-page,
+.technology-page,
+.impact-page,
+.explore-page,
+.project-page,
+.kolam-detail-page,
+.module-page {
+  width: 100%;
+  min-height: calc(100vh - 128px);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-paper);
+  flex: 1;
+}
+
+/* --- Shared Typography --- */
+.heading-display {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--color-text-dark);
+  line-height: 1.25;
+}
+
+.heading-2 {
+  font-size: var(--text-3xl);
+}
+
+.heading-3 {
+  font-size: var(--text-2xl);
+}
+
+.heading-4 {
+  font-size: var(--text-xl);
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.eyebrow--accent {
+  color: var(--color-maroon-main);
+}
+
+.body-text {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text-body);
+}
+
+.body-text--sm {
+  font-size: 13.5px;
+}
+
+.label-tech {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+

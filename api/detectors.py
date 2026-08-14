@@ -1,111 +1,205 @@
+"""M4.2 Phase F/G: the detector abstraction the API layer uses so it
+never has to know whether dots came from the classical detector or an
+ML detector. Lives here (api/), NOT in engine/ -- engine/ stays free of
+PyTorch/detector-specific code, matching the boundary
+engine/ml_contract.py already establishes (a Protocol only, no concrete
+implementation). This is intentionally thin -- one dataclass, two small
+classes -- per the task's "do not over-engineer this" instruction.
+
+COORDINATE CONTRACT: `DetectionResult.dots` are in the ORIGINAL,
+AS-UPLOADED image's pixel coordinate frame -- not the internal
+model-input or heatmap-cell frame, and not even
+`engine.image_io.preprocess()`'s own deskewed-and-rotated frame.
+`preprocess()` rotates the image around its own center to correct mild
+camera tilt; both detectors' raw output lands in that ROTATED frame, so
+this module explicitly rotates back (inverse of `rotation_deg`) before
+returning -- otherwise dot overlays would not align with the image the
+user actually sees. This is the "map coordinates back to ORIGINAL IMAGE
+coordinates" requirement, applied precisely, not just for the
+model-input resize.
+"""
+
 from __future__ import annotations
 
 import os
 import sys
-import numpy as np
+import time
+from dataclasses import dataclass, field
+
+import cv2
 import networkx as nx
+import numpy as np
 
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from engine.image_io import preprocess, detect_lattice, trace_path, Lattice, Preprocessed
-
-
-def run_classical_detector(image_path: str) -> tuple[Preprocessed, Lattice, list, nx.MultiGraph]:
-    """Run classical CV distance-transform + peak local maxima dot detection."""
-    preprocessed = preprocess(image_path)
-    lattice = detect_lattice(preprocessed)
-    edges = trace_path(preprocessed, lattice)
-    G = nx.MultiGraph()
-    G.add_nodes_from(lattice.lattice_coords)
-    for a, b in edges:
-        G.add_edge(a, b)
-    return preprocessed, lattice, edges, G
+from engine import image_io  # noqa: E402
 
 
-def run_ml_detector(image_path: str) -> tuple[Preprocessed, Lattice, list, nx.MultiGraph, dict]:
-    """Run learned ML dot-heatmap network detector if available."""
-    preprocessed = preprocess(image_path)
-    info = {"available": False, "status": "unknown"}
+@dataclass
+class DetectionResult:
+    detector: str  # "classical" | "ml"
+    model_version: str | None
+    dots: list[tuple[float, float]]  # ORIGINAL image pixel coords (x, y) -- see module docstring
+    width: int
+    height: int
+    processing_ms: float
+    graph: nx.MultiGraph  # lattice-coordinate graph, for /analyze and /reconstruct -- NOT serialized directly to JSON
+    error: str | None = field(default=None)  # set instead of raising, for /compare-detectors partial-failure reporting
 
-    try:
-        import torch
-        from experiments.m4_1.ml_lattice_detector import LearnedLatticeDetector, CHECKPOINT_PATH
-        
-        if not os.path.exists(CHECKPOINT_PATH):
-            info = {"available": False, "status": "checkpoint_missing", "path": CHECKPOINT_PATH}
-            lattice = Lattice([], [], 0.0)
-            edges = []
-            G = nx.MultiGraph()
-            return preprocessed, lattice, edges, G, info
 
-        detector = LearnedLatticeDetector(CHECKPOINT_PATH)
-        lattice = detector(preprocessed)
-        edges = trace_path(preprocessed, lattice)
-        G = nx.MultiGraph()
-        G.add_nodes_from(lattice.lattice_coords)
+def _undo_deskew(pixel_positions: list[tuple[float, float]], rotation_deg: float, w: int, h: int) -> list[tuple[float, float]]:
+    if not pixel_positions or rotation_deg == 0.0:
+        return list(pixel_positions)
+    M_inv = cv2.getRotationMatrix2D((w / 2, h / 2), -rotation_deg, 1.0)
+    pts = np.array(pixel_positions, dtype=np.float32).reshape(-1, 1, 2)
+    undone = cv2.transform(pts, M_inv).reshape(-1, 2)
+    return [(float(x), float(y)) for x, y in undone]
+
+
+class ClassicalDetector:
+    """Wraps engine.image_io.detect_lattice + trace_path, UNMODIFIED --
+    this class adds no new detection logic, only the DetectionResult
+    packaging and coordinate un-deskewing described above."""
+
+    name = "classical"
+    model_version = None
+
+    def detect(self, image_path: str) -> DetectionResult:
+        t0 = time.monotonic()
+        img = cv2.imread(image_path)
+        if img is None:
+            raise FileNotFoundError(f"could not read image: {image_path}")
+        h, w = img.shape[:2]
+
+        preprocessed = image_io.preprocess(image_path)
+        lattice = image_io.detect_lattice(preprocessed)
+        edges = image_io.trace_path(preprocessed, lattice)
+
+        graph = nx.MultiGraph()
+        graph.add_nodes_from(lattice.lattice_coords)
         for a, b in edges:
-            G.add_edge(a, b)
-        
-        info = {"available": True, "status": "ok", "checkpoint": CHECKPOINT_PATH}
-        return preprocessed, lattice, edges, G, info
+            graph.add_edge(a, b)
 
-    except ImportError:
-        info = {"available": False, "status": "torch_not_installed"}
-        lattice = Lattice([], [], 0.0)
-        edges = []
-        G = nx.MultiGraph()
-        return preprocessed, lattice, edges, G, info
-    except Exception as e:
-        info = {"available": False, "status": f"error: {str(e)}"}
-        lattice = Lattice([], [], 0.0)
-        edges = []
-        G = nx.MultiGraph()
-        return preprocessed, lattice, edges, G, info
+        dots_original = _undo_deskew(lattice.pixel_positions, preprocessed.rotation_deg, w, h)
+        elapsed_ms = (time.monotonic() - t0) * 1000
+
+        return DetectionResult(
+            detector=self.name, model_version=self.model_version, dots=dots_original,
+            width=w, height=h, processing_ms=elapsed_ms, graph=graph,
+        )
 
 
-def compare_classical_and_ml_detectors(image_path: str) -> dict:
-    """Run classical and ML detectors on the same image and compute spatial diff metrics."""
-    prep_c, lat_c, edges_c, G_c = run_classical_detector(image_path)
-    prep_m, lat_m, edges_m, G_m, info_m = run_ml_detector(image_path)
+class MLDetector:
+    """Wraps experiments/m4_2/ml_lattice_detector.py's
+    LearnedLatticeDetectorV2. Raises explicitly (does NOT silently fall
+    back to classical) if the checkpoint is missing or inference fails
+    -- per the task's rules 10/11. Loaded lazily and cached on first use
+    so importing this module never requires torch/a checkpoint to
+    exist unless the ML detector is actually requested."""
 
-    dots_c = lat_c.pixel_positions if lat_c else []
-    dots_m = lat_m.pixel_positions if lat_m else []
+    name = "ml"
 
-    # Spatial match matching within 15px radius
-    matched_c = set()
-    matched_m = set()
-    radius_thresh = 15.0
+    def __init__(self):
+        self._detector = None
+        self.model_version = None
 
-    for i, pc in enumerate(dots_c):
-        for j, pm in enumerate(dots_m):
-            dist = np.hypot(pc[0] - pm[0], pc[1] - pm[1])
-            if dist <= radius_thresh:
-                matched_c.add(i)
-                matched_m.add(j)
+    def _ensure_loaded(self):
+        if self._detector is None:
+            from experiments.m4_2.ml_lattice_detector import LearnedLatticeDetectorV2, MalformedOutputError
+            try:
+                self._detector = LearnedLatticeDetectorV2()
+            except MalformedOutputError as e:
+                raise RuntimeError(f"ML detector unavailable: {e}") from e
+            self.model_version = self._detector.model_version
 
-    matched_count = len(matched_c)
-    classical_only_count = len(dots_c) - matched_count
-    ml_only_count = len(dots_m) - len(matched_m)
+    def detect(self, image_path: str) -> DetectionResult:
+        self._ensure_loaded()
+        t0 = time.monotonic()
+        img = cv2.imread(image_path)
+        if img is None:
+            raise FileNotFoundError(f"could not read image: {image_path}")
+        h, w = img.shape[:2]
 
-    return {
-        "classical": {
-            "dot_count": len(dots_c),
-            "dots": [{"x": float(p[0]), "y": float(p[1])} for p in dots_c],
-            "dot_radius": float(lat_c.dot_radius) if lat_c else 0.0,
-        },
-        "ml": {
-            "status": info_m["status"],
-            "available": info_m["available"],
-            "dot_count": len(dots_m),
-            "dots": [{"x": float(p[0]), "y": float(p[1])} for p in dots_m],
-            "dot_radius": float(lat_m.dot_radius) if lat_m else 0.0,
-        },
-        "comparison": {
-            "matched_count": matched_count,
-            "classical_only_count": classical_only_count,
-            "ml_only_count": ml_only_count,
-            "match_rate": round(matched_count / max(1, len(dots_c)), 4),
-        },
-    }
+        preprocessed = image_io.preprocess(image_path)
+        lattice = self._detector(preprocessed)
+        edges = image_io.trace_path(preprocessed, lattice)
+
+        graph = nx.MultiGraph()
+        graph.add_nodes_from(lattice.lattice_coords)
+        for a, b in edges:
+            graph.add_edge(a, b)
+
+        dots_original = _undo_deskew(lattice.pixel_positions, preprocessed.rotation_deg, w, h)
+        elapsed_ms = (time.monotonic() - t0) * 1000
+
+        return DetectionResult(
+            detector=self.name, model_version=self.model_version, dots=dots_original,
+            width=w, height=h, processing_ms=elapsed_ms, graph=graph,
+        )
+
+
+class GatedMLDetector:
+    """Wraps experiments/m4_2/gated_ml_lattice_detector.py's
+    GatedLearnedLatticeDetectorV2. Raises explicitly (does NOT silently fall
+    back to classical) if the checkpoint is missing or inference fails.
+    Loaded lazily and cached on first use."""
+
+    name = "ml-gated"
+
+    def __init__(self):
+        self._detector = None
+        self.model_version = None
+
+    def _ensure_loaded(self):
+        if self._detector is None:
+            from experiments.m4_2.gated_ml_lattice_detector import GatedLearnedLatticeDetectorV2
+            from experiments.m4_2.ml_lattice_detector import MalformedOutputError
+            try:
+                self._detector = GatedLearnedLatticeDetectorV2()
+            except (MalformedOutputError, RuntimeError, FileNotFoundError) as e:
+                raise RuntimeError(f"Gated ML detector unavailable: {e}") from e
+            self.model_version = self._detector.model_version
+
+    def detect(self, image_path: str) -> DetectionResult:
+        self._ensure_loaded()
+        t0 = time.monotonic()
+        img = cv2.imread(image_path)
+        if img is None:
+            raise FileNotFoundError(f"could not read image: {image_path}")
+        h, w = img.shape[:2]
+
+        preprocessed = image_io.preprocess(image_path)
+        lattice = self._detector(preprocessed)
+        edges = image_io.trace_path(preprocessed, lattice)
+
+        graph = nx.MultiGraph()
+        graph.add_nodes_from(lattice.lattice_coords)
+        for a, b in edges:
+            graph.add_edge(a, b)
+
+        dots_original = _undo_deskew(lattice.pixel_positions, preprocessed.rotation_deg, w, h)
+        elapsed_ms = (time.monotonic() - t0) * 1000
+
+        return DetectionResult(
+            detector=self.name, model_version=self.model_version, dots=dots_original,
+            width=w, height=h, processing_ms=elapsed_ms, graph=graph,
+        )
+
+
+_CLASSICAL = ClassicalDetector()
+_ML = MLDetector()
+_ML_GATED = GatedMLDetector()
+
+
+def get_detector(name: str):
+    if not isinstance(name, str):
+        raise ValueError(f"unknown detector {name!r}; must be 'classical', 'ml', or 'ml-gated'")
+    normalized = name.strip().lower().replace("_", "-")
+    if normalized == "classical":
+        return _CLASSICAL
+    if normalized == "ml":
+        return _ML
+    if normalized in {"ml-gated", "gated-ml"}:
+        return _ML_GATED
+    raise ValueError(f"unknown detector {name!r}; must be 'classical', 'ml', or 'ml-gated'")
+

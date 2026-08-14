@@ -1,0 +1,100 @@
+{
+  "localization_tolerance_px": 6.0,
+  "sets": {
+    "synthetic_val": {
+      "classical": {
+        "n_images": 45,
+        "mean_recall": 0.1084303017957189,
+        "mean_precision": 0.9961469710540516,
+        "mean_f1": 0.11141466727570594,
+        "mean_localization_error_px": 1.1117501589842622,
+        "mean_latency_ms": 19.019577784153324
+      },
+      "ml": {
+        "n_images": 45,
+        "mean_recall": 0.9990418095612902,
+        "mean_precision": 0.999521154546368,
+        "mean_f1": 0.9992803867088917,
+        "mean_localization_error_px": 2.7308312577169223,
+        "mean_latency_ms": 132.32102666709883
+      }
+    },
+    "synthetic_test": {
+      "classical": {
+        "n_images": 60,
+        "mean_recall": 0.1998249299719888,
+        "mean_precision": 0.9997757847533632,
+        "mean_f1": 0.19979913599875412,
+        "mean_localization_error_px": 0.7718029645669575,
+        "mean_latency_ms": 19.123056666285265
+      },
+      "ml": {
+        "n_images": 60,
+        "mean_recall": 0.9978662633263756,
+        "mean_precision": 0.9985115669315001,
+        "mean_f1": 0.9981842908375141,
+        "mean_localization_error_px": 2.7433869253692267,
+        "mean_latency_ms": 125.1663400005782
+      }
+    }
+  },
+  "real_photos": {
+    "real_in_scope": {
+      "classical": [
+        {
+          "file": "kolam2_tshrinivasan.jpg",
+          "n_detected": 1,
+          "latency_ms": 99.08240000368096
+        },
+        {
+          "file": "kolam_attur1_infofarmer.jpg",
+          "n_detected": 12,
+          "latency_ms": 255.06910000694916
+        },
+        {
+          "file": "kolam_naduveetu_meenakshisundaram.jpg",
+          "n_detected": 0,
+          "latency_ms": 262.9853000107687
+        },
+        {
+          "file": "muggu_kollam_sirensongs.jpg",
+          "n_detected": 4,
+          "latency_ms": 114.42460000398569
+        }
+      ],
+      "ml": [
+        {
+          "file": "kolam2_tshrinivasan.jpg",
+          "n_detected": 58,
+          "latency_ms": 102.26580000016838
+        },
+        {
+          "file": "kolam_attur1_infofarmer.jpg",
+          "n_detected": 297,
+          "latency_ms": 174.153900006786
+        },
+        {
+          "file": "kolam_naduveetu_meenakshisundaram.jpg",
+          "n_detected": 563,
+          "latency_ms": 160.2816999948118
+        },
+        {
+          "file": "muggu_kollam_sirensongs.jpg",
+          "n_detected": 151,
+          "latency_ms": 127.16729997191578
+        }
+      ]
+    },
+    "real_no_dot": {
+      "n_images": 18,
+      "classical_fp_rate": 0.3333333333333333,
+      "ml_fp_rate": 1.0
+    }
+  },
+  "decision": {
+    "ml_beats_classical_on_synthetic_test_recall": true,
+    "ml_beats_classical_on_synthetic_test_f1": true,
+    "ml_no_dot_fp_rate_better_or_equal": false,
+    "recommend_ml_as_default": false
+  }
+}

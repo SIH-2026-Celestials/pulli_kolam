@@ -1,0 +1,42 @@
+{
+  "index": 0,
+  "seed": 10000000,
+  "valid": false,
+  "score": 0.015625,
+  "n_dots": 100,
+  "n_edges": 161,
+  "connected_components": 2,
+  "n_odd_degree_nodes": 22,
+  "symmetry_coverage": 0.046875,
+  "config": {
+    "complexity": 0.6,
+    "symmetry": "auto",
+    "size": "small",
+    "n_restarts": 8,
+    "max_multiplicity": 2,
+    "lattice_width": 10,
+    "lattice_height": 10,
+    "motif_library_size": 29,
+    "motif_sources": [
+      "kolam19#323",
+      "kolam19#387",
+      "kolam29#51",
+      "kolam19#163",
+      "kolam19#51"
+    ]
+  },
+  "generation_latency_seconds": 7.464044094085693,
+  "render_success": true,
+  "fingerprint_hash": -3768498812285946100,
+  "novelty_vs_reference": {
+    "n_candidates": 1,
+    "n_unique_fingerprints": 1,
+    "unique_rate": 1.0,
+    "exact_topological_duplicate_rate": 0.0,
+    "exact_coordinate_duplicate_rate": null,
+    "near_duplicate_rate": 0.0,
+    "near_duplicate_threshold": 0.9,
+    "n_coordinate_comparable_pairs": 0
+  },
+  "sample_id": "kolam_0000"
+}

@@ -1,0 +1,24 @@
+# Pure deterministic research engine (engine/) runtime dependencies.
+# No FastAPI, no torch -- these are the classical-detector / graph /
+# motif / reconstruction dependencies only. Pinned to the versions
+# verified against the 171-test baseline (python -m pytest -q).
+#
+# opencv-python-headless (not opencv-python) intentionally: engine/
+# never opens a GUI window; the headless wheel avoids pulling in
+# GTK/X11 shared libraries that a server/container has no use for.
+
+numpy==2.1.3
+scipy==1.15.3
+pandas==2.2.3
+networkx==3.4.2
+scikit-image==0.25.0
+opencv-python-headless==5.0.0.93
+
+# engine/render.py (deterministic SVG/PNG rendering) lazy-imports this
+# for PNG output only -- SVG output is hand-built strings, no
+# dependency. Not currently called from api/'s request path, but is
+# part of engine/'s own declared dependency set. Already present
+# transitively via matplotlib in the top-level dev environment; pinned
+# directly here since engine/render.py imports it directly and a split
+# engine-only container needs it too.
+Pillow==11.1.0

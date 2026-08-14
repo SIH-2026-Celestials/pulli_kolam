@@ -1,0 +1,34 @@
+{
+  "attempt": 23,
+  "seed": 900023,
+  "source_layout": "kolam19#344",
+  "success": true,
+  "metrics": {
+    "connected_components": 1,
+    "n_nodes_outside_largest_component": 0,
+    "n_odd_degree_nodes": 0,
+    "total_correction_cost": 0,
+    "edge_multiplicity_max": 3,
+    "n_placements": 148,
+    "n_restarts_used": 10,
+    "repair_edges_applied": 14,
+    "latency_seconds": 15.434125661849976,
+    "seed": 900023
+  },
+  "validity": {
+    "connected_components": 1,
+    "is_eulerian_circuit": true,
+    "has_eulerian_path": true,
+    "largest_component_covers_all_nodes": true
+  },
+  "novelty": {
+    "n_candidates": 1,
+    "n_unique_fingerprints": 1,
+    "unique_rate": 1.0,
+    "exact_topological_duplicate_rate": 0.0,
+    "exact_coordinate_duplicate_rate": 0.0,
+    "near_duplicate_rate": 0.0,
+    "near_duplicate_threshold": 0.9,
+    "n_coordinate_comparable_pairs": 1
+  }
+}

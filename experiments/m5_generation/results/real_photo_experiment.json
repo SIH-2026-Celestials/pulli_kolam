@@ -1,0 +1,358 @@
+{
+  "summary": {
+    "n_photos": 8,
+    "n_recognition_failed": 0,
+    "n_generation_skipped_insufficient_recognition": 8,
+    "n_generation_attempted": 0,
+    "n_generation_candidates_total": 0,
+    "n_generation_valid_total": 0,
+    "real_photo_recognition_precision_recall": "UNRESOLVED (no ground truth)",
+    "note": "Real-photo recognition on this dataset is a known, previously documented weak point (experiments/real_photo_baseline.json, docs/M4_2_EVALUATION.md) -- classical/ML detectors frequently fail the is_traceable gate on real photographs (lighting, shadow, non-uniform dot ink vs. line ink). This experiment measures the SAME honest limitation for the generation pipeline: generation can only run once recognition succeeds."
+  },
+  "records": [
+    {
+      "file": "ithayakkamalam_pulli_mayooranathan.jpg",
+      "quality": {
+        "path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\real_photos\\ithayakkamalam_pulli_mayooranathan.jpg",
+        "width": 518,
+        "height": 511,
+        "aspect_ratio": 1.0136986301369864,
+        "brightness_mean": 1.5294410989127232,
+        "contrast_std": 18.91115732274074,
+        "blur_score": 742.1367596279533,
+        "estimated_rotation_deg": -90.0,
+        "background_complexity": 0.00336232234470982,
+        "foreground_ink_fraction": 0.9827199298823565,
+        "estimated_crop_quality": 0.9884169884169884
+      },
+      "normalized_debug_saved": true,
+      "recognition": {
+        "sources": [
+          {
+            "detector": "classical",
+            "available": true,
+            "count": 0,
+            "error": null
+          },
+          {
+            "detector": "ml-gated",
+            "available": true,
+            "count": 0,
+            "error": null
+          }
+        ],
+        "n_consensus_dots": 0,
+        "agreement_fraction": null,
+        "pairwise_disagreement": {
+          "classical_only": 0,
+          "ml-gated_only": 0
+        },
+        "primary_graph_source": "classical",
+        "precision_recall_note": "UNRESOLVED -- no hand-labeled ground-truth dots exist for real photos"
+      },
+      "structural_representation": null,
+      "generation_skipped_reason": "primary detector (classical) produced 0 dots / 0 edges -- insufficient to build a structural representation or induce a motif library (matches known real-photo recognition limitation, see experiments/real_photo_baseline.json)"
+    },
+    {
+      "file": "kolam1_raaj.jpg",
+      "quality": {
+        "path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\real_photos\\kolam1_raaj.jpg",
+        "width": 344,
+        "height": 293,
+        "aspect_ratio": 1.174061433447099,
+        "brightness_mean": 99.27448607032304,
+        "contrast_std": 53.63904173308171,
+        "blur_score": 5361.340503468108,
+        "estimated_rotation_deg": -90.0,
+        "background_complexity": 0.13529843638383998,
+        "foreground_ink_fraction": 0.6393364552742281,
+        "estimated_crop_quality": 0.8546511627906976
+      },
+      "normalized_debug_saved": true,
+      "recognition": {
+        "sources": [
+          {
+            "detector": "classical",
+            "available": true,
+            "count": 0,
+            "error": null
+          },
+          {
+            "detector": "ml-gated",
+            "available": true,
+            "count": 375,
+            "error": null
+          }
+        ],
+        "n_consensus_dots": 0,
+        "agreement_fraction": 0.0,
+        "pairwise_disagreement": {
+          "classical_only": 0,
+          "ml-gated_only": 375
+        },
+        "primary_graph_source": "classical",
+        "precision_recall_note": "UNRESOLVED -- no hand-labeled ground-truth dots exist for real photos"
+      },
+      "structural_representation": null,
+      "generation_skipped_reason": "primary detector (classical) produced 0 dots / 0 edges -- insufficient to build a structural representation or induce a motif library (matches known real-photo recognition limitation, see experiments/real_photo_baseline.json)"
+    },
+    {
+      "file": "kolam2_tshrinivasan.jpg",
+      "quality": {
+        "path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\real_photos\\kolam2_tshrinivasan.jpg",
+        "width": 1727,
+        "height": 2081,
+        "aspect_ratio": 0.829889476213359,
+        "brightness_mean": 62.52236506044848,
+        "contrast_std": 21.603605599492386,
+        "blur_score": 175.28639751040018,
+        "estimated_rotation_deg": -90.0,
+        "background_complexity": 0.07732713911149683,
+        "foreground_ink_fraction": 0.6704261987090857,
+        "estimated_crop_quality": 0.829889476213359
+      },
+      "normalized_debug_saved": true,
+      "recognition": {
+        "sources": [
+          {
+            "detector": "classical",
+            "available": true,
+            "count": 1,
+            "error": null
+          },
+          {
+            "detector": "ml-gated",
+            "available": true,
+            "count": 0,
+            "error": null
+          }
+        ],
+        "n_consensus_dots": 0,
+        "agreement_fraction": 0.0,
+        "pairwise_disagreement": {
+          "classical_only": 1,
+          "ml-gated_only": 0
+        },
+        "primary_graph_source": "classical",
+        "precision_recall_note": "UNRESOLVED -- no hand-labeled ground-truth dots exist for real photos"
+      },
+      "structural_representation": null,
+      "generation_skipped_reason": "primary detector (classical) produced 0 dots / 0 edges -- insufficient to build a structural representation or induce a motif library (matches known real-photo recognition limitation, see experiments/real_photo_baseline.json)"
+    },
+    {
+      "file": "kolam_aruppukottai_tanandaraj.jpg",
+      "quality": {
+        "path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\real_photos\\kolam_aruppukottai_tanandaraj.jpg",
+        "width": 1600,
+        "height": 1200,
+        "aspect_ratio": 1.3333333333333333,
+        "brightness_mean": 93.85290677083333,
+        "contrast_std": 45.50369312551564,
+        "blur_score": 543.0658691902602,
+        "estimated_rotation_deg": -90.0,
+        "background_complexity": 0.08090364583333333,
+        "foreground_ink_fraction": 0.54486875,
+        "estimated_crop_quality": 0.75
+      },
+      "normalized_debug_saved": true,
+      "recognition": {
+        "sources": [
+          {
+            "detector": "classical",
+            "available": true,
+            "count": 1,
+            "error": null
+          },
+          {
+            "detector": "ml-gated",
+            "available": true,
+            "count": 41,
+            "error": null
+          }
+        ],
+        "n_consensus_dots": 0,
+        "agreement_fraction": 0.0,
+        "pairwise_disagreement": {
+          "classical_only": 1,
+          "ml-gated_only": 41
+        },
+        "primary_graph_source": "classical",
+        "precision_recall_note": "UNRESOLVED -- no hand-labeled ground-truth dots exist for real photos"
+      },
+      "structural_representation": null,
+      "generation_skipped_reason": "primary detector (classical) produced 0 dots / 0 edges -- insufficient to build a structural representation or induce a motif library (matches known real-photo recognition limitation, see experiments/real_photo_baseline.json)"
+    },
+    {
+      "file": "kolam_attur12_infofarmer.jpg",
+      "quality": {
+        "path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\real_photos\\kolam_attur12_infofarmer.jpg",
+        "width": 4000,
+        "height": 3000,
+        "aspect_ratio": 1.3333333333333333,
+        "brightness_mean": 96.41054625,
+        "contrast_std": 28.431233749639024,
+        "blur_score": 43.13820207686647,
+        "estimated_rotation_deg": -90.0,
+        "background_complexity": 0.03810683333333333,
+        "foreground_ink_fraction": 0.670561,
+        "estimated_crop_quality": 0.75
+      },
+      "normalized_debug_saved": true,
+      "recognition": {
+        "sources": [
+          {
+            "detector": "classical",
+            "available": true,
+            "count": 0,
+            "error": null
+          },
+          {
+            "detector": "ml-gated",
+            "available": true,
+            "count": 0,
+            "error": null
+          }
+        ],
+        "n_consensus_dots": 0,
+        "agreement_fraction": null,
+        "pairwise_disagreement": {
+          "classical_only": 0,
+          "ml-gated_only": 0
+        },
+        "primary_graph_source": "classical",
+        "precision_recall_note": "UNRESOLVED -- no hand-labeled ground-truth dots exist for real photos"
+      },
+      "structural_representation": null,
+      "generation_skipped_reason": "primary detector (classical) produced 0 dots / 0 edges -- insufficient to build a structural representation or induce a motif library (matches known real-photo recognition limitation, see experiments/real_photo_baseline.json)"
+    },
+    {
+      "file": "kolam_attur1_infofarmer.jpg",
+      "quality": {
+        "path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\real_photos\\kolam_attur1_infofarmer.jpg",
+        "width": 4000,
+        "height": 3000,
+        "aspect_ratio": 1.3333333333333333,
+        "brightness_mean": 134.35438425,
+        "contrast_std": 27.753688662710864,
+        "blur_score": 29.84574591654017,
+        "estimated_rotation_deg": -90.0,
+        "background_complexity": 0.022155666666666667,
+        "foreground_ink_fraction": 0.11941075,
+        "estimated_crop_quality": 0.75
+      },
+      "normalized_debug_saved": true,
+      "recognition": {
+        "sources": [
+          {
+            "detector": "classical",
+            "available": true,
+            "count": 12,
+            "error": null
+          },
+          {
+            "detector": "ml-gated",
+            "available": true,
+            "count": 0,
+            "error": null
+          }
+        ],
+        "n_consensus_dots": 0,
+        "agreement_fraction": 0.0,
+        "pairwise_disagreement": {
+          "classical_only": 12,
+          "ml-gated_only": 0
+        },
+        "primary_graph_source": "classical",
+        "precision_recall_note": "UNRESOLVED -- no hand-labeled ground-truth dots exist for real photos"
+      },
+      "structural_representation": null,
+      "generation_skipped_reason": "primary detector (classical) produced 12 dots / 0 edges -- insufficient to build a structural representation or induce a motif library (matches known real-photo recognition limitation, see experiments/real_photo_baseline.json)"
+    },
+    {
+      "file": "kolam_attur5_infofarmer.jpg",
+      "quality": {
+        "path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\real_photos\\kolam_attur5_infofarmer.jpg",
+        "width": 4000,
+        "height": 3000,
+        "aspect_ratio": 1.3333333333333333,
+        "brightness_mean": 107.9730835,
+        "contrast_std": 41.039570420940805,
+        "blur_score": 37.64393413673767,
+        "estimated_rotation_deg": -90.0,
+        "background_complexity": 0.03855658333333333,
+        "foreground_ink_fraction": 0.5392519166666667,
+        "estimated_crop_quality": 0.75
+      },
+      "normalized_debug_saved": true,
+      "recognition": {
+        "sources": [
+          {
+            "detector": "classical",
+            "available": true,
+            "count": 0,
+            "error": null
+          },
+          {
+            "detector": "ml-gated",
+            "available": true,
+            "count": 0,
+            "error": null
+          }
+        ],
+        "n_consensus_dots": 0,
+        "agreement_fraction": null,
+        "pairwise_disagreement": {
+          "classical_only": 0,
+          "ml-gated_only": 0
+        },
+        "primary_graph_source": "classical",
+        "precision_recall_note": "UNRESOLVED -- no hand-labeled ground-truth dots exist for real photos"
+      },
+      "structural_representation": null,
+      "generation_skipped_reason": "primary detector (classical) produced 0 dots / 0 edges -- insufficient to build a structural representation or induce a motif library (matches known real-photo recognition limitation, see experiments/real_photo_baseline.json)"
+    },
+    {
+      "file": "kolam_bangalore_moed.jpg",
+      "quality": {
+        "path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\real_photos\\kolam_bangalore_moed.jpg",
+        "width": 800,
+        "height": 600,
+        "aspect_ratio": 1.3333333333333333,
+        "brightness_mean": 125.46613125,
+        "contrast_std": 32.213326997395136,
+        "blur_score": 287.5704993262326,
+        "estimated_rotation_deg": -90.0,
+        "background_complexity": 0.11344583333333333,
+        "foreground_ink_fraction": 0.24355833333333332,
+        "estimated_crop_quality": 0.75
+      },
+      "normalized_debug_saved": true,
+      "recognition": {
+        "sources": [
+          {
+            "detector": "classical",
+            "available": true,
+            "count": 0,
+            "error": null
+          },
+          {
+            "detector": "ml-gated",
+            "available": true,
+            "count": 206,
+            "error": null
+          }
+        ],
+        "n_consensus_dots": 0,
+        "agreement_fraction": 0.0,
+        "pairwise_disagreement": {
+          "classical_only": 0,
+          "ml-gated_only": 206
+        },
+        "primary_graph_source": "classical",
+        "precision_recall_note": "UNRESOLVED -- no hand-labeled ground-truth dots exist for real photos"
+      },
+      "structural_representation": null,
+      "generation_skipped_reason": "primary detector (classical) produced 0 dots / 0 edges -- insufficient to build a structural representation or induce a motif library (matches known real-photo recognition limitation, see experiments/real_photo_baseline.json)"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 /* =========================================================
-   PULLI — Screenshot-Accurate Design Tokens
+   PULLI - Screenshot-Accurate Design Tokens
    ========================================================= */
 
 :root {
@@ -25,6 +25,18 @@
   --color-step-active:  #5A0718; /* Active maroon step circle */
   --color-step-muted:   #CECAC2; /* Muted gray step circle */
 
+  /* --- Secondary-page palette aliases (Analyze/About/Explore/HowItWorks/etc.) --- */
+  --color-accent:       var(--color-gold);
+  --color-ink:           var(--color-text-dark);
+  --color-ink-light:    #4A423D;
+  --color-line:          var(--color-card-border);
+  --color-line-dark:    #CFC5B8;
+  --color-soft-gray:    var(--color-text-muted);
+  --color-muted:        #A79F95;
+  --color-valid:        var(--color-step-done);
+  --color-white:        #FFFFFF;
+  --color-paper-dark:   #F4EDE0; /* Slightly deeper ivory for header/panel banners */
+
   /* --- Typography --- */
   --font-serif:  'Playfair Display', Georgia, serif;
   --font-sans:   'Inter', system-ui, -apple-system, sans-serif;
@@ -40,9 +52,25 @@
   --text-2xl:  2.125rem;    /* 34px */
   --text-3xl:  2.75rem;     /* 44px */
 
+  --tracking-wide: 0.02em;
+
   /* --- Layout & Spacing --- */
   --max-width: 1480px;
   --gutter: 48px;
+
+  /* 4px base spacing scale, used by Analyze/About/Explore/HowItWorks/Generate/etc. */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
 
   /* --- Border Radius --- */
   --radius-sm: 6px;
@@ -54,4 +82,5 @@
   /* --- Transitions --- */
   --transition-fast:   150ms ease;
   --transition-normal: 250ms ease;
+  --transition-slow:   400ms ease;
 }

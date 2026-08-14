@@ -1,0 +1,205 @@
+{
+  "evaluated_on": "validation set only (experiments/m4_2/data/val)",
+  "sweep": [
+    {
+      "confidence_threshold": 0.6,
+      "min_distance_heatmap_cells": 2.0,
+      "mean_precision": 0.999521154546368,
+      "mean_recall": 0.9990418095612902,
+      "mean_f1": 0.999281424569622,
+      "avg_peaks_per_image": 273.93333333333334
+    },
+    {
+      "confidence_threshold": 0.6,
+      "min_distance_heatmap_cells": 1.5,
+      "mean_precision": 0.999475335531477,
+      "mean_recall": 0.9990418095612902,
+      "mean_f1": 0.9992585255253292,
+      "avg_peaks_per_image": 273.9555555555556
+    },
+    {
+      "confidence_threshold": 0.5,
+      "min_distance_heatmap_cells": 2.0,
+      "mean_precision": 0.9992656805013252,
+      "mean_recall": 0.9990418095612902,
+      "mean_f1": 0.9991537324911461,
+      "avg_peaks_per_image": 274.0
+    },
+    {
+      "confidence_threshold": 0.5,
+      "min_distance_heatmap_cells": 1.5,
+      "mean_precision": 0.9968527157526356,
+      "mean_recall": 0.9990418095612902,
+      "mean_f1": 0.9979460621597316,
+      "avg_peaks_per_image": 275.0444444444444
+    },
+    {
+      "confidence_threshold": 0.4,
+      "min_distance_heatmap_cells": 2.0,
+      "mean_precision": 0.9640486383209924,
+      "mean_recall": 0.9990418095612902,
+      "mean_f1": 0.9812333376409522,
+      "avg_peaks_per_image": 282.8666666666667
+    },
+    {
+      "confidence_threshold": 0.6,
+      "min_distance_heatmap_cells": 2.5,
+      "mean_precision": 0.9944974326704236,
+      "mean_recall": 0.9642815898089073,
+      "mean_f1": 0.9791564586213368,
+      "avg_peaks_per_image": 259.3777777777778
+    },
+    {
+      "confidence_threshold": 0.5,
+      "min_distance_heatmap_cells": 2.5,
+      "mean_precision": 0.9930681981951592,
+      "mean_recall": 0.9642815898089073,
+      "mean_f1": 0.9784632126695851,
+      "avg_peaks_per_image": 259.93333333333334
+    },
+    {
+      "confidence_threshold": 0.4,
+      "min_distance_heatmap_cells": 2.5,
+      "mean_precision": 0.9909129120139158,
+      "mean_recall": 0.9642815898089073,
+      "mean_f1": 0.9774158808938185,
+      "avg_peaks_per_image": 260.84444444444443
+    },
+    {
+      "confidence_threshold": 0.3,
+      "min_distance_heatmap_cells": 2.5,
+      "mean_precision": 0.9858353521791948,
+      "mean_recall": 0.9642815898089073,
+      "mean_f1": 0.9749393589904803,
+      "avg_peaks_per_image": 263.02222222222224
+    },
+    {
+      "confidence_threshold": 0.2,
+      "min_distance_heatmap_cells": 2.5,
+      "mean_precision": 0.9730983312805194,
+      "mean_recall": 0.9642815898089073,
+      "mean_f1": 0.968669898674212,
+      "avg_peaks_per_image": 267.4
+    },
+    {
+      "confidence_threshold": 0.6,
+      "min_distance_heatmap_cells": 3.0,
+      "mean_precision": 0.957770683200668,
+      "mean_recall": 0.8835117993097358,
+      "mean_f1": 0.9191438116404889,
+      "avg_peaks_per_image": 232.86666666666667
+    },
+    {
+      "confidence_threshold": 0.5,
+      "min_distance_heatmap_cells": 3.0,
+      "mean_precision": 0.946000867866759,
+      "mean_recall": 0.8835117993097358,
+      "mean_f1": 0.9136891412809236,
+      "avg_peaks_per_image": 237.77777777777777
+    },
+    {
+      "confidence_threshold": 0.4,
+      "min_distance_heatmap_cells": 3.0,
+      "mean_precision": 0.9403900244939754,
+      "mean_recall": 0.8835117993097358,
+      "mean_f1": 0.9110640405642958,
+      "avg_peaks_per_image": 240.33333333333334
+    },
+    {
+      "confidence_threshold": 0.3,
+      "min_distance_heatmap_cells": 3.0,
+      "mean_precision": 0.9365609719585201,
+      "mean_recall": 0.8835117993097358,
+      "mean_f1": 0.9092632806343867,
+      "avg_peaks_per_image": 242.06666666666666
+    },
+    {
+      "confidence_threshold": 0.2,
+      "min_distance_heatmap_cells": 3.0,
+      "mean_precision": 0.9329210791048782,
+      "mean_recall": 0.8835117993097358,
+      "mean_f1": 0.9075444416457991,
+      "avg_peaks_per_image": 243.64444444444445
+    },
+    {
+      "confidence_threshold": 0.4,
+      "min_distance_heatmap_cells": 1.5,
+      "mean_precision": 0.7116100251640998,
+      "mean_recall": 0.9990418095612902,
+      "mean_f1": 0.831178095753216,
+      "avg_peaks_per_image": 382.8
+    },
+    {
+      "confidence_threshold": 0.3,
+      "min_distance_heatmap_cells": 2.0,
+      "mean_precision": 0.7033014087450493,
+      "mean_recall": 0.9990418095612902,
+      "mean_f1": 0.8254827869067466,
+      "avg_peaks_per_image": 377.26666666666665
+    },
+    {
+      "confidence_threshold": 0.6,
+      "min_distance_heatmap_cells": 1.0,
+      "mean_precision": 0.5626928595172429,
+      "mean_recall": 0.9998866213151928,
+      "mean_f1": 0.7201285682327662,
+      "avg_peaks_per_image": 532.0222222222222
+    },
+    {
+      "confidence_threshold": 0.2,
+      "min_distance_heatmap_cells": 2.0,
+      "mean_precision": 0.5164196370921202,
+      "mean_recall": 0.9990418095612902,
+      "mean_f1": 0.680881469961261,
+      "avg_peaks_per_image": 511.35555555555555
+    },
+    {
+      "confidence_threshold": 0.3,
+      "min_distance_heatmap_cells": 1.5,
+      "mean_precision": 0.4509347886128326,
+      "mean_recall": 0.9990418095612902,
+      "mean_f1": 0.621393073208486,
+      "avg_peaks_per_image": 591.6888888888889
+    },
+    {
+      "confidence_threshold": 0.5,
+      "min_distance_heatmap_cells": 1.0,
+      "mean_precision": 0.4038896586262269,
+      "mean_recall": 0.9998866213151928,
+      "mean_f1": 0.5753678444613372,
+      "avg_peaks_per_image": 732.3333333333334
+    },
+    {
+      "confidence_threshold": 0.2,
+      "min_distance_heatmap_cells": 1.5,
+      "mean_precision": 0.3379872170473197,
+      "mean_recall": 0.9990418095612902,
+      "mean_f1": 0.5050950341504942,
+      "avg_peaks_per_image": 784.3777777777777
+    },
+    {
+      "confidence_threshold": 0.4,
+      "min_distance_heatmap_cells": 1.0,
+      "mean_precision": 0.27360743843428226,
+      "mean_recall": 0.9998866213151928,
+      "mean_f1": 0.42964694666354036,
+      "avg_peaks_per_image": 1064.4666666666667
+    },
+    {
+      "confidence_threshold": 0.3,
+      "min_distance_heatmap_cells": 1.0,
+      "mean_precision": 0.20712059484065048,
+      "mean_recall": 0.9998866213151928,
+      "mean_f1": 0.3431580341989795,
+      "avg_peaks_per_image": 1400.8444444444444
+    },
+    {
+      "confidence_threshold": 0.2,
+      "min_distance_heatmap_cells": 1.0,
+      "mean_precision": 0.17890098339769603,
+      "mean_recall": 0.9998866213151928,
+      "mean_f1": 0.3034994584678496,
+      "avg_peaks_per_image": 1625.4222222222222
+    }
+  ]
+}

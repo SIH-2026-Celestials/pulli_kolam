@@ -1,21 +1,24 @@
 import { Check } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
 import './AnalysisPipeline.css'
 
 export default function AnalysisPipeline({ customImage, progress = 56 }) {
+  const { t } = useLanguage()
+
   const steps = [
-    { num: 1, label: 'Upload Image', status: 'completed' },
-    { num: 2, label: 'Detect Dots', status: 'completed' },
-    { num: 3, label: 'Trace Stroke', status: 'completed' },
-    { num: 4, label: 'Build Graph', status: 'active' },
-    { num: 5, label: 'Detect Symmetry', status: 'pending' },
-    { num: 6, label: 'Find Motifs', status: 'pending' },
-    { num: 7, label: 'Validate Stroke', status: 'pending' },
-    { num: 8, label: 'Extract Rules', status: 'pending' }
+    { num: 1, label: t('analysis.uploadImage'), status: 'completed' },
+    { num: 2, label: t('analysis.detectDots'), status: 'completed' },
+    { num: 3, label: t('analysis.traceStroke'), status: 'completed' },
+    { num: 4, label: t('analysis.buildGraph'), status: 'active' },
+    { num: 5, label: t('analysis.detectSymmetry'), status: 'pending' },
+    { num: 6, label: t('analysis.findMotifs'), status: 'pending' },
+    { num: 7, label: t('analysis.validateStroke'), status: 'pending' },
+    { num: 8, label: t('analysis.extractRules'), status: 'pending' }
   ]
 
   return (
     <div className="analysis-card">
-      <h2 className="analysis-title">Analyze Your Kolam – Live Process</h2>
+      <h2 className="analysis-title">{t('analysis.title')}</h2>
 
       {/* STEPPER BAR */}
       <div className="stepper-container">
@@ -61,7 +64,7 @@ export default function AnalysisPipeline({ customImage, progress = 56 }) {
               </svg>
             )}
           </div>
-          <span className="panel-caption">Uploaded Image</span>
+          <span className="panel-caption">{t('analysis.uploadedImage')}</span>
         </div>
 
         <span className="panel-arrow">&rarr;</span>
@@ -82,7 +85,7 @@ export default function AnalysisPipeline({ customImage, progress = 56 }) {
               )}
             </svg>
           </div>
-          <span className="panel-caption">Detected Dots</span>
+          <span className="panel-caption">{t('analysis.detectedDots')}</span>
         </div>
 
         <span className="panel-arrow">&rarr;</span>
@@ -125,7 +128,7 @@ export default function AnalysisPipeline({ customImage, progress = 56 }) {
               />
             </svg>
           </div>
-          <span className="panel-caption">Traced Stroke</span>
+          <span className="panel-caption">{t('analysis.tracedStroke')}</span>
         </div>
 
         <span className="panel-arrow">&rarr;</span>
@@ -160,7 +163,7 @@ export default function AnalysisPipeline({ customImage, progress = 56 }) {
               ))}
             </svg>
           </div>
-          <span className="panel-caption caption-active">Graph Representation</span>
+          <span className="panel-caption caption-active">{t('analysis.graphRepresentation')}</span>
         </div>
 
         <span className="panel-arrow">&rarr;</span>
@@ -190,16 +193,16 @@ export default function AnalysisPipeline({ customImage, progress = 56 }) {
               <line x1="140" y1="20" x2="20" y2="140" stroke="#FF4D4D" strokeWidth="1" strokeDasharray="3 3" />
             </svg>
           </div>
-          <span className="panel-caption">Symmetry (D4)</span>
+          <span className="panel-caption">{t('analysis.symmetryD4')}</span>
         </div>
       </div>
 
       {/* BOTTOM PROGRESS BOX: BUILDING GRAPH */}
       <div className="building-graph-box">
         <div className="graph-box-text">
-          <h3 className="graph-box-title">Building Graph</h3>
+          <h3 className="graph-box-title">{t('analysis.buildingGraph')}</h3>
           <p className="graph-box-desc">
-            Converting the traced stroke into a mathematical graph with nodes and edges.
+            {t('analysis.buildingGraphDesc')}
           </p>
         </div>
 

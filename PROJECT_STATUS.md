@@ -1,7 +1,7 @@
-# PROJECT STATUS — PULLI Kolam Design-Principle Engine
+# PROJECT STATUS - PULLI Kolam Design-Principle Engine
 
-**Last Updated:** 2026-08-13 (lint fixes)  
-**Branch:** `feat/frontend-clone-ui`
+**Last Updated:** 2026-08-13 (merged changes)  
+**Branch:** `master`
 
 ---
 
@@ -19,6 +19,7 @@ PULLI is a computational platform that uses ML, computer vision, and graph theor
 |---|---|---|
 | Kolam dataset ingestion (`kolam19`) | ✅ Complete | 400 geometric traces loaded |
 | Dot detection pipeline | ✅ Complete | Grid-based pulli detection |
+| ML Dot Lattice Detector (`experiments/m4_2`) | ✅ Complete | PyTorch lattice detection model with 99.9% recall and 99.9% precision |
 | Stroke tracing algorithm | ✅ Complete | Sub-pixel resolution polyline traces |
 | Graph representation (NetworkX MultiGraph) | ✅ Complete | Nodes + edges with repeated strands |
 | D4 dihedral symmetry analysis | ✅ Complete | 8-fold symmetry group detection |
@@ -32,7 +33,7 @@ PULLI is a computational platform that uses ML, computer vision, and graph theor
 | Milestone | Status | Notes |
 |---|---|---|
 | Project scaffold (React + Vite) | ✅ Complete | Vite v8, React 19 |
-| Design system (tokens, global styles) | ✅ Complete | Playfair Display + Inter, maroon/gold palette |
+| Design system (tokens, global styles) | ✅ Complete | Playfair Display + Inter, maroon/gold palette. Was Home-page-only for a while - Analyze/About/Gallery/How it Works/Generate referenced a shared `.container`/`.section`/`.eyebrow`/`.heading-display`/`.btn*` utility layer and a `--space-*`/`--color-ink`/`--color-line`/etc. token set that had never been defined, so those pages rendered as unstyled HTML. Fixed via `tokens.css` additions + new `utilities.css`. |
 | Navbar component | ✅ Complete | Deep maroon, gold active underline, Login button |
 | Hero section (3-column layout) | ✅ Complete | Heading, center Kolam SVG, AI meets tradition card |
 | Center Kolam SVG illustration | ✅ Complete | Authentic 4-fold symmetric continuous loop art |
@@ -43,6 +44,11 @@ PULLI is a computational platform that uses ML, computer vision, and graph theor
 | Footer component | ✅ Complete | Maroon, copyright, AICTE initiative credit |
 | File upload functionality | ✅ Complete | Triggers analysis pipeline simulation |
 | Generate More interactivity | ✅ Complete | Cycles between two variation sets |
+| About page | ✅ Complete | Routed at `/about` |
+| How it Works page | ✅ Complete | Routed at `/how-it-works` |
+| Generate page | ✅ Complete | Routed at `/generate`; fixes navbar link that previously 404'd blank (no matching route) |
+| 404 / catch-all route | ✅ Complete | Prevents blank page on unmatched routes |
+| Gallery page (kolam archive browser) | ✅ Complete | Search/filter by number, 400-pattern grid, Load More pagination - moved up from "In Progress" below, it was already functionally complete |
 | `npm run build` | ✅ Passing | Zero errors, clean production bundle |
 
 ---
@@ -53,7 +59,6 @@ PULLI is a computational platform that uses ML, computer vision, and graph theor
 |---|---|---|
 | Generative reconstruction (pattern generation) | 🔄 In Progress | Foundation laid via motif grammar |
 | Backend API integration with frontend | 🔄 In Progress | REST endpoints planned |
-| Gallery page (kolam archive browser) | 🔄 In Progress | Basic scaffold exists |
 | Kolam detail view | 🔄 In Progress | Route exists, content pending |
 
 ---
@@ -66,8 +71,6 @@ PULLI is a computational platform that uses ML, computer vision, and graph theor
 | REST API (FastAPI) for analysis endpoint | 📋 Planned | |
 | Real-time websocket progress for analysis steps | 📋 Planned | |
 | Kolam gallery with search and filters | 📋 Planned | |
-| About page | 📋 Planned | |
-| How it Works page | 📋 Planned | |
 | Mobile responsive layouts (tablet + mobile) | 📋 Planned | Desktop-first currently |
 | PWA / offline capability | 📋 Planned | |
 
@@ -77,11 +80,14 @@ PULLI is a computational platform that uses ML, computer vision, and graph theor
 
 | Metric | Value |
 |---|---|
-| Dataset | `kolam19` — 400 patterns |
+| Dataset | `kolam19` - 400 patterns |
 | Dot Lattice | 37 × 37 |
 | Evaluation Sample | 15 patterns |
 | Fixed Radius Edge Recall | 82.8% |
 | Adaptive Radius Edge Recall | 99.5% |
+| ML Dot Recall | 99.78% (test set) |
+| ML Dot Precision | 99.85% (test set) |
+| ML Dot F1 Score | 99.81% (test set) |
 | Automated Tests Passing | All |
 | Frontend Build | ✅ Clean (Vite 8) |
 | ESLint | ✅ 0 errors, 0 warnings |
@@ -93,7 +99,7 @@ PULLI is a computational platform that uses ML, computer vision, and graph theor
 The Home page frontend has been implemented as a **pixel-accurate clone** of the reference design:
 
 - **Navbar**: Deep maroon (`#500914`), PULLI brand, nav links with gold active underline, Login
-- **Hero**: 3-column layout — typography + actions | center Kolam SVG | AI meets tradition card
+- **Hero**: 3-column layout - typography + actions | center Kolam SVG | AI meets tradition card
 - **Feature Strip**: 5 feature items with vertical dividers
 - **Analysis Panel**: 8-step live pipeline, 5 visualization stages, 56% building graph progress
 - **Variations Panel**: 4 generated Kolam thumbnails, Design Rule Summary

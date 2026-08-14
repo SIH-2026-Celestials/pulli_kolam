@@ -1,0 +1,12 @@
+# FastAPI REST service (api/). Needs BOTH the classical detector
+# (engine/, via requirements-engine.txt) and the ML detector
+# (experiments/m4_1, m4_2, via requirements-ml.txt) in the same
+# process -- see api/main.py's module docstring for why
+# KMP_DUPLICATE_LIB_OK is required when both are loaded together.
+# This is the complete dependency set for the deployed API container.
+
+-r requirements-ml.txt
+
+fastapi==0.115.5
+uvicorn==0.32.1
+python-multipart==0.0.26

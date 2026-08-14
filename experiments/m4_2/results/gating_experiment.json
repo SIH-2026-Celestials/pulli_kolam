@@ -1,0 +1,638 @@
+{
+  "config": {
+    "thresholds": [
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      0.95,
+      0.99
+    ],
+    "min_distance_heatmap_cells": 2.0,
+    "lattice_residual_threshold_px": 10.0
+  },
+  "synthetic_val_ungated": {
+    "0.6": {
+      "mean_precision": 0.999521154546368,
+      "mean_recall": 0.9990418095612902,
+      "mean_f1": 0.9992803867088917
+    },
+    "0.7": {
+      "mean_precision": 0.999521154546368,
+      "mean_recall": 0.9990418095612902,
+      "mean_f1": 0.9992803867088917
+    },
+    "0.8": {
+      "mean_precision": 0.999613845802876,
+      "mean_recall": 0.99868878435978,
+      "mean_f1": 0.9991484406790796
+    },
+    "0.9": {
+      "mean_precision": 0.9998362307886117,
+      "mean_recall": 0.9153247442058366,
+      "mean_f1": 0.9551848051137634
+    },
+    "0.95": {
+      "mean_precision": 1.0,
+      "mean_recall": 0.5230074962112284,
+      "mean_f1": 0.6818141572563308
+    },
+    "0.99": {
+      "mean_precision": 1.0,
+      "mean_recall": 0.009666526938890085,
+      "mean_f1": 0.018862489512232055
+    }
+  },
+  "synthetic_val_gated": {
+    "0.6": {
+      "mean_precision": 0.999521154546368,
+      "mean_recall": 0.9990418095612902,
+      "mean_f1": 0.9992803867088917
+    },
+    "0.7": {
+      "mean_precision": 0.999521154546368,
+      "mean_recall": 0.9990418095612902,
+      "mean_f1": 0.9992803867088917
+    },
+    "0.8": {
+      "mean_precision": 0.999613845802876,
+      "mean_recall": 0.99868878435978,
+      "mean_f1": 0.9991484406790796
+    },
+    "0.9": {
+      "mean_precision": 0.9998362307886117,
+      "mean_recall": 0.9153247442058366,
+      "mean_f1": 0.9551848051137634
+    },
+    "0.95": {
+      "mean_precision": 1.0,
+      "mean_recall": 0.5230074962112284,
+      "mean_f1": 0.6818141572563308
+    },
+    "0.99": {
+      "mean_precision": 1.0,
+      "mean_recall": 0.0020762783843439564,
+      "mean_f1": 0.004081031058343125
+    }
+  },
+  "real_photos_ungated": {
+    "0.6": {
+      "inscope": [
+        {
+          "file": "kolam2_tshrinivasan.jpg",
+          "n_raw": 58,
+          "n_gated": 58,
+          "lattice_residual_px": 17.22600826155813
+        },
+        {
+          "file": "kolam_attur1_infofarmer.jpg",
+          "n_raw": 297,
+          "n_gated": 297,
+          "lattice_residual_px": 19.80176219643017
+        },
+        {
+          "file": "kolam_naduveetu_meenakshisundaram.jpg",
+          "n_raw": 563,
+          "n_gated": 563,
+          "lattice_residual_px": 12.809982079189869
+        },
+        {
+          "file": "muggu_kollam_sirensongs.jpg",
+          "n_raw": 151,
+          "n_gated": 151,
+          "lattice_residual_px": 9.145424835973142
+        }
+      ],
+      "nodot_fp": 18,
+      "nodot_n": 18,
+      "nodot_residuals": [
+        1.3241906930491405,
+        8.47198011899195,
+        13.911749523740607,
+        12.783423598356606,
+        2.679956413774589,
+        8.85790682355575,
+        9.672352355715844,
+        1.4973279081202657,
+        79.95242270826854,
+        33.6544975966499,
+        13.847595912830672,
+        5.145590701809178,
+        5.154381771692698,
+        20.81894780010231,
+        14.62369519495252,
+        45.95148018262482,
+        4.305133006140084,
+        7.718795468609352
+      ],
+      "nodot_fp_rate": 1.0
+    },
+    "0.7": {
+      "inscope": [
+        {
+          "file": "kolam2_tshrinivasan.jpg",
+          "n_raw": 46,
+          "n_gated": 46,
+          "lattice_residual_px": 16.980460322220985
+        },
+        {
+          "file": "kolam_attur1_infofarmer.jpg",
+          "n_raw": 270,
+          "n_gated": 270,
+          "lattice_residual_px": 14.124670142351192
+        },
+        {
+          "file": "kolam_naduveetu_meenakshisundaram.jpg",
+          "n_raw": 508,
+          "n_gated": 508,
+          "lattice_residual_px": 10.1734080067333
+        },
+        {
+          "file": "muggu_kollam_sirensongs.jpg",
+          "n_raw": 130,
+          "n_gated": 130,
+          "lattice_residual_px": 10.792097119198408
+        }
+      ],
+      "nodot_fp": 18,
+      "nodot_n": 18,
+      "nodot_residuals": [
+        2.166259353348018,
+        8.55614002308375,
+        13.758012477355093,
+        13.84085042451559,
+        2.7981817440970698,
+        9.1387418279748,
+        7.30719839487198,
+        1.1334270095458432,
+        6.535557399439663e-13,
+        29.671358063143884,
+        18.699530230063072,
+        5.718376670071912,
+        5.021593675096866,
+        29.994581317655815,
+        19.39717743629804,
+        41.60507525986519,
+        4.385807929382588,
+        24.549993478856305
+      ],
+      "nodot_fp_rate": 1.0
+    },
+    "0.8": {
+      "inscope": [
+        {
+          "file": "kolam2_tshrinivasan.jpg",
+          "n_raw": 27,
+          "n_gated": 27,
+          "lattice_residual_px": 17.948961345072544
+        },
+        {
+          "file": "kolam_attur1_infofarmer.jpg",
+          "n_raw": 230,
+          "n_gated": 230,
+          "lattice_residual_px": 16.225226486675307
+        },
+        {
+          "file": "kolam_naduveetu_meenakshisundaram.jpg",
+          "n_raw": 420,
+          "n_gated": 420,
+          "lattice_residual_px": 15.343943925223689
+        },
+        {
+          "file": "muggu_kollam_sirensongs.jpg",
+          "n_raw": 102,
+          "n_gated": 102,
+          "lattice_residual_px": 11.307791914596411
+        }
+      ],
+      "nodot_fp": 18,
+      "nodot_n": 18,
+      "nodot_residuals": [
+        1.487198213723131,
+        16.857207569160764,
+        16.62960996589814,
+        14.484485919811807,
+        2.7979938192111278,
+        9.2355745080553,
+        10.689912146590709,
+        1.278294360028072,
+        28.862808587250484,
+        15.533697166155008,
+        6.960523264382991,
+        5.432987608330509,
+        31.230866980602574,
+        12.203542474551277,
+        35.60844253415757,
+        5.144551772021474,
+        19.07808620917621
+      ],
+      "nodot_fp_rate": 1.0
+    },
+    "0.9": {
+      "inscope": [
+        {
+          "file": "kolam2_tshrinivasan.jpg",
+          "n_raw": 3,
+          "n_gated": 3,
+          "lattice_residual_px": 9.473903143468003e-13
+        },
+        {
+          "file": "kolam_attur1_infofarmer.jpg",
+          "n_raw": 124,
+          "n_gated": 124,
+          "lattice_residual_px": 20.459544916846372
+        },
+        {
+          "file": "kolam_naduveetu_meenakshisundaram.jpg",
+          "n_raw": 161,
+          "n_gated": 161,
+          "lattice_residual_px": 12.381594619639497
+        },
+        {
+          "file": "muggu_kollam_sirensongs.jpg",
+          "n_raw": 41,
+          "n_gated": 41,
+          "lattice_residual_px": 15.882168694919764
+        }
+      ],
+      "nodot_fp": 18,
+      "nodot_n": 18,
+      "nodot_residuals": [
+        1.8074341317304232,
+        15.21690614142563,
+        20.010703092087507,
+        24.640935831194252,
+        4.723552393132559,
+        13.374578359263717,
+        8.868286876997852,
+        2.0263073552298945,
+        19.906637176138993,
+        13.839703520495341,
+        9.365991114057014,
+        37.98078266555388,
+        27.56115817687272,
+        106.00101028525896,
+        8.594127803216352,
+        21.121467512488994
+      ],
+      "nodot_fp_rate": 1.0
+    },
+    "0.95": {
+      "inscope": [
+        {
+          "file": "kolam2_tshrinivasan.jpg",
+          "n_raw": 1,
+          "n_gated": 1,
+          "lattice_residual_px": null
+        },
+        {
+          "file": "kolam_attur1_infofarmer.jpg",
+          "n_raw": 37,
+          "n_gated": 37,
+          "lattice_residual_px": 35.15096471591316
+        },
+        {
+          "file": "kolam_naduveetu_meenakshisundaram.jpg",
+          "n_raw": 36,
+          "n_gated": 36,
+          "lattice_residual_px": 30.972186995290674
+        },
+        {
+          "file": "muggu_kollam_sirensongs.jpg",
+          "n_raw": 10,
+          "n_gated": 10,
+          "lattice_residual_px": 31.583273458896905
+        }
+      ],
+      "nodot_fp": 16,
+      "nodot_n": 18,
+      "nodot_residuals": [
+        3.239565014132003,
+        44.26476244381213,
+        8.859471270695664,
+        26.11348459396922,
+        14.27866983145285,
+        4.648020735857589,
+        52.18943474668704,
+        18.576191609576256,
+        17.91296153344829,
+        64.13065022390597,
+        10.995114193456017,
+        28.16687760083977
+      ],
+      "nodot_fp_rate": 0.8888888888888888
+    },
+    "0.99": {
+      "inscope": [
+        {
+          "file": "kolam2_tshrinivasan.jpg",
+          "n_raw": 0,
+          "n_gated": 0,
+          "lattice_residual_px": null
+        },
+        {
+          "file": "kolam_attur1_infofarmer.jpg",
+          "n_raw": 0,
+          "n_gated": 0,
+          "lattice_residual_px": null
+        },
+        {
+          "file": "kolam_naduveetu_meenakshisundaram.jpg",
+          "n_raw": 0,
+          "n_gated": 0,
+          "lattice_residual_px": null
+        },
+        {
+          "file": "muggu_kollam_sirensongs.jpg",
+          "n_raw": 0,
+          "n_gated": 0,
+          "lattice_residual_px": null
+        }
+      ],
+      "nodot_fp": 0,
+      "nodot_n": 18,
+      "nodot_residuals": [],
+      "nodot_fp_rate": 0.0
+    }
+  },
+  "real_photos_gated": {
+    "0.6": {
+      "inscope": [
+        {
+          "file": "kolam2_tshrinivasan.jpg",
+          "n_raw": 58,
+          "n_gated": 0,
+          "lattice_residual_px": 17.22600826155813
+        },
+        {
+          "file": "kolam_attur1_infofarmer.jpg",
+          "n_raw": 297,
+          "n_gated": 0,
+          "lattice_residual_px": 19.80176219643017
+        },
+        {
+          "file": "kolam_naduveetu_meenakshisundaram.jpg",
+          "n_raw": 563,
+          "n_gated": 0,
+          "lattice_residual_px": 12.809982079189869
+        },
+        {
+          "file": "muggu_kollam_sirensongs.jpg",
+          "n_raw": 151,
+          "n_gated": 151,
+          "lattice_residual_px": 9.145424835973142
+        }
+      ],
+      "nodot_fp": 10,
+      "nodot_n": 18,
+      "nodot_residuals": [
+        1.3241906930491405,
+        8.47198011899195,
+        13.911749523740607,
+        12.783423598356606,
+        2.679956413774589,
+        8.85790682355575,
+        9.672352355715844,
+        1.4973279081202657,
+        79.95242270826854,
+        33.6544975966499,
+        13.847595912830672,
+        5.145590701809178,
+        5.154381771692698,
+        20.81894780010231,
+        14.62369519495252,
+        45.95148018262482,
+        4.305133006140084,
+        7.718795468609352
+      ],
+      "nodot_fp_rate": 0.5555555555555556
+    },
+    "0.7": {
+      "inscope": [
+        {
+          "file": "kolam2_tshrinivasan.jpg",
+          "n_raw": 46,
+          "n_gated": 0,
+          "lattice_residual_px": 16.980460322220985
+        },
+        {
+          "file": "kolam_attur1_infofarmer.jpg",
+          "n_raw": 270,
+          "n_gated": 0,
+          "lattice_residual_px": 14.124670142351192
+        },
+        {
+          "file": "kolam_naduveetu_meenakshisundaram.jpg",
+          "n_raw": 508,
+          "n_gated": 0,
+          "lattice_residual_px": 10.1734080067333
+        },
+        {
+          "file": "muggu_kollam_sirensongs.jpg",
+          "n_raw": 130,
+          "n_gated": 0,
+          "lattice_residual_px": 10.792097119198408
+        }
+      ],
+      "nodot_fp": 10,
+      "nodot_n": 18,
+      "nodot_residuals": [
+        2.166259353348018,
+        8.55614002308375,
+        13.758012477355093,
+        13.84085042451559,
+        2.7981817440970698,
+        9.1387418279748,
+        7.30719839487198,
+        1.1334270095458432,
+        6.535557399439663e-13,
+        29.671358063143884,
+        18.699530230063072,
+        5.718376670071912,
+        5.021593675096866,
+        29.994581317655815,
+        19.39717743629804,
+        41.60507525986519,
+        4.385807929382588,
+        24.549993478856305
+      ],
+      "nodot_fp_rate": 0.5555555555555556
+    },
+    "0.8": {
+      "inscope": [
+        {
+          "file": "kolam2_tshrinivasan.jpg",
+          "n_raw": 27,
+          "n_gated": 0,
+          "lattice_residual_px": 17.948961345072544
+        },
+        {
+          "file": "kolam_attur1_infofarmer.jpg",
+          "n_raw": 230,
+          "n_gated": 0,
+          "lattice_residual_px": 16.225226486675307
+        },
+        {
+          "file": "kolam_naduveetu_meenakshisundaram.jpg",
+          "n_raw": 420,
+          "n_gated": 0,
+          "lattice_residual_px": 15.343943925223689
+        },
+        {
+          "file": "muggu_kollam_sirensongs.jpg",
+          "n_raw": 102,
+          "n_gated": 0,
+          "lattice_residual_px": 11.307791914596411
+        }
+      ],
+      "nodot_fp": 7,
+      "nodot_n": 18,
+      "nodot_residuals": [
+        1.487198213723131,
+        16.857207569160764,
+        16.62960996589814,
+        14.484485919811807,
+        2.7979938192111278,
+        9.2355745080553,
+        10.689912146590709,
+        1.278294360028072,
+        28.862808587250484,
+        15.533697166155008,
+        6.960523264382991,
+        5.432987608330509,
+        31.230866980602574,
+        12.203542474551277,
+        35.60844253415757,
+        5.144551772021474,
+        19.07808620917621
+      ],
+      "nodot_fp_rate": 0.3888888888888889
+    },
+    "0.9": {
+      "inscope": [
+        {
+          "file": "kolam2_tshrinivasan.jpg",
+          "n_raw": 3,
+          "n_gated": 3,
+          "lattice_residual_px": 9.473903143468003e-13
+        },
+        {
+          "file": "kolam_attur1_infofarmer.jpg",
+          "n_raw": 124,
+          "n_gated": 0,
+          "lattice_residual_px": 20.459544916846372
+        },
+        {
+          "file": "kolam_naduveetu_meenakshisundaram.jpg",
+          "n_raw": 161,
+          "n_gated": 0,
+          "lattice_residual_px": 12.381594619639497
+        },
+        {
+          "file": "muggu_kollam_sirensongs.jpg",
+          "n_raw": 41,
+          "n_gated": 0,
+          "lattice_residual_px": 15.882168694919764
+        }
+      ],
+      "nodot_fp": 6,
+      "nodot_n": 18,
+      "nodot_residuals": [
+        1.8074341317304232,
+        15.21690614142563,
+        20.010703092087507,
+        24.640935831194252,
+        4.723552393132559,
+        13.374578359263717,
+        8.868286876997852,
+        2.0263073552298945,
+        19.906637176138993,
+        13.839703520495341,
+        9.365991114057014,
+        37.98078266555388,
+        27.56115817687272,
+        106.00101028525896,
+        8.594127803216352,
+        21.121467512488994
+      ],
+      "nodot_fp_rate": 0.3333333333333333
+    },
+    "0.95": {
+      "inscope": [
+        {
+          "file": "kolam2_tshrinivasan.jpg",
+          "n_raw": 1,
+          "n_gated": 0,
+          "lattice_residual_px": null
+        },
+        {
+          "file": "kolam_attur1_infofarmer.jpg",
+          "n_raw": 37,
+          "n_gated": 0,
+          "lattice_residual_px": 35.15096471591316
+        },
+        {
+          "file": "kolam_naduveetu_meenakshisundaram.jpg",
+          "n_raw": 36,
+          "n_gated": 0,
+          "lattice_residual_px": 30.972186995290674
+        },
+        {
+          "file": "muggu_kollam_sirensongs.jpg",
+          "n_raw": 10,
+          "n_gated": 0,
+          "lattice_residual_px": 31.583273458896905
+        }
+      ],
+      "nodot_fp": 3,
+      "nodot_n": 18,
+      "nodot_residuals": [
+        3.239565014132003,
+        44.26476244381213,
+        8.859471270695664,
+        26.11348459396922,
+        14.27866983145285,
+        4.648020735857589,
+        52.18943474668704,
+        18.576191609576256,
+        17.91296153344829,
+        64.13065022390597,
+        10.995114193456017,
+        28.16687760083977
+      ],
+      "nodot_fp_rate": 0.16666666666666666
+    },
+    "0.99": {
+      "inscope": [
+        {
+          "file": "kolam2_tshrinivasan.jpg",
+          "n_raw": 0,
+          "n_gated": 0,
+          "lattice_residual_px": null
+        },
+        {
+          "file": "kolam_attur1_infofarmer.jpg",
+          "n_raw": 0,
+          "n_gated": 0,
+          "lattice_residual_px": null
+        },
+        {
+          "file": "kolam_naduveetu_meenakshisundaram.jpg",
+          "n_raw": 0,
+          "n_gated": 0,
+          "lattice_residual_px": null
+        },
+        {
+          "file": "muggu_kollam_sirensongs.jpg",
+          "n_raw": 0,
+          "n_gated": 0,
+          "lattice_residual_px": null
+        }
+      ],
+      "nodot_fp": 0,
+      "nodot_n": 18,
+      "nodot_residuals": [],
+      "nodot_fp_rate": 0.0
+    }
+  }
+}

@@ -25,7 +25,7 @@ const panels = [
   {
     id: 'structure',
     label: 'THE STRUCTURE',
-    description: 'D4 symmetry axes — vertical, horizontal, and 180° rotational.',
+    description: 'D4 symmetry axes - vertical, horizontal, and 180° rotational.',
     visual: <StructureVisual />,
     span: 'small',
   },
@@ -141,7 +141,7 @@ function GraphVisual() {
           fillOpacity={i === 6 ? 1 : 0.7}/>
       ))}
       <text x="40" y="192" fontSize="7.5" fill="var(--color-soft-gray)" fontFamily="monospace">
-        MultiGraph — edge multiplicity
+        MultiGraph - edge multiplicity
       </text>
     </svg>
   )
