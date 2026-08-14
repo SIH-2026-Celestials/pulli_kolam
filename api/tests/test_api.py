@@ -216,6 +216,29 @@ def test_detect_default_is_classical_not_ml():
     assert r.json()["detector"] == "classical"
 
 
+def test_cors_allows_local_frontend_origin():
+    """Regression test for a real bug found via browser E2E testing (not
+    caught by TestClient-based tests, since TestClient never enforces
+    CORS the way a real browser does): without CORSMiddleware, every
+    request from the Vite dev frontend (a different origin: 5173/5174 vs
+    this API's 8000) was silently blocked by the browser before it ever
+    reached an endpoint, making every /detect page action fail with a
+    misleading "backend unavailable" message despite the server working
+    fine. Assert the middleware is actually wired, not just that it's
+    imported."""
+    r = client.get("/api/v1/health", headers={"Origin": "http://localhost:5173"})
+    assert r.status_code == 200
+    assert r.headers.get("access-control-allow-origin") == "http://localhost:5173"
+
+
+def test_cors_rejects_non_local_origin():
+    """The allow-list is a localhost-only regex, not a blanket wildcard --
+    confirm a non-local origin does not get an allow-origin header back."""
+    r = client.get("/api/v1/health", headers={"Origin": "https://evil.example.com"})
+    assert r.status_code == 200  # request still succeeds (no credentials involved)
+    assert "access-control-allow-origin" not in {k.lower() for k in r.headers.keys()}
+
+
 # ============================================================
 # Integration proof: detector=ml genuinely controls the DOWNSTREAM
 # graph/analysis/reconstruction pipeline, not just /detect's own

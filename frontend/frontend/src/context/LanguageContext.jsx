@@ -1,10 +1,16 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import { TRANSLATIONS, getSavedLanguage, saveLanguage, resolve } from '../i18n/index'
 
 const LanguageContext = createContext(null)
 
 export function LanguageProvider({ children }) {
   const [lang, setLang] = useState(getSavedLanguage)
+
+  // Keep the document's lang attribute in sync so screen readers and
+  // search engines get the correct language signal for the active locale.
+  useEffect(() => {
+    document.documentElement.lang = lang
+  }, [lang])
 
   const setLanguage = useCallback((code) => {
     if (TRANSLATIONS[code]) {

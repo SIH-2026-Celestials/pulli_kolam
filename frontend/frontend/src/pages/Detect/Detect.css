@@ -138,6 +138,16 @@
   cursor: not-allowed;
 }
 
+.reconstruct-btn {
+  margin-top: var(--space-3);
+  width: 100%;
+}
+
+.reconstruct-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .detect-error {
   margin-top: var(--space-4);
   color: #B8302D;

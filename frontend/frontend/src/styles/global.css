@@ -45,6 +45,25 @@ a {
   color: inherit;
 }
 
+/* Global App Shell layout & Fixed background dot grid lattice overlay */
+.app-shell {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell > .kolam-grid-pattern {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
 /* --- Shared Layout & Grid Helpers --- */
 .container {
   width: 100%;
@@ -143,4 +162,3 @@ a {
   color: var(--color-text-muted);
   text-transform: uppercase;
 }
-

@@ -1,0 +1,18 @@
+.account-page {
+  padding-bottom: var(--space-24, 96px);
+}
+
+.account-header {
+  background-color: var(--color-paper-dark, var(--color-gold-subtle));
+}
+
+.account-card {
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 24px);
+}
+
+.account-logout-btn {
+  width: 100%;
+}

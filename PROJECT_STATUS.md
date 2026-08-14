@@ -33,15 +33,18 @@ PULLI is a computational platform that uses ML, computer vision, and graph theor
 | Milestone | Status | Notes |
 |---|---|---|
 | Project scaffold (React + Vite) | ✅ Complete | Vite v8, React 19 |
-| Design system (tokens, global styles) | ✅ Complete | Playfair Display + Inter, maroon/gold palette. Was Home-page-only for a while - Analyze/About/Gallery/How it Works/Generate referenced a shared `.container`/`.section`/`.eyebrow`/`.heading-display`/`.btn*` utility layer and a `--space-*`/`--color-ink`/`--color-line`/etc. token set that had never been defined, so those pages rendered as unstyled HTML. Fixed via `tokens.css` additions + new `utilities.css`. |
+| Design system (tokens, global styles) | ✅ Complete | Playfair Display + Inter, maroon/gold palette. Aligned color variables to the heritage editorial palette (deep maroon `#5A0615`, antique gold `#A97824`, warm ivory `#FBF8F1`, cream `#F5F0E6`, borders warm beige `#E6DCCB`). Was Home-page-only for a while - Analyze/About/Gallery/How it Works/Generate referenced a shared `.container`/`.section`/`.eyebrow`/`.heading-display`/`.btn*` utility layer and a `--space-*`/`--color-ink`/`--color-line`/etc. token set that had never been defined, so those pages rendered as unstyled HTML. Fixed via `tokens.css` additions + new `utilities.css`. |
 | Navbar component | ✅ Complete | Deep maroon, gold active underline, Login button |
-| Hero section (3-column layout) | ✅ Complete | Heading, center Kolam SVG, AI meets tradition card |
-| Center Kolam SVG illustration | ✅ Complete | Authentic 4-fold symmetric continuous loop art |
+| Theme toggle button | ✅ Complete | Default theme light, persists theme state via localStorage, toggles '.dark-theme' class on the documentElement and changes icon dynamically between Sun/Moon. |
+| Reusable Decorative System | ✅ Complete | Created `KolamCornerDecoration`, `KolamDecoration` (divider/border), `KolamGridPattern` (subtle repeating dot lattices), and `KolamMotif` for inline decorations. |
+| Hero section (3-column layout) | ✅ Complete | Heading, center Kolam SVG, AI meets tradition card with subtle grid overlays. |
+| Center Kolam SVG illustration | ✅ Complete | Authentic 4-fold symmetric continuous loop art with automated SVG line-draw load animation and slow opacity pulse. |
+| Drag-and-drop file upload modal | ✅ Complete | Interactive dropzone overlay showing 'Upload your Kolam / Drag & drop your image here / or / Browse files', including 10MB size limit check and drag states. |
 | Feature strip (5 items) | ✅ Complete | Horizontal layout with vertical dividers |
 | Live Analysis Pipeline card | ✅ Complete | 8-step stepper, 5 visual panels, progress bar |
 | Generated Kolam Variations card | ✅ Complete | 4 thumbnails, Generate More button |
 | Design Rule Summary | ✅ Complete | Grid, Symmetry, Stroke, Motif Families, Complexity |
-| Footer component | ✅ Complete | Maroon, copyright, AICTE initiative credit |
+| Footer component | ✅ Complete | Maroon, copyright, AICTE initiative credit, corner patterns and running borders |
 | File upload functionality | ✅ Complete | Triggers analysis pipeline simulation |
 | Generate More interactivity | ✅ Complete | Cycles between two variation sets |
 | About page | ✅ Complete | Routed at `/about` |

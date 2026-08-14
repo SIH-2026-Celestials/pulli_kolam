@@ -1,42 +1,82 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Upload, Landmark, Cpu, Network, Sparkles, HeartHandshake, Sparkle } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
+import { validateImageFile } from '../../lib/validateImageFile'
 import KolamHeroSvg from './KolamHeroSvg'
+import KolamCornerDecoration from '../kolam/KolamCornerDecoration'
+import KolamGridPattern from '../kolam/KolamGridPattern'
 import './Hero.css'
 
-export default function Hero({ onUploadImage }) {
+export default function Hero() {
   const { t } = useLanguage()
+  const navigate = useNavigate()
   const fileInputRef = useRef(null)
-  const navigate=useNavigate();
+  const closeButtonRef = useRef(null)
+  const [uploadModalOpen, setUploadModalOpen] = useState(false)
+  const [dragActive, setDragActive] = useState(false)
+  const [uploadError, setUploadError] = useState(null)
 
+  // Move focus into the modal on open and let Escape close it, so
+  // keyboard/screen-reader users aren't left stranded behind the overlay.
+  useEffect(() => {
+    if (!uploadModalOpen) return
+    closeButtonRef.current?.focus()
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setUploadModalOpen(false)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [uploadModalOpen])
+
+  const handleDrag = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true)
+    } else if (e.type === "dragleave") {
+      setDragActive(false)
+    }
+  }
+
+  // Hands the file to the real /detect page instead of running a local
+  // fake analysis -- this component has no backend of its own to call.
+  const processFile = (file) => {
+    if (!file) return
+    const result = validateImageFile(file)
+    if (!result.valid) {
+      setUploadError(result.message)
+      return
+    }
+    setUploadError(null)
+    setUploadModalOpen(false)
+    navigate('/detect', { state: { incomingFile: file } })
+  }
+
+  const handleDrop = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragActive(false)
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processFile(e.dataTransfer.files[0])
+    }
+  }
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0]
-    if (file && onUploadImage) {
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        onUploadImage(event.target.result)
-      }
-      reader.readAsDataURL(file)
+    if (file) {
+      processFile(file)
     }
   }
 
   return (
     <section className="hero-clone-section">
       {/* Subtle Background Corner Decorative SVG Elements */}
-      <div className="bg-decor bg-decor-tl">
-        <svg width="180" height="180" viewBox="0 0 200 200" fill="none" opacity="0.15">
-          <circle cx="100" cy="100" r="80" stroke="#B88735" strokeWidth="1" strokeDasharray="4 8" />
-          <path d="M 20 100 Q 100 20 180 100 Q 100 180 20 100 Z" stroke="#B88735" strokeWidth="1" />
-        </svg>
-      </div>
-      <div className="bg-decor bg-decor-tr">
-        <svg width="180" height="180" viewBox="0 0 200 200" fill="none" opacity="0.15">
-          <circle cx="100" cy="100" r="80" stroke="#B88735" strokeWidth="1" strokeDasharray="4 8" />
-          <path d="M 100 20 Q 180 100 100 180 Q 20 100 100 20 Z" stroke="#B88735" strokeWidth="1" />
-        </svg>
-      </div>
+      <KolamCornerDecoration position="top-left" />
+      <KolamCornerDecoration position="top-right" />
+      <KolamCornerDecoration position="bottom-left" />
+      <KolamCornerDecoration position="bottom-right" />
+      <KolamGridPattern opacity={0.03} />
 
       <div className="hero-container">
         {/* LEFT COLUMN: Typography & Actions */}
@@ -59,7 +99,13 @@ export default function Hero({ onUploadImage }) {
               accept="image/png, image/jpeg, image/webp"
               style={{ display: 'none' }}
             />
-            <button className="btn-primary-maroon" onClick={() => { navigate('/Detect') }}>
+            <button
+              className="btn-primary-maroon"
+              onClick={() => {
+                setUploadError(null)
+                setUploadModalOpen(true)
+              }}
+            >
               <Upload size={16} />
               <span>{t('hero.primaryBtn')}</span>
             </button>
@@ -80,9 +126,10 @@ export default function Hero({ onUploadImage }) {
         {/* RIGHT COLUMN: AI Meets Tradition Card */}
         <div className="hero-col-right">
           <div className="tradition-card">
+            <KolamGridPattern opacity={0.03} />
             <div className="card-header-row">
               <div className="header-icon-box">
-                <Sparkle size={18} fill="#B88735" color="#B88735" />
+                <Sparkle size={18} fill="var(--color-gold)" color="var(--color-gold)" />
               </div>
               <h2 className="card-title">{t('aiCard.title')}</h2>
             </div>
@@ -116,6 +163,48 @@ export default function Hero({ onUploadImage }) {
           </div>
         </div>
       </div>
+
+      {/* ── DRAG & DROP FILE UPLOAD MODAL ── */}
+      {uploadModalOpen && (
+        <div className="upload-modal-overlay" onClick={() => setUploadModalOpen(false)}>
+          <div
+            className="upload-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="upload-modal-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              ref={closeButtonRef}
+              className="upload-modal-close"
+              onClick={() => setUploadModalOpen(false)}
+              aria-label="Close upload dialog"
+            >
+              ✕
+            </button>
+            <h3 id="upload-modal-title" className="upload-modal-title">Upload your Kolam</h3>
+
+            <div
+              className={`upload-dropzone${dragActive ? ' drag-active' : ''}`}
+              onDragEnter={handleDrag}
+              onDragOver={handleDrag}
+              onDragLeave={handleDrag}
+              onDrop={handleDrop}
+            >
+              <Upload size={32} className="upload-dropzone-icon" />
+              <p className="upload-dropzone-text">Drag & drop your image here</p>
+              <span className="upload-dropzone-or">or</span>
+              <button className="btn-primary-maroon upload-browse-btn" onClick={() => fileInputRef.current?.click()}>
+                Browse files
+              </button>
+            </div>
+            {uploadError && (
+              <p className="upload-modal-error" role="alert">{uploadError}</p>
+            )}
+            <p className="upload-modal-hint">{t('hero.fileHint')}</p>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

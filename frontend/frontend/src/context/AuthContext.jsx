@@ -18,20 +18,27 @@ import {
   serverTimestamp
 } from 'firebase/firestore'
 
-const AuthContext = createContext()
+const AuthContext = createContext(null)
 
 const LOCAL_STORAGE_RECENT_KEY = 'pulli_recent_kolams'
 const LOCAL_STORAGE_GUEST_KEY = 'pulli_guest_mode'
 const AUTH_PROVIDER = import.meta.env.VITE_AUTH_PROVIDER || 'firebase' // 'firebase' | 'supabase'
 
+// 'loading' | 'authenticated' | 'unauthenticated' | 'error'
+// 'error' is distinct from 'unauthenticated' -- a 401 from /me genuinely
+// means "no session," but a network failure means "we don't know," and
+// those should not be presented to the user identically.
 export function AuthProvider({ children }) {
+  const [status, setStatus] = useState('loading')
   const [user, setUser] = useState(null)
-  const [isGuest, setIsGuest] = useState(() => {
-    return localStorage.getItem(LOCAL_STORAGE_GUEST_KEY) === 'true'
+  const [recentKolams, setRecentKolams] = useState(() => {
+    try {
+      const stored = localStorage.getItem(LOCAL_STORAGE_RECENT_KEY)
+      return stored ? JSON.parse(stored) : []
+    } catch {
+      return []
+    }
   })
-  const [authLoading, setAuthLoading] = useState(true)
-  const [recentKolams, setRecentKolams] = useState([])
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
   // Initialize Auth Listener (Firebase or Supabase)
   useEffect(() => {
@@ -123,6 +130,8 @@ export function AuthProvider({ children }) {
         }
       }
     }
+    return { data, error }
+  }, [])
 
     // Guest Mode / LocalStorage Fallback
     try {
@@ -135,7 +144,8 @@ export function AuthProvider({ children }) {
     } catch (e) {
       setRecentKolams([])
     }
-  }
+    return { data, error }
+  }, [])
 
   // Add a newly generated or analyzed Kolam to recent history
   async function addRecentKolam(kolamItem) {
@@ -147,7 +157,6 @@ export function AuthProvider({ children }) {
       symmetry: kolamItem.symmetry || 'D4 Dihedral',
       validity: kolamItem.validity || '✓ Eulerian Single-stroke',
       created_at: new Date().toISOString(),
-      is_guest: !user,
     }
 
     // Update Local Storage for Guest Mode / Immediate Feedback
@@ -275,30 +284,14 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isGuest,
-        authLoading,
-        recentKolams,
-        isAuthModalOpen,
-        setIsAuthModalOpen,
-        bypassLogin,
-        login,
-        signup,
-        logout,
-        addRecentKolam,
-      }}
-    >
+    <AuthContext.Provider value={{ status, user, login, register, logout, refresh, recentKolams, addRecentKolam }}>
       {children}
     </AuthContext.Provider>
   )
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
-  return context
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>')
+  return ctx
 }

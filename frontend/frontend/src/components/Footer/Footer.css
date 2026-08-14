@@ -13,7 +13,7 @@
   width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -34,17 +34,17 @@
 .footer-right {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
 }
 
 .footer-link {
   color: #E8E0D5;
   text-decoration: none;
-  transition: color 0.2s ease;
 }
 
 .footer-link:hover {
   color: #FFFFFF;
+  text-decoration: underline;
 }
 
 .footer-pattern {

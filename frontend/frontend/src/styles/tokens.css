@@ -3,39 +3,39 @@
    ========================================================= */
 
 :root {
-  /* --- Colors (Reference Screenshot Palette) --- */
-  --color-header-bg:    #500914; /* Deep Maroon / Burgundy */
-  --color-footer-bg:    #43000F; /* Dark Wine / Deep Maroon */
-  --color-maroon-main:  #5A0718; /* Primary Maroon Button & Accent */
-  --color-maroon-dark:  #3D030F;
-  --color-gold:         #B88735; /* Muted Gold / Bronze */
-  --color-gold-light:   #D4AF37;
-  --color-gold-subtle:  #F4E8D2;
+  /* --- Colors (Screenshot-Faithful Heritage Palette) --- */
+  --color-header-bg:    #5A0615; /* Primary Deep Maroon */
+  --color-footer-bg:    #3B0711; /* Dark Wine */
+  --color-maroon-main:  #5A0615; /* Primary Maroon button & accent */
+  --color-maroon-dark:  #3B0711;
+  --color-gold:         #A97824; /* Muted Antique Gold */
+  --color-gold-light:   #C59A4A; /* Warm Gold */
+  --color-gold-subtle:  #F5F0E6; /* Cream */
 
-  --color-paper:        #FAF7F0; /* Warm Ivory background */
-  --color-paper-card:   #FFFFFF; /* Pure White Card background */
-  --color-paper-light:  #F7F4EC;
-  --color-card-border:  #E4DCD0; /* Thin warm border */
+  --color-paper:        #FBF8F1; /* Warm Ivory background */
+  --color-paper-card:   #FFFDFC; /* Surface White/Ivory */
+  --color-paper-light:  #F5F0E6; /* Cream */
+  --color-card-border:  #E6DCCB; /* Warm Beige border */
 
-  --color-text-dark:    #201A18; /* Dark Charcoal Heading */
-  --color-text-body:    #5A524C; /* Warm Gray Body */
-  --color-text-muted:   #888078; /* Light Muted Gray */
+  --color-text-dark:    #171717; /* Primary Charcoal text */
+  --color-text-body:    #4B4843; /* Secondary text */
+  --color-text-muted:   #77716A; /* Muted text */
 
   --color-step-done:    #227B44; /* Green completed step circle */
-  --color-step-active:  #5A0718; /* Active maroon step circle */
-  --color-step-muted:   #CECAC2; /* Muted gray step circle */
+  --color-step-active:  #5A0615; /* Active maroon step circle */
+  --color-step-muted:   #E6DCCB; /* Muted beige step circle */
 
   /* --- Secondary-page palette aliases (Analyze/About/Explore/HowItWorks/etc.) --- */
   --color-accent:       var(--color-gold);
   --color-ink:           var(--color-text-dark);
-  --color-ink-light:    #4A423D;
+  --color-ink-light:    var(--color-text-body);
   --color-line:          var(--color-card-border);
   --color-line-dark:    #CFC5B8;
   --color-soft-gray:    var(--color-text-muted);
   --color-muted:        #A79F95;
   --color-valid:        var(--color-step-done);
   --color-white:        #FFFFFF;
-  --color-paper-dark:   #F4EDE0; /* Slightly deeper ivory for header/panel banners */
+  --color-paper-dark:   #F5F0E6; /* Cream for header/panel banners */
 
   /* --- Typography --- */
   --font-serif:  'Playfair Display', Georgia, serif;
@@ -84,3 +84,30 @@
   --transition-normal: 250ms ease;
   --transition-slow:   400ms ease;
 }
+
+/* --- Dark Theme Variable Overrides --- */
+.dark-theme {
+  --color-paper:        #12100F; /* Sleek rich dark background */
+  --color-paper-card:   #1C1917; /* Slate card background */
+  --color-paper-light:  #24201D; /* Soft contrast background */
+  --color-card-border:  #2E2722; /* Soft warm border */
+  --color-text-dark:    #EAE5DC; /* Softer off-white heading, less harsh contrast */
+  --color-text-body:    #B2AAA2; /* Muted ivory body text */
+  --color-text-muted:   #7A7167; /* Muted text */
+  --color-paper-dark:   #161312; 
+  --color-line-dark:    #3E352E;
+  --color-ink:          #EAE5DC;
+  --color-white:        var(--color-paper-card);
+  
+  /* Desaturated heritage tones for dark mode elegance */
+  --color-header-bg:    #1A1213; /* Desaturated dark charcoal-maroon */
+  --color-footer-bg:    #140E0F; /* Muted dark wine-charcoal */
+  --color-maroon-main:  #9B4A53; /* Soft desaturated rose-maroon button */
+  --color-maroon-dark:  #7D343C;
+  --color-gold:         #BCA374; /* Soft champagne gold accent */
+  --color-gold-light:   #D4C2A1;
+  --color-gold-subtle:  #211C18; /* Muted background gold glow */
+}
+
+
+

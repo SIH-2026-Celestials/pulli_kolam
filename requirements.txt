@@ -10,6 +10,24 @@
 
 -r requirements-api.txt
 
+# Used only by api/ (M4.2 REST service) -- NOT a dependency of engine/.
+# Already present in this project's development environment prior to
+# M4.2; declared here for reproducibility.
+fastapi
+uvicorn
+python-multipart
+
+# Used only by api/auth/ (identity/session infrastructure) -- NOT a
+# dependency of engine/ or the detector/analyze/reconstruct endpoints.
+# sqlalchemy talks to a local SQLite file by default (DATABASE_URL unset)
+# so local dev needs no database server installed; point DATABASE_URL at
+# PostgreSQL in production (see docs/DEPLOYMENT.md) and additionally
+# install psycopg2-binary there -- not installed by default here since
+# this project has no Postgres instance to develop against.
+sqlalchemy
+bcrypt
+python-dotenv
+
 # Used only by top-level research/plotting scripts (plot_kolam.py,
 # analyze_symmetry.py, etc.) -- NOT imported by engine/ or api/.
 matplotlib==3.10.0

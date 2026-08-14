@@ -23,8 +23,17 @@ async function request(path, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const res = await fetch(`${API_BASE}${path}`, { ...options, signal: controller.signal });
+    // 'include' on every request (not just auth ones) so the session
+    // cookie -- HttpOnly, never touched from JS -- rides along
+    // automatically once set; harmless for the image endpoints, which
+    // ignore it entirely.
+    const res = await fetch(`${API_BASE}${path}`, { ...options, credentials: 'include', signal: controller.signal });
     clearTimeout(timeoutId);
+
+    // 204 No Content (logout) has no body to parse.
+    if (res.status === 204) {
+      return { data: null, error: null };
+    }
 
     let body;
     try {
@@ -39,8 +48,14 @@ async function request(path, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
       // _api_error) -- prefer switching on status code (stable contract)
       // with `code` carried through for callers that want finer-grained
       // handling than the `kind` bucket below provides.
-      const message = body.error || `Request failed (${res.status})`;
+      const message = body.error || body.detail || `Request failed (${res.status})`;
       const code = body.code;
+      if (res.status === 401) {
+        return { data: null, error: apiError('unauthorized', message, res.status, code) };
+      }
+      if (res.status === 409) {
+        return { data: null, error: apiError('conflict', message, res.status, code) };
+      }
       if (res.status === 503) {
         return { data: null, error: apiError('model_unavailable', message, res.status, code) };
       }
@@ -51,7 +66,7 @@ async function request(path, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
         return { data: null, error: apiError('invalid_image', message, res.status, code) };
       }
       if (res.status === 422) {
-        return { data: null, error: apiError('invalid_request', message, res.status, code) };
+        return { data: null, error: apiError('invalid_input', describeValidationError(body) || message, res.status, code) };
       }
       return { data: null, error: apiError('unknown', message, res.status, code) };
     }
@@ -64,6 +79,22 @@ async function request(path, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
     }
     return { data: null, error: apiError('backend_unavailable', 'Could not reach the PULLI backend. Is the API server running?') };
   }
+}
+
+/** FastAPI/pydantic validation errors (422) come back as {detail: [{msg, loc}, ...]} -- flatten to one readable string. */
+function describeValidationError(body) {
+  if (Array.isArray(body?.detail) && body.detail.length) {
+    return body.detail.map((d) => d.msg).join(' ');
+  }
+  return body?.detail || body?.error || 'Invalid input.';
+}
+
+function postJson(path, payload) {
+  return request(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
 }
 
 /** @returns {Promise<{data: any, error: null} | {data: null, error: import('./types').ApiError}>} */
@@ -119,6 +150,37 @@ export function compareDetectors(imageFile) {
   const form = new FormData();
   form.append('image', imageFile);
   return request('/api/v1/compare-detectors', { method: 'POST', body: form });
+}
+
+// --- Auth (api/auth/router.py) ---
+// Session state lives in an HttpOnly cookie set by the backend -- these
+// calls never read or write a token themselves, only trigger the
+// browser's normal cookie handling via credentials: 'include' (above).
+
+/**
+ * @param {{email: string, password: string, displayName: string}} params
+ * @returns {Promise<{data: import('./types').User, error: null} | {data: null, error: import('./types').ApiError}>}
+ */
+export function register({ email, password, displayName }) {
+  return postJson('/api/v1/auth/register', { email, password, display_name: displayName });
+}
+
+/**
+ * @param {{email: string, password: string}} params
+ * @returns {Promise<{data: import('./types').User, error: null} | {data: null, error: import('./types').ApiError}>}
+ */
+export function login({ email, password }) {
+  return postJson('/api/v1/auth/login', { email, password });
+}
+
+/** @returns {Promise<{data: null, error: null} | {data: null, error: import('./types').ApiError}>} */
+export function logout() {
+  return request('/api/v1/auth/logout', { method: 'POST' });
+}
+
+/** @returns {Promise<{data: import('./types').User, error: null} | {data: null, error: import('./types').ApiError}>} */
+export function getMe() {
+  return request('/api/v1/auth/me');
 }
 
 // Generation runs a real multi-restart structural search per candidate

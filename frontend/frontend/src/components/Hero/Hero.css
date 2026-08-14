@@ -1,6 +1,6 @@
 .hero-clone-section {
   width: 100%;
-  background-color: var(--color-paper);
+  background-color: transparent;
   padding: 48px 0 36px 0;
   position: relative;
   overflow: hidden;
@@ -25,9 +25,9 @@
   width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 32px;
   display: grid;
-  grid-template-columns: 1fr 1.15fr 0.95fr;
+  grid-template-columns: 1.2fr 1.02fr 0.78fr;
   align-items: center;
   gap: 36px;
 }
@@ -93,7 +93,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #FFFFFF;
+  background-color: var(--color-white);
   color: var(--color-text-dark);
   border: 1px solid var(--color-card-border);
   padding: 12px 22px;
@@ -105,8 +105,8 @@
 }
 
 .btn-secondary-outline:hover {
-  border-color: #A0988E;
-  background-color: #FAF6EE;
+  border-color: var(--color-text-muted);
+  background-color: var(--color-paper-light);
 }
 
 .hero-file-hint {
@@ -142,11 +142,13 @@
 
 .tradition-card {
   width: 100%;
-  background-color: #FFFFFF;
+  background-color: var(--color-paper-card);
   border: 1px solid var(--color-card-border);
   border-radius: 14px;
   padding: 24px 26px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
 }
 
 .card-header-row {
@@ -194,6 +196,157 @@
 }
 
 .row-icon {
-  color: #B88735;
+  color: var(--color-gold);
   flex-shrink: 0;
+}
+
+/* ── Central Kolam SVG Animations ── */
+.kolam-lines-group path,
+.kolam-lines-group circle {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawKolam 5s cubic-bezier(0.4, 0, 0.2, 1) forwards, pulseOpacity 6s ease-in-out infinite 5s;
+}
+
+@keyframes drawKolam {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes pulseOpacity {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.72;
+  }
+}
+
+/* ── Upload Modal & Dropzone ── */
+.upload-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(23, 23, 23, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+  padding: 20px;
+}
+
+.upload-modal {
+  background-color: var(--color-paper-card);
+  border: 1.5px solid var(--color-card-border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  padding: 36px;
+  position: relative;
+  box-shadow: 0 20px 48px rgba(59, 7, 17, 0.12);
+  animation: modalEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.upload-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.upload-modal-close:hover {
+  background-color: var(--color-paper-light);
+  color: var(--color-text-dark);
+}
+
+.upload-modal-title {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-maroon-main);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.upload-dropzone {
+  border: 2px dashed var(--color-card-border);
+  background-color: var(--color-paper);
+  border-radius: 12px;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.upload-dropzone.drag-active {
+  border-color: var(--color-gold);
+  background-color: var(--color-gold-subtle);
+  box-shadow: inset 0 0 0 1px var(--color-gold);
+}
+
+.upload-dropzone-icon {
+  color: var(--color-gold);
+  margin-bottom: 12px;
+  opacity: 0.8;
+}
+
+.upload-dropzone-text {
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.upload-dropzone-or {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.upload-browse-btn {
+  padding: 8px 24px;
+  font-size: 13.5px;
+}
+
+.upload-modal-hint {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 18px;
+  text-align: center;
+}
+
+.upload-modal-error {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: #B8302D;
+  margin-top: 14px;
+  text-align: center;
 }

@@ -1,0 +1,227 @@
+/* ── Kolam Decorative Patterns ── */
+
+.kolam-corner-decor {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.kolam-corner-decor.top-left {
+  top: 12px;
+  left: 12px;
+}
+
+.kolam-corner-decor.top-right {
+  top: 12px;
+  right: 12px;
+  transform: scaleX(-1);
+}
+
+.kolam-corner-decor.bottom-left {
+  bottom: 12px;
+  left: 12px;
+  transform: scaleY(-1);
+}
+
+.kolam-corner-decor.bottom-right {
+  bottom: 12px;
+  right: 12px;
+  transform: scale(-1);
+}
+
+.kolam-decor-wrapper {
+  display: block;
+  pointer-events: none;
+}
+
+.kolam-decor-wrapper.horizontal {
+  width: 100%;
+}
+
+.kolam-grid-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.kolam-motif-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* ── TAMIL CULTURE BACKGROUND STYLES ── */
+.tamil-background-root {
+  position: fixed;
+  inset: 0;
+  z-index: -2; /* behind grid-pattern and all contents */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.tamil-pillar-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  height: 100%;
+  opacity: 0.03;
+  filter: blur(0.8px);
+}
+
+.tamil-pillar-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  height: 100%;
+  opacity: 0.03;
+  filter: blur(0.8px);
+}
+
+.tamil-gopuram-box {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 360px;
+  height: 500px;
+  opacity: 0.02;
+  filter: blur(1.5px);
+}
+
+.tamil-kolam-float {
+  position: absolute;
+  opacity: 0.035;
+  filter: blur(0.8px);
+}
+
+.tamil-kolam-float.tk-1 {
+  top: 15%;
+  left: 10%;
+  animation: floatSlow-1 25s ease-in-out infinite alternate;
+}
+
+.tamil-kolam-float.tk-2 {
+  bottom: 25%;
+  right: 12%;
+  animation: floatSlow-2 30s ease-in-out infinite alternate;
+}
+
+/* Cinematic drifting background animations */
+@keyframes floatSlow-1 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(25px, 15px) rotate(8deg);
+  }
+}
+
+@keyframes floatSlow-2 {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(-30px, -20px) rotate(-10deg);
+  }
+}
+
+/* Responsive hides for small screens to prevent visual clutter */
+@media (max-width: 1024px) {
+  .tamil-pillar-left,
+  .tamil-pillar-right {
+    display: none;
+  }
+  .tamil-gopuram-box {
+    opacity: 0.015;
+    width: 280px;
+    height: 390px;
+    bottom: -20px;
+  }
+  .tamil-kolam-float {
+    opacity: 0.02;
+  }
+}
+
+/* ── TAMIL PARALLAX GOPURAMS STYLES ── */
+.gopuram-parallax-root {
+  position: fixed;
+  inset: 0;
+  z-index: 0; /* Behind page text/buttons but in front of body background */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.gopuram-parallax-wrapper {
+  position: absolute;
+  width: 320px;
+  height: 800px;
+  will-change: transform;
+}
+
+.gopuram-parallax-wrapper.left {
+  left: 0;
+  top: 100px;
+  -webkit-mask-image: radial-gradient(ellipse at left center, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 0) 80%);
+  mask-image: radial-gradient(ellipse at left center, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 0) 80%);
+}
+
+.gopuram-parallax-wrapper.right {
+  right: 0;
+  top: 100px;
+  -webkit-mask-image: radial-gradient(ellipse at right center, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 0) 80%);
+  mask-image: radial-gradient(ellipse at right center, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 0) 80%);
+}
+
+/* Actual Dravidian Gopuram Image with Ken Burns animation */
+.gopuram-motion-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.1; /* Subtly 0.1 visible background texture */
+  filter: grayscale(100%) sepia(100%) hue-rotate(190deg) saturate(220%) brightness(0.9) contrast(1.15) blur(0.5px);
+  will-change: transform;
+}
+
+.gopuram-parallax-wrapper.left .gopuram-motion-img {
+  animation: kenBurnsLeft 48s ease-in-out infinite alternate;
+}
+
+.gopuram-parallax-wrapper.right .gopuram-motion-img {
+  animation: kenBurnsRight 52s ease-in-out infinite alternate;
+}
+
+/* Ken Burns Camera Pan & Zoom motions */
+@keyframes kenBurnsLeft {
+  0% {
+    transform: scale(1.03) translate(0, 0);
+  }
+  100% {
+    transform: scale(1.15) translate(-15px, -10px);
+  }
+}
+
+@keyframes kenBurnsRight {
+  0% {
+    transform: scale(1.03) translate(0, 0);
+  }
+  100% {
+    transform: scale(1.15) translate(15px, -10px);
+  }
+}
+
+/* Responsive hides to guarantee it never overlaps central layouts on tablet/mobile */
+@media (max-width: 1280px) {
+  .gopuram-parallax-root {
+    display: none;
+  }
+}
+
+
+

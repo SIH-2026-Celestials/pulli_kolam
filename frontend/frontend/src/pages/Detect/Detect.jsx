@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { detect, analyze, reconstruct, compareDetectors, getModelInfo } from '../../lib/api/kolam'
 import { categorizeCompareDots } from '../../lib/api/kolam'
+import { validateImageFile } from '../../lib/validateImageFile'
 import AnalysisPipeline from '../../components/AnalysisPipeline/AnalysisPipeline'
 import GeneratedVariations from '../../components/GeneratedVariations/GeneratedVariations'
 import './Detect.css'
@@ -12,6 +14,7 @@ const MODES = [
 ]
 
 export default function Detect() {
+  const location = useLocation()
   const [file, setFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
   const [mode, setMode] = useState('classical')
@@ -50,6 +53,14 @@ export default function Detect() {
 
   const onFileSelected = useCallback((f) => {
     if (!f) return
+    const result = validateImageFile(f)
+    if (!result.valid) {
+      setFile(null)
+      setPreviewUrl(null)
+      setStatus('error')
+      setErrorMsg(result.message)
+      return
+    }
     setFile(f)
     setPreviewUrl(URL.createObjectURL(f))
     setDetectResult(null)
@@ -71,6 +82,18 @@ export default function Detect() {
       }
       setPipelineProgress(current)
     }, 400)
+  }, [])
+
+  // A file handed off from the homepage's upload CTA (Hero.jsx) arrives
+  // via router state -- pick it up once on mount so the user doesn't have
+  // to re-select it here. Deferred a tick so this doesn't set state
+  // synchronously within the effect body (react-hooks/set-state-in-effect).
+  useEffect(() => {
+    const incoming = location.state?.incomingFile
+    if (!incoming) return
+    const id = setTimeout(() => onFileSelected(incoming), 0)
+    return () => clearTimeout(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const onDrop = useCallback((e) => {
@@ -147,6 +170,16 @@ export default function Detect() {
   }
 
   const scale = imgNaturalSize && imgRenderedSize ? imgRenderedSize.width / imgNaturalSize.width : 1
+
+  // The backend's `agreement` counts (api/main.py) match each classical dot to
+  // its single nearest ML dot independently, without deduplicating which ML
+  // dot was already claimed -- on images with a large count mismatch this can
+  // double-count the same ML dot as "agreeing" with several classical dots,
+  // which can even push ml_only negative. categorizeCompareDots() (used for
+  // the overlay markers below) does a proper one-to-one match, so the summary
+  // numbers are derived from that instead of trusting compareResult.agreement
+  // directly -- never show a number known to be arithmetically wrong.
+  const compareCounts = compareResult ? categorizeCompareDots(compareResult) : null
 
   return (
     <main id="main-content" className="detect-page">
@@ -253,6 +286,12 @@ export default function Detect() {
               </p>
             )}
 
+            {status === 'success' && !(mode === 'compare' ? compareResult : detectResult) && (
+              <p className="body-text body-text--sm detect-placeholder">
+                Switched detector -- click &quot;Analyze Kolam&quot; to run {mode === 'compare' ? 'a comparison' : `the ${mode} detector`} on this image.
+              </p>
+            )}
+
             {mode !== 'compare' && detectResult && (
               <div className="archival-frame result-card">
                 <h2 className="heading-display heading-3">Detection Result</h2>
@@ -288,9 +327,9 @@ export default function Detect() {
                   </div>
                 </div>
                 <div className="step-table">
-                  <div className="step-row"><span className="label-tech">Agreeing dots</span><strong className="legend-agree">{compareResult.agreement.agreeing_dots ?? '-'}</strong></div>
-                  <div className="step-row"><span className="label-tech">ML only</span><strong className="legend-ml">{compareResult.agreement.ml_only ?? '-'}</strong></div>
-                  <div className="step-row"><span className="label-tech">Classical only</span><strong className="legend-classical">{compareResult.agreement.classical_only ?? '-'}</strong></div>
+                  <div className="step-row"><span className="label-tech">Agreeing dots</span><strong className="legend-agree">{compareCounts.agree.length}</strong></div>
+                  <div className="step-row"><span className="label-tech">ML only</span><strong className="legend-ml">{compareCounts.mlOnly.length}</strong></div>
+                  <div className="step-row"><span className="label-tech">Classical only</span><strong className="legend-classical">{compareCounts.classicalOnly.length}</strong></div>
                 </div>
                 <div className="overlay-legend">
                   <span><i className="swatch legend-agree" /> Agreement</span>

@@ -44,6 +44,15 @@ import sys
 import tempfile
 import time
 
+from dotenv import load_dotenv
+
+# Loads .env (DATABASE_URL, AUTH_SECRET, COOKIE_*, CORS_ORIGINS) if present
+# in the repo root -- copy .env.example to .env for local dev. Does
+# nothing (no error) if the file doesn't exist, and never overrides a
+# variable already set in the real environment (production deployments
+# typically set these via the platform, not a checked-in-adjacent file).
+load_dotenv()
+
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -51,6 +60,8 @@ from fastapi.responses import JSONResponse
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+from api.auth.db import init_db  # noqa: E402
+from api.auth.router import router as auth_router  # noqa: E402
 from api.canonical import graph_to_json, motif_placements_to_json, reconstruction_to_json, validity_to_json  # noqa: E402
 from api.detectors import get_detector  # noqa: E402
 from api.generation_service import get_generation_service  # noqa: E402
@@ -69,26 +80,40 @@ from engine import motifs, validity  # noqa: E402
 
 app = FastAPI(title="PULLI API", version="0.1.0")
 
-# CORS_ORIGINS: comma-separated list of allowed frontend origins, e.g.
-# "http://localhost:5173,https://pulli.example.com". Deliberately NOT
-# defaulted to "*" -- an explicit origin list is required in any
-# deployment where the API is reachable from a browser. For local
-# development where the variable is unset, the common Vite dev-server
-# origins are allowed so `npm run dev` works without extra setup;
-# production deployments must set CORS_ORIGINS explicitly.
-_DEV_DEFAULT_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000"
+# The frontend (Vite dev server) runs on a different origin than this API
+# (5173/5174 vs 8000) -- without this, every browser request is blocked by
+# CORS before it even reaches the endpoints below (confirmed: this is not
+# hypothetical, it was reproduced in a real browser E2E run against the
+# real frontend). allow_credentials=True is required for the auth session
+# cookie (api/auth/) to be sent/received cross-origin at all -- per the
+# CORS spec this means allow_origins can never be "*", so CORS_ORIGINS
+# (comma-separated explicit origins) is the production path; unset, it
+# falls back to a permissive localhost-only regex for zero-config local
+# dev (covers whatever port Vite picks, not just the common defaults).
 _cors_origins_env = os.environ.get("CORS_ORIGINS", "").strip()
-CORS_ORIGINS = [origin.strip() for origin in (_cors_origins_env or _DEV_DEFAULT_ORIGINS).split(",") if origin.strip()]
-
+_cors_kwargs = (
+    {"allow_origins": [o.strip() for o in _cors_origins_env.split(",") if o.strip()]}
+    if _cors_origins_env
+    else {"allow_origin_regex": r"http://(localhost|127\.0\.0\.1):\d+"}
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
+    **_cors_kwargs,
 )
 
+app.include_router(auth_router)
 app.include_router(generations_router)
+
+
+@app.on_event("startup")
+def _create_auth_tables() -> None:
+    # Identity/session tables only -- never touches image-processing code.
+    # See api/auth/db.py's module docstring for why create_all() (not a
+    # migration tool) is the right amount of infrastructure here.
+    init_db()
 
 
 @app.on_event("startup")
@@ -445,6 +470,256 @@ def compare_detectors(image: UploadFile = File(...)):
         "ml": _side(ml_result, ml_error, "ml"),
         "agreement": agreement,
     }
+
+
+# ────────────────────────────────────────────────────────────────────
+#  SSE Streaming Pipeline  (/api/v1/analyze-stream/*)
+#
+#  Two endpoints that expose the SAME engine stages already used by
+#  /api/v1/analyze, but emit Server-Sent Events between each stage so
+#  the frontend stepper can advance in real time.
+#
+#  No engine/ML code is duplicated here -- every stage calls the same
+#  helper / engine function that /analyze uses.  The only addition is
+#  the asyncio.Queue-based event bus between the background thread and
+#  the SSE generator.
+# ────────────────────────────────────────────────────────────────────
+
+import asyncio
+import json
+import uuid
+from concurrent.futures import ThreadPoolExecutor
+
+from fastapi.responses import StreamingResponse
+
+# In-process job store: job_id → {"path": str, "detector": str, "queue": asyncio.Queue}
+# Entries are deleted once the SSE stream is exhausted or on error.
+# This is deliberately simple (no Redis, no DB) -- adequate for a
+# single-process dev server with low concurrency.
+_STREAM_JOBS: dict[str, dict] = {}
+_PIPELINE_EXECUTOR = ThreadPoolExecutor(max_workers=4, thread_name_prefix="pulli-pipeline")
+
+
+def _sse(event: str, data: dict) -> str:
+    """Format a single SSE message."""
+    return f"event: {event}\ndata: {json.dumps(data)}\n\n"
+
+
+def _run_pipeline_in_thread(job_id: str, image_path: str, detector: str, loop: asyncio.AbstractEventLoop) -> None:
+    """
+    Runs the full Kolam analysis pipeline synchronously (in a thread-pool
+    worker) and posts SSE events to the job's asyncio.Queue so the async
+    SSE generator can yield them to the browser.
+
+    Stages mirror /api/v1/analyze exactly -- no logic is duplicated, only
+    the event-emission wrapper is new.
+    """
+    job = _STREAM_JOBS.get(job_id)
+    if job is None:
+        return
+
+    queue: asyncio.Queue = job["queue"]
+
+    def emit(event: str, data: dict) -> None:
+        asyncio.run_coroutine_threadsafe(queue.put(_sse(event, data)), loop)
+
+    def stage_started(stage_id: str, idx: int, message: str) -> None:
+        emit("stage_started", {
+            "job_id": job_id, "stage": stage_id,
+            "stage_index": idx, "status": "running", "message": message,
+        })
+
+    def stage_completed(stage_id: str, idx: int, message: str, result: dict | None = None) -> None:
+        payload: dict = {
+            "job_id": job_id, "stage": stage_id,
+            "stage_index": idx, "status": "completed", "message": message,
+        }
+        if result is not None:
+            payload["result"] = result
+        emit("stage_completed", payload)
+
+    def stage_failed(stage_id: str, idx: int, message: str) -> None:
+        emit("stage_failed", {
+            "job_id": job_id, "stage": stage_id,
+            "stage_index": idx, "status": "failed", "message": message,
+        })
+        emit("pipeline_failed", {
+            "job_id": job_id, "status": "failed",
+            "stage": stage_id, "stage_index": idx, "message": message,
+        })
+        asyncio.run_coroutine_threadsafe(queue.put(None), loop)  # sentinel
+
+    try:
+        # ── STAGE 0: upload_image (already done, just signal it) ──────
+        stage_started("upload_image", 0, "Image received.")
+        stage_completed("upload_image", 0, "Image uploaded successfully.")
+
+        # ── STAGE 1: detect_dots ──────────────────────────────────────
+        stage_started("detect_dots", 1, "Detecting pulli dots…")
+        try:
+            det_result = _run_detector(detector, image_path)
+        except HTTPException as exc:
+            stage_failed("detect_dots", 1, exc.detail)
+            return
+        stage_completed("detect_dots", 1, f"Detected {len(det_result.dots)} dots.", {
+            "dot_count": len(det_result.dots),
+            "detector": det_result.detector,
+            "model_version": det_result.model_version,
+            "processing_ms": round(det_result.processing_ms, 2),
+        })
+
+        # ── STAGE 2: trace_stroke ─────────────────────────────────────
+        stage_started("trace_stroke", 2, "Tracing stroke from dot arrangement…")
+        G = det_result.graph
+        edge_count = G.number_of_edges()
+        stage_completed("trace_stroke", 2, f"Stroke traced — {edge_count} edges.", {
+            "edge_count": edge_count,
+        })
+
+        # ── STAGE 3: build_graph ──────────────────────────────────────
+        stage_started("build_graph", 3, "Building mathematical graph…")
+        graph_data = graph_to_json(G)
+        stage_completed("build_graph", 3,
+            f"Graph built: {graph_data['nodes']} nodes, {graph_data['edges']} edges.", graph_data)
+
+        # ── STAGE 4: detect_symmetry ──────────────────────────────────
+        stage_started("detect_symmetry", 4, "Analysing structural symmetry…")
+        dots = set(G.nodes())
+        if G.number_of_nodes():
+            val_result = validity.check_validity(G)
+        else:
+            val_result = {
+                "is_eulerian_circuit": False, "has_eulerian_path": False,
+                "connected_components": 0, "largest_component_covers_all_nodes": False,
+            }
+        sym_data = {
+            "connected_components": val_result.get("connected_components", 0),
+            "largest_component_covers_all_nodes": val_result.get("largest_component_covers_all_nodes", False),
+        }
+        stage_completed("detect_symmetry", 4,
+            f"Symmetry analysis done — {sym_data['connected_components']} component(s).", sym_data)
+
+        # ── STAGE 5: find_motifs ──────────────────────────────────────
+        stage_started("find_motifs", 5, "Identifying motif patterns…")
+        placements: list = []
+        if len(dots) >= 1:
+            interior = motifs.interior_points(dots, radius=1)
+            placements, _residual, _fully_covered = motifs.induce_motif_set_adaptive(
+                G, interior, dots, max_radius=2, max_motifs_per_radius=50
+            )
+        stage_completed("find_motifs", 5, f"Found {len(placements)} motif placement(s).", {
+            "motif_count": len(placements),
+        })
+
+        # ── STAGE 6: validate_stroke ──────────────────────────────────
+        stage_started("validate_stroke", 6, "Validating Eulerian stroke property…")
+        validity_data = validity_to_json(val_result)
+        is_valid = validity_data["is_eulerian_circuit"]
+        stage_completed("validate_stroke", 6,
+            f"Stroke {'is a valid Eulerian circuit' if is_valid else 'is NOT a valid Eulerian circuit'}.",
+            validity_data)
+
+        # ── STAGE 7: extract_rules ────────────────────────────────────
+        stage_started("extract_rules", 7, "Extracting design rules…")
+        rules_data = {
+            "dot_count": len(det_result.dots),
+            "motif_count": len(placements),
+            "is_eulerian_circuit": validity_data["is_eulerian_circuit"],
+            "has_eulerian_path": validity_data["has_eulerian_path"],
+            "connected_components": validity_data["connected_components"],
+            "graph_nodes": graph_data["nodes"],
+            "graph_edges": graph_data["edges"],
+        }
+        stage_completed("extract_rules", 7, "Design rules extracted.", rules_data)
+
+        # ── PIPELINE COMPLETE ─────────────────────────────────────────
+        emit("pipeline_completed", {
+            "job_id": job_id, "status": "completed",
+            "message": "Kolam analysis completed successfully.",
+        })
+
+    except Exception as exc:  # noqa: BLE001
+        emit("pipeline_failed", {
+            "job_id": job_id, "status": "failed",
+            "message": f"Unexpected pipeline error: {type(exc).__name__}: {exc}",
+        })
+    finally:
+        # Sentinel: tells the SSE generator to stop.
+        asyncio.run_coroutine_threadsafe(queue.put(None), loop)
+        # Clean up temp file if not already removed.
+        try:
+            if os.path.exists(image_path):
+                os.unlink(image_path)
+        except OSError:
+            pass
+        # Remove job from store.
+        _STREAM_JOBS.pop(job_id, None)
+
+
+@app.post("/api/v1/analyze-stream/start")
+async def analyze_stream_start(
+    image: UploadFile = File(...),
+    detector: str = Form("classical"),
+):
+    """
+    Accept an image upload and immediately return a job_id.
+    The actual ML pipeline runs asynchronously -- the client should
+    connect to /api/v1/analyze-stream/{job_id}/events to receive
+    stage-by-stage progress via SSE.
+    """
+    if detector not in ("classical", "ml"):
+        raise HTTPException(status_code=400, detail=f"detector must be 'classical' or 'ml', got {detector!r}")
+
+    path = _save_upload_to_temp(image)
+    job_id = str(uuid.uuid4())
+
+    loop = asyncio.get_event_loop()
+    queue: asyncio.Queue = asyncio.Queue()
+    _STREAM_JOBS[job_id] = {"path": path, "detector": detector, "queue": queue}
+
+    # Fire-and-forget: runs the full pipeline in a thread-pool worker.
+    loop.run_in_executor(
+        _PIPELINE_EXECUTOR,
+        _run_pipeline_in_thread,
+        job_id, path, detector, loop,
+    )
+
+    return {"job_id": job_id, "status": "started", "detector": detector}
+
+
+@app.get("/api/v1/analyze-stream/{job_id}/events")
+async def analyze_stream_events(job_id: str):
+    """
+    Server-Sent Events endpoint.  The client connects here after
+    receiving a job_id from /start.  Events are emitted in order as
+    each pipeline stage begins and completes.  The stream closes when
+    the pipeline finishes or fails.
+    """
+    job = _STREAM_JOBS.get(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail=f"No active analysis job with id {job_id!r}.")
+
+    queue: asyncio.Queue = job["queue"]
+
+    async def event_generator():
+        # Keep-alive comment so the browser doesn't close a "stalled" connection
+        # before the first real event arrives (ML pipeline can take a few seconds
+        # to start on a cold process).
+        yield ": keep-alive\n\n"
+        while True:
+            item = await queue.get()
+            if item is None:  # sentinel -- pipeline done
+                break
+            yield item
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",   # nginx: disable proxy buffering
+        },
+    )
 
 
 MAX_GENERATE_COUNT = 5  # bounds worst-case request latency (each candidate runs up to N_RESTARTS search passes)

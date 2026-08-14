@@ -7,13 +7,13 @@
 import {
   detect, analyze, reconstruct, compareDetectors, generate, getHealth, getModelInfo,
   createGeneration, getGeneration, getGenerationMathematics, getGenerationGraph, listModels,
-  listGenerations, generationExportUrl,
+  listGenerations, generationExportUrl, register, login, logout, getMe,
 } from './client';
 
 export {
   detect, analyze, reconstruct, compareDetectors, generate, getHealth, getModelInfo,
   createGeneration, getGeneration, getGenerationMathematics, getGenerationGraph, listModels,
-  listGenerations, generationExportUrl,
+  listGenerations, generationExportUrl, register, login, logout, getMe,
 };
 
 const MATCH_TOLERANCE_PX = 6.0;

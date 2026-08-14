@@ -72,6 +72,13 @@ __pycache__/
 frontend/frontend/node_modules/
 frontend/frontend/dist/
 
+# Auth/identity (api/auth/) -- local secrets and the local dev SQLite
+# database must never be committed. Real deployments set DATABASE_URL/
+# AUTH_SECRET/etc. via the platform's env config, not a checked-in file.
+.env
+*.db
+*.db-journal
+
 # Raw dataset archive (redundant with extracted kolam_data/)
 one-stroke-dotted-pulli-kolam.zip
 

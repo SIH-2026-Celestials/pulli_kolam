@@ -85,11 +85,12 @@ export default function Technology() {
               </ul>
             </div>
 
-            <div className="stack-card archival-frame stack-card--future">
-              <h3 className="eyebrow">Planned</h3>
+            <div className="stack-card archival-frame">
+              <h3 className="eyebrow">Backend</h3>
               <ul className="stack-list label-tech">
                 <li><span>API Layer</span> FastAPI</li>
-                <li><span>Status</span> Not yet connected</li>
+                <li><span>Endpoints</span> Detect, Analyze, Reconstruct, Compare Detectors</li>
+                <li><span>Status</span> Live -- powers the /detect page</li>
               </ul>
             </div>
           </div>
