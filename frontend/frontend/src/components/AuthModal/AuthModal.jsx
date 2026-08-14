@@ -377,3 +377,5 @@ export default function AuthModal() {
     </div>
   )
 }
+
+export { AuthModal }
