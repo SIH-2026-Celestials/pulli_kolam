@@ -3,6 +3,7 @@ import Hero from '../../components/Hero/Hero'
 import FeatureStrip from '../../components/FeatureStrip/FeatureStrip'
 import AnalysisPipeline from '../../components/AnalysisPipeline/AnalysisPipeline'
 import GeneratedVariations from '../../components/GeneratedVariations/GeneratedVariations'
+import RecentKolams from '../../components/RecentKolams/RecentKolams'
 import { useKolamAnalysis } from '../../lib/api/useKolamAnalysis'
 import { useLanguage } from '../../context/LanguageContext'
 import './Home.css'
@@ -76,7 +77,10 @@ export default function Home() {
             <GeneratedVariations />
           </div>
 
-          {/* 4. AICTE INITIATIVE SECTION */}
+          {/* 4. RECENTLY GENERATED KOLAMS — full width below both columns */}
+          <RecentKolams />
+
+          {/* 5. AICTE INITIATIVE SECTION */}
           <section className="aicte-section">
             <div className="aicte-card">
               <div className="aicte-content">

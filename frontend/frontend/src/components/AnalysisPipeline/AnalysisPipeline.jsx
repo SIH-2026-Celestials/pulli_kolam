@@ -41,7 +41,7 @@ export default function AnalysisPipeline({
   // The progress line spans from stage 0 to the last completed/running
   const progressPct = totalStages <= 1
     ? 0
-    : Math.round((completedCount / (totalStages - 1)) * 100)
+    : Math.min(100, Math.round((completedCount / (totalStages - 1)) * 100))
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0]
@@ -81,7 +81,7 @@ export default function AnalysisPipeline({
       {/* ── STEPPER BAR ─────────────────────────────────────────────── */}
       <div className="stepper-container">
         <div className="stepper-line-bg" />
-        <div className="stepper-line-active" style={{ width: `${progressPct}%` }} />
+        <div className="stepper-line-active" style={{ width: `calc((100% - 90px) * ${progressPct / 100})` }} />
 
         <div className="stepper-steps">
           {stages.map((stage, idx) => (

@@ -3,7 +3,6 @@ import { RotateCw, Grid, GitFork, Infinity as LoopIcon, Flower2, BarChart2, Down
 import { useLanguage } from '../../context/LanguageContext'
 import { useAuth } from '../../context/AuthContext'
 import { createGeneration, getGenerationGraph, generationExportUrl } from '../../lib/api/kolam'
-import RecentKolams from '../RecentKolams/RecentKolams'
 import './GeneratedVariations.css'
 
 const MAX_GENERATE_COUNT = 5
@@ -407,8 +406,6 @@ export default function GeneratedVariations() {
         )}
       </div>
 
-      {/* RECENT KOLAMS STORAGE HISTORY DISPLAY */}
-      <RecentKolams />
     </div>
   )
 }

@@ -23,13 +23,14 @@
   width: 100%;
   margin-bottom: 28px;
   padding: 0 10px;
+  overflow: hidden;
 }
 
 .stepper-line-bg {
   position: absolute;
-  top: 14px;
-  left: 24px;
-  right: 24px;
+  top: 13px;
+  left: 45px;
+  right: 45px;
   height: 2px;
   background-color: var(--color-card-border);
   z-index: 1;
@@ -37,12 +38,13 @@
 
 .stepper-line-active {
   position: absolute;
-  top: 14px;
-  left: 24px;
+  top: 13px;
+  left: 45px;
   height: 2px;
   background-color: var(--color-step-done);
   z-index: 2;
   transition: width 0.3s ease;
+  max-width: calc(100% - 90px);
 }
 
 .stepper-steps {
