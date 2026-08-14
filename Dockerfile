@@ -66,4 +66,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 # Production mode -- no --reload. KMP_DUPLICATE_LIB_OK is set inside
 # api/main.py itself (see its module docstring); not repeated here.
 # Bind dynamically to Render/Fly.io platform PORT environment variable.
-CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Run migrations automatically on container startup.
+CMD ["sh", "-c", "alembic upgrade head && uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
