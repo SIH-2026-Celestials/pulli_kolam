@@ -6,7 +6,7 @@ import './GeneratedVariations.css'
 
 export default function GeneratedVariations() {
   const { t } = useLanguage()
-  const [status, setStatus] = useState('idle') // idle | loading | success | error
+  const [status, setStatus] = useState('loading') // idle | loading | success | error
   const [candidates, setCandidates] = useState([])
   const [constraints, setConstraints] = useState(null)
   const [model, setModel] = useState(null)
@@ -31,8 +31,20 @@ export default function GeneratedVariations() {
   }
 
   useEffect(() => {
-    runGenerate()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let cancelled = false
+    generate({ count: 2 }).then(({ data, error }) => {
+      if (cancelled) return
+      if (error) {
+        setStatus('error')
+        setErrorMsg(error.message)
+        return
+      }
+      setCandidates(data.candidates)
+      setConstraints(data.constraints)
+      setModel(data.model)
+      setStatus('success')
+    })
+    return () => { cancelled = true }
   }, [])
 
   const nValid = candidates.filter((c) => c.is_valid).length
@@ -72,11 +84,10 @@ export default function GeneratedVariations() {
         <>
           {/* CANDIDATE GRID */}
           <div className="variations-grid">
-            {candidates.map((c, i) => (
+            {candidates.map((c) => (
               <div key={c.seed} className="variation-thumb-box" title={`seed=${c.seed}, valid=${c.is_valid}`}>
                 <div
                   className="variation-svg-wrap"
-                  // eslint-disable-next-line react/no-danger
                   dangerouslySetInnerHTML={{ __html: c.render_svg }}
                 />
                 {!c.is_valid && <span className="variation-invalid-badge">invalid</span>}
