@@ -5,6 +5,7 @@ import {
   Copy, Check, History, ChevronDown, ChevronUp, ShieldCheck, Layers, Info,
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import { useLanguage } from '../../context/LanguageContext'
 import {
   createGeneration, listGenerations, generationExportUrl, getGeneration, getHealth,
 } from '../../lib/api/kolam'
