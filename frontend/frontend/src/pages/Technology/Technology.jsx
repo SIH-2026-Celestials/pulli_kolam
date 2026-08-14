@@ -1,17 +1,20 @@
 import { Link } from 'react-router-dom'
+import { useLanguage } from '../../context/LanguageContext'
 import './Technology.css'
 
 export default function Technology() {
+  const { t } = useLanguage()
+
   return (
     <main id="main-content" className="technology-page">
       <header className="technology-header section section--bordered">
         <div className="container--narrow">
-          <p className="eyebrow eyebrow--accent">System Architecture</p>
+          <p className="eyebrow eyebrow--accent">{t('technology.eyebrow')}</p>
           <h1 className="heading-display heading-2 technology-title">
-            Technology
+            {t('technology.title')}
           </h1>
           <p className="body-text technology-sub">
-            The data pipeline and technology stack behind PULLI's computational analysis of traditional Kolam patterns.
+            {t('technology.sub')}
           </p>
         </div>
       </header>

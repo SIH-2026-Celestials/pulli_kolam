@@ -1,19 +1,22 @@
+import { useLanguage } from '../../context/LanguageContext'
 import ModuleCard from '../../components/ModuleCard/ModuleCard'
 import { learnModules } from '../../data/learnData'
 import './Learn.css'
 
 export default function Learn() {
+  const { t } = useLanguage()
+
   return (
     <main id="main-content" className="learn-page">
       {/* ── 1. HERO SECTION ────────────────────────────────────────────── */}
       <header className="learn-header section section--bordered">
         <div className="container--narrow">
-          <p className="eyebrow eyebrow--accent">INDIAN KNOWLEDGE SYSTEMS (IKS)</p>
+          <p className="eyebrow eyebrow--accent">{t('learn.eyebrow')}</p>
           <h1 className="heading-display heading-2 learn-title">
-            LEARNING &amp; EDUCATION
+            {t('learn.title')}
           </h1>
           <p className="body-text learn-sub">
-            Explore the ethnomathematics, graph theory, D₄ symmetry groups, and cultural history behind South Indian one-stroke <em>Pulli Kolam</em> patterns.
+            {t('learn.sub')}
           </p>
         </div>
       </header>
@@ -21,10 +24,10 @@ export default function Learn() {
       {/* ── 2. MODULE CARDS GRID ───────────────────────────────────────── */}
       <section className="container--narrow section section--bordered">
         <div className="section-title-block">
-          <p className="eyebrow">Interactive Curriculum</p>
-          <h2 className="heading-display heading-3">FOUR LEARNING MODULES</h2>
+          <p className="eyebrow">{t('learn.curriculumEyebrow')}</p>
+          <h2 className="heading-display heading-3">{t('learn.curriculumTitle')}</h2>
           <p className="body-text body-text--sm">
-            Select a module below to study its mathematical theory and interact with live visual demonstrations.
+            {t('learn.curriculumSub')}
           </p>
         </div>
 
@@ -39,35 +42,35 @@ export default function Learn() {
       <section className="section section--bordered learn-why-section">
         <div className="container--narrow">
           <div className="section-title-block">
-            <p className="eyebrow eyebrow--accent">Pedagogical Value</p>
-            <h2 className="heading-display heading-3">WHY STUDY KOLAM MATHEMATICS?</h2>
+            <p className="eyebrow eyebrow--accent">{t('learn.whyEyebrow')}</p>
+            <h2 className="heading-display heading-3">{t('learn.whyTitle')}</h2>
             <p className="body-text body-text--sm">
-              How traditional South Indian ritual floor drawings bridge ancient cultural practice with modern computer science.
+              {t('learn.whySub')}
             </p>
           </div>
 
           <div className="why-grid">
             <div className="why-card archival-frame">
-              <span className="eyebrow eyebrow--accent">PILLAR 01</span>
-              <h3 className="heading-display heading-4">Ethnomathematics</h3>
+              <span className="eyebrow eyebrow--accent">{t('learn.p1Eyebrow')}</span>
+              <h3 className="heading-display heading-4">{t('learn.p1Title')}</h3>
               <p className="body-text body-text--sm">
-                Demonstrates how complex topological ideas (Eulerian circuits, array grammars, knot theory) were practiced intuitively for centuries prior to modern formal graph notation.
+                {t('learn.p1Desc')}
               </p>
             </div>
 
             <div className="why-card archival-frame">
-              <span className="eyebrow eyebrow--accent">PILLAR 02</span>
-              <h3 className="heading-display heading-4">STEM &amp; Computer Science</h3>
+              <span className="eyebrow eyebrow--accent">{t('learn.p2Eyebrow')}</span>
+              <h3 className="heading-display heading-4">{t('learn.p2Title')}</h3>
               <p className="body-text body-text--sm">
-                Provides a visual, interactive medium for teaching graph theory, edge multiplicity, array expansion, and D₄ dihedral group transformations to students.
+                {t('learn.p2Desc')}
               </p>
             </div>
 
             <div className="why-card archival-frame">
-              <span className="eyebrow eyebrow--accent">PILLAR 03</span>
-              <h3 className="heading-display heading-4">Cultural Heritage</h3>
+              <span className="eyebrow eyebrow--accent">{t('learn.p3Eyebrow')}</span>
+              <h3 className="heading-display heading-4">{t('learn.p3Title')}</h3>
               <p className="body-text body-text--sm">
-                Supports AICTE's Indian Knowledge Systems (IKS) initiative by preserving sacred oral and floor art traditions in machine-readable computational formats.
+                {t('learn.p3Desc')}
               </p>
             </div>
           </div>

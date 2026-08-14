@@ -10,17 +10,18 @@ export default function Terms() {
   return (
     <main id="main-content" className="legal-page">
       <header className="legal-header section section--bordered">
-        <div className="container">
+        <div className="container--narrow">
           <p className="eyebrow eyebrow--accent">{t('legal.termsEyebrow')}</p>
           <h1 className="heading-display heading-2">{t('legal.termsTitle')}</h1>
         </div>
       </header>
 
-      <section className="container section legal-content">
-        <p className="legal-effective-date label-tech">Effective date: {EFFECTIVE_DATE}</p>
-        <p className="legal-english-notice">{t('legal.englishOnlyNotice')}</p>
+      <div className="legal-container">
+        <article className="legal-card legal-content">
+          <p className="legal-effective-date label-tech">Effective date: {EFFECTIVE_DATE}</p>
+          <p className="legal-english-notice">{t('legal.englishOnlyNotice')}</p>
 
-        <h2 className="heading-display heading-3">Acceptance of these terms</h2>
+          <h2 className="heading-display heading-3">Acceptance of these terms</h2>
         <p className="body-text">
           By using PULLI, you agree to these terms. If you do not agree, please do not use the
           service.
@@ -133,7 +134,8 @@ export default function Terms() {
         <p className="body-text">
           See the <Link to="/contact">Contact page</Link>.
         </p>
-      </section>
+        </article>
+      </div>
     </main>
   )
 }

@@ -17,7 +17,7 @@ const CornerSVG = () => (
 
 export default function AuthModal() {
   const { t } = useLanguage()
-  const { login, register } = useAuth()
+  const { login, register, bypassAuth } = useAuth()
   const { isOpen, mode, closeModal, toggleMode } = useAuthModal()
   
   // Login Form States
@@ -223,6 +223,28 @@ export default function AuthModal() {
               >
                 {loginSubmitting && <Loader2 size={16} className="auth-spinner" />}
                 <span>{loginSubmitting ? t('auth.loggingIn') : t('auth.loginSubmit')}</span>
+              </button>
+
+              <button
+                type="button"
+                className="auth-btn-secondary"
+                style={{
+                  marginTop: '10px',
+                  width: '100%',
+                  padding: '10px',
+                  background: 'transparent',
+                  border: '1px stroke var(--color-gold, #d4af37)',
+                  color: 'var(--color-gold, #d4af37)',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem'
+                }}
+                onClick={() => {
+                  bypassAuth()
+                  closeModal()
+                }}
+              >
+                ⚡ Bypass Login (Explore App)
               </button>
             </form>
 

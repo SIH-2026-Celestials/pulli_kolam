@@ -1,16 +1,25 @@
 // മലയാളം (Malayalam)
 const ml = {
   nav: {
-    home: 'ഹോം',
+    home: 'പ്രധാന പേജ്',
     analyze: 'വിശകലനം',
-    generate: 'സൃഷ്ടിക്കുക',
-    gallery: 'ഗ്യാലറി',
+    generate: 'നിർമ്മിക്കുക',
+    gallery: 'ഗാലറി',
     about: 'കുറിച്ച്',
     howItWorks: 'ഇത് എങ്ങനെ പ്രവർത്തിക്കുന്നു',
     detect: 'കണ്ടെത്തുക',
+    playground: 'പ്ലേഗ്രൗണ്ട്',
+    learn: 'പഠിക്കുക',
+    technology: 'സാങ്കേതികവിദ്യ',
+    impact: 'പ്രഭാവം',
     login: 'ലോഗിൻ',
-    register: 'രജിസ്റ്റർ ചെയ്യുക',
-    logout: 'ലോഗ്ഔട്ട്',
+    register: 'രജിസ്റ്റർ',
+    logout: 'ലോഗ് ഔട്ട്',
+    bypassAuth: 'നേരിട്ടുള്ള പ്രവേശനം',
+  },
+  footer: {
+    tagline: 'കോലം ഡിസൈൻ തത്വങ്ങളുടെ എഞ്ചിൻ',
+    initiative: 'AICTE – പൈതൃകവും സംസ്കാരവും പദ്ധതി',
   },
   hero: {
     line1: 'പാറ്റേൺ മനസ്സിലാക്കുക.',

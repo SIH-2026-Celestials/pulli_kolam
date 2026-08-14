@@ -4,6 +4,15 @@ import { getMe, login as apiLogin, logout as apiLogout, register as apiRegister 
 const AuthContext = createContext(null)
 
 const LOCAL_STORAGE_RECENT_KEY = 'pulli_recent_kolams'
+const LOCAL_STORAGE_BYPASS_KEY = 'pulli_auth_bypass'
+
+const GUEST_BYPASS_USER = {
+  id: 'guest_bypass_user',
+  displayName: 'Guest Explorer',
+  email: 'guest@pulli-kolam.dev',
+  role: 'guest',
+  isBypass: true,
+}
 
 // 'loading' | 'authenticated' | 'unauthenticated' | 'error'
 // 'error' is distinct from 'unauthenticated' -- a 401 from /me genuinely
@@ -23,6 +32,16 @@ export function AuthProvider({ children }) {
 
   const refresh = useCallback(async () => {
     setStatus('loading')
+    try {
+      if (localStorage.getItem(LOCAL_STORAGE_BYPASS_KEY) === 'true') {
+        setUser(GUEST_BYPASS_USER)
+        setStatus('authenticated')
+        return
+      }
+    } catch {
+      // localStorage read error fallback
+    }
+
     const { data, error } = await getMe()
     if (data) {
       setUser(data)
@@ -43,7 +62,22 @@ export function AuthProvider({ children }) {
     return () => clearTimeout(id)
   }, [refresh])
 
+  const bypassAuth = useCallback(() => {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_BYPASS_KEY, 'true')
+    } catch {
+      // localStorage write error fallback
+    }
+    setUser(GUEST_BYPASS_USER)
+    setStatus('authenticated')
+  }, [])
+
   const login = useCallback(async (email, password) => {
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_BYPASS_KEY)
+    } catch {
+      // ignore
+    }
     const { data, error } = await apiLogin({ email, password })
     if (data) {
       setUser(data)
@@ -53,6 +87,11 @@ export function AuthProvider({ children }) {
   }, [])
 
   const register = useCallback(async (email, password, displayName) => {
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_BYPASS_KEY)
+    } catch {
+      // ignore
+    }
     const { data, error } = await apiRegister({ email, password, displayName })
     if (data) {
       setUser(data)
@@ -62,6 +101,11 @@ export function AuthProvider({ children }) {
   }, [])
 
   const logout = useCallback(async () => {
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_BYPASS_KEY)
+    } catch {
+      // ignore
+    }
     await apiLogout()
     setUser(null)
     setStatus('unauthenticated')
@@ -99,7 +143,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ status, user, login, register, logout, refresh, recentKolams, addRecentKolam }}>
+    <AuthContext.Provider value={{ status, user, login, register, logout, bypassAuth, refresh, recentKolams, addRecentKolam }}>
       {children}
     </AuthContext.Provider>
   )

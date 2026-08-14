@@ -10,17 +10,18 @@ export default function Privacy() {
   return (
     <main id="main-content" className="legal-page">
       <header className="legal-header section section--bordered">
-        <div className="container">
+        <div className="container--narrow">
           <p className="eyebrow eyebrow--accent">{t('legal.privacyEyebrow')}</p>
           <h1 className="heading-display heading-2">{t('legal.privacyTitle')}</h1>
         </div>
       </header>
 
-      <section className="container section legal-content">
-        <p className="legal-effective-date label-tech">Effective date: {EFFECTIVE_DATE}</p>
-        <p className="legal-english-notice">{t('legal.englishOnlyNotice')}</p>
+      <div className="legal-container">
+        <article className="legal-card legal-content">
+          <p className="legal-effective-date label-tech">Effective date: {EFFECTIVE_DATE}</p>
+          <p className="legal-english-notice">{t('legal.englishOnlyNotice')}</p>
 
-        <h2 className="heading-display heading-3">What PULLI collects</h2>
+          <h2 className="heading-display heading-3">What PULLI collects</h2>
         <p className="body-text">
           PULLI collects two kinds of information: account information you provide if you
           register, and the images you upload if you use the Detect page. It does not collect
@@ -107,7 +108,8 @@ export default function Privacy() {
           See the <Link to="/contact">Contact page</Link> for how to reach us about privacy
           questions or data requests.
         </p>
-      </section>
+        </article>
+      </div>
     </main>
   )
 }

@@ -6,7 +6,7 @@ import './Login.css'
 
 export default function Login() {
   const { t } = useLanguage()
-  const { login } = useAuth()
+  const { login, bypassAuth } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [email, setEmail] = useState('')
@@ -24,6 +24,12 @@ export default function Login() {
       setError(err.kind === 'unauthorized' ? t('auth.errorInvalidCredentials') : err.message)
       return
     }
+    const redirectTo = location.state?.from || '/account'
+    navigate(redirectTo, { replace: true })
+  }
+
+  const handleBypass = () => {
+    bypassAuth()
     const redirectTo = location.state?.from || '/account'
     navigate(redirectTo, { replace: true })
   }
@@ -63,6 +69,15 @@ export default function Login() {
 
           <button type="submit" className="btn btn--primary auth-submit" disabled={submitting}>
             {submitting ? t('auth.loggingIn') : t('auth.loginSubmit')}
+          </button>
+
+          <button
+            type="button"
+            className="btn btn--secondary auth-bypass-btn"
+            style={{ marginTop: '12px', width: '100%', border: '1px stroke var(--color-gold-300, #d4af37)', cursor: 'pointer' }}
+            onClick={handleBypass}
+          >
+            ⚡ Bypass Authentication (Explore App)
           </button>
 
           <p className="body-text body-text--sm auth-switch">

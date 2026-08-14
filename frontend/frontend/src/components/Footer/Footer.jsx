@@ -14,11 +14,11 @@ export default function Footer() {
 
       <div className="footer-inner">
         <div className="footer-left">
-          <span>&copy; 2026 PULLI &ndash; Kolam Design-Principle Engine</span>
+          <span>&copy; 2026 PULLI &ndash; {t('footer.tagline')}</span>
         </div>
 
         <div className="footer-center">
-          <span>AICTE &ndash; Heritage &amp; Culture Initiative</span>
+          <span>{t('footer.initiative')}</span>
         </div>
 
         <div className="footer-right">

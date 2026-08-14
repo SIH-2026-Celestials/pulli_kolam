@@ -49,6 +49,7 @@ function StatusDot({ label, ok, detail }) {
 }
 
 export default function Playground() {
+  const { t } = useLanguage()
   const { addRecentKolam } = useAuth()
   const canvasHostRef = useRef(null)
 
@@ -290,11 +291,10 @@ export default function Playground() {
     <main className="playground-page">
       <header className="playground-header section section--bordered">
         <div className="container--narrow">
-          <p className="eyebrow eyebrow--accent">GENERATION + MATHEMATICAL ANALYSIS + ML VERIFICATION</p>
-          <h1 className="heading-display heading-hero">Kolam Design Playground</h1>
+          <p className="eyebrow eyebrow--accent">{t('playground.eyebrow')}</p>
+          <h1 className="heading-display heading-hero">{t('playground.title')}</h1>
           <p className="body-text playground-sub">
-            Generate a novel Kolam through PULLI's M5 structural search, inspect its graph and mathematics,
-            and verify it against the frozen M4.2 recognizer.
+            {t('playground.sub')}
           </p>
           <div className="status-bar">
             <StatusDot label="BACKEND" ok={backendOk} detail="FastAPI /api/v1/health" />

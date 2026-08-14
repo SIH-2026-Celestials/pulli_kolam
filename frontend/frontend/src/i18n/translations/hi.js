@@ -8,9 +8,18 @@ const hi = {
     about: 'परिचय',
     howItWorks: 'यह कैसे काम करता है',
     detect: 'पहचानें',
+    playground: 'प्लेग्राउंड',
+    learn: 'सीखें',
+    technology: 'प्रौद्योगिकी',
+    impact: 'प्रभाव',
     login: 'लॉग इन',
     register: 'रजिस्टर करें',
     logout: 'लॉग आउट',
+    bypassAuth: 'डायरेक्ट एक्सेस',
+  },
+  footer: {
+    tagline: 'कोलम डिज़ाइन-सिद्धांत इंजन',
+    initiative: 'AICTE – विरासत और संस्कृति पहल',
   },
   hero: {
     line1: 'पैटर्न को समझें।',

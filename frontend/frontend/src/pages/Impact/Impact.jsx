@@ -1,19 +1,20 @@
 import { Link } from 'react-router-dom'
+import { useLanguage } from '../../context/LanguageContext'
 import './Impact.css'
 
 export default function Impact() {
+  const { t } = useLanguage()
+
   return (
     <main id="main-content" className="impact-page">
       <header className="impact-header section section--bordered">
         <div className="container--narrow">
-          <p className="eyebrow eyebrow--accent">Public &amp; Institutional Value</p>
+          <p className="eyebrow eyebrow--accent">{t('impact.eyebrow')}</p>
           <h1 className="heading-display heading-2 impact-title">
-            Potential Impact
+            {t('impact.title')}
           </h1>
           <p className="body-text impact-sub">
-            How a computational framework for Kolam analysis could support digital heritage,
-            education, and pattern research. These are potential applications of the current
-            research, not deployed or measured outcomes.
+            {t('impact.sub')}
           </p>
         </div>
       </header>

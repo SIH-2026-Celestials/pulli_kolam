@@ -94,7 +94,7 @@ export default function Account() {
     ? recentKolams.filter((k) => k.validity && k.validity.includes('Eulerian')).length
     : 0
 
-  const displayName = user.display_name || user.email?.split('@')[0] || 'Kolam Practitioner'
+  const displayName = user.displayName || user.display_name || user.email?.split('@')[0] || 'Kolam Practitioner'
   const handleName = `@${user.email?.split('@')[0] || 'practitioner'}`
   const joinDate = user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'August 2026'
 

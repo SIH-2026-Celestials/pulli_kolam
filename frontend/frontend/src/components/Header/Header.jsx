@@ -10,7 +10,7 @@ import './Header.css'
 
 export default function Header() {
   const { lang, setLanguage, t } = useLanguage()
-  const { status, user, logout } = useAuth()
+  const { status, user, logout, bypassAuth } = useAuth()
   const { openLogin, openRegister } = useAuthModal()
   const navigate = useNavigate()
   const [langOpen, setLangOpen] = useState(false)
@@ -63,6 +63,8 @@ export default function Header() {
 
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0]
 
+  const userName = user?.displayName || user?.display_name || 'Guest Explorer'
+
   return (
     <header className="navbar-clone">
       <div className="navbar-inner">
@@ -86,13 +88,13 @@ export default function Header() {
             {t('nav.detect')}
           </NavLink>
           <NavLink to="/playground" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            Playground
+            {t('nav.playground')}
           </NavLink>
           <NavLink to="/explore" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
             {t('nav.gallery')}
           </NavLink>
           <NavLink to="/learn" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            Learn
+            {t('nav.learn')}
           </NavLink>
           <NavLink to="/about" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
             {t('nav.about')}
@@ -142,8 +144,8 @@ export default function Header() {
           {status === 'authenticated' && user ? (
             <div className="auth-controls">
               <Link to="/account" className="auth-user-chip">
-                <span className="auth-user-avatar">{user.display_name.charAt(0).toUpperCase()}</span>
-                <span className="auth-user-name">{user.display_name}</span>
+                <span className="auth-user-avatar">{userName.charAt(0).toUpperCase()}</span>
+                <span className="auth-user-name">{userName}</span>
               </Link>
               <button className="btn-login" onClick={handleLogout}>
                 {t('nav.logout')}
@@ -151,6 +153,26 @@ export default function Header() {
             </div>
           ) : (
             <div className="auth-controls">
+              <button
+                type="button"
+                className="btn-bypass navbar-btn-action"
+                style={{
+                  padding: '6px 12px',
+                  background: 'rgba(212, 175, 55, 0.12)',
+                  border: '1px solid var(--color-gold, #d4af37)',
+                  color: 'var(--color-gold, #d4af37)',
+                  borderRadius: '4px',
+                  fontSize: '0.8rem',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+                onClick={() => {
+                  bypassAuth()
+                  navigate('/account')
+                }}
+              >
+                ⚡ {t('nav.bypassAuth')}
+              </button>
               <button
                 type="button"
                 className="auth-login-link navbar-btn-action"
