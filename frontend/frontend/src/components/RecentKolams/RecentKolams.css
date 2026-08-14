@@ -85,14 +85,17 @@
 .recent-carousel-track {
   display: flex;
   gap: 12px;
+  /* overflow-x must stay 'auto' so scrollLeft works via JS;
+     the scrollbar itself is hidden via scrollbar-width */
   overflow-x: auto;
   overflow-y: hidden;
-  scroll-snap-type: x mandatory;
+  /* Remove scroll-snap — it fights the RAF auto-scroll */
   cursor: grab;
   padding-bottom: 6px;
-  /* prevent track from ever growing wider than its wrapper */
   width: 100%;
   min-width: 0;
+  /* Prevent any layout shift or selection during drag */
+  user-select: none;
   /* hide scrollbar cross-browser */
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -105,7 +108,7 @@
 /* ── Individual card ── */
 .recent-card {
   flex: 0 0 200px;
-  scroll-snap-align: start;
+  /* No scroll-snap-align — RAF scroll handles positioning */
   display: flex;
   flex-direction: column;
   background-color: var(--color-paper);

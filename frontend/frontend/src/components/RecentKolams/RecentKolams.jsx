@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { Database, HardDrive, ChevronLeft, ChevronRight } from 'lucide-react'
 import './RecentKolams.css'
@@ -64,21 +64,65 @@ const MOCK_KOLAM_ITEMS = [
   }
 ]
 
-const CARD_WIDTH = 168 // px — card width + gap
+// Auto-scroll speed: pixels per frame (at ~60 fps ≈ 0.5px/frame = 30px/s)
+const SCROLL_SPEED = 0.5
 
 export default function RecentKolams({ onSelectKolam }) {
   const { user, status, recentKolams } = useAuth()
   const isAuth = status === 'authenticated' && user
 
-  const displayList = (recentKolams && recentKolams.length > 0) ? recentKolams : MOCK_KOLAM_ITEMS
+  const baseList = (recentKolams && recentKolams.length > 0) ? recentKolams : MOCK_KOLAM_ITEMS
+  // Duplicate list for seamless infinite-loop illusion
+  const displayList = [...baseList, ...baseList, ...baseList]
 
   const trackRef = useRef(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
 
-  // Drag-to-scroll state
-  const dragRef = useRef({ active: false, startX: 0, scrollLeft: 0 })
+  // Auto-scroll state refs (no re-renders needed)
+  const pausedRef = useRef(false)   // true when mouse is hovering
+  const rafRef    = useRef(null)    // the current requestAnimationFrame id
+  const dragRef   = useRef({ active: false, startX: 0, scrollLeft: 0 })
 
+  // ── Auto-scroll loop ────────────────────────────────────────────────
+  useEffect(() => {
+    const el = trackRef.current
+    if (!el) return
+
+    // Kick off at the midpoint of the tripled list so there's room to
+    // scroll in both directions before hitting a boundary.
+    const setMidpoint = () => {
+      el.scrollLeft = el.scrollWidth / 3
+    }
+    setMidpoint()
+
+    const tick = () => {
+      if (!pausedRef.current && el) {
+        el.scrollLeft += SCROLL_SPEED
+
+        // When we reach the end of the second copy, silently jump back
+        // to the matching position in the first copy — the user sees
+        // nothing because the content is identical.
+        const third = el.scrollWidth / 3
+        if (el.scrollLeft >= third * 2) {
+          el.scrollLeft -= third
+        }
+        // Guard against scrolling too far left
+        if (el.scrollLeft <= 0) {
+          el.scrollLeft += third
+        }
+      }
+      rafRef.current = requestAnimationFrame(tick)
+    }
+
+    rafRef.current = requestAnimationFrame(tick)
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
+  }, [baseList.length]) // restart if the list length changes
+
+  // ── Manual scroll buttons (pause auto-scroll briefly) ─────────────
   const syncButtons = useCallback(() => {
     const el = trackRef.current
     if (!el) return
@@ -89,13 +133,27 @@ export default function RecentKolams({ onSelectKolam }) {
   const scrollBy = useCallback((dir) => {
     const el = trackRef.current
     if (!el) return
-    el.scrollBy({ left: dir * CARD_WIDTH * 2, behavior: 'smooth' })
-    setTimeout(syncButtons, 350)
+    // Briefly pause auto-scroll while the button scroll animates
+    pausedRef.current = true
+    el.scrollBy({ left: dir * 212 * 2, behavior: 'smooth' })
+    setTimeout(() => {
+      syncButtons()
+      pausedRef.current = false
+    }, 500)
   }, [syncButtons])
 
+  // ── Hover: pause / resume ──────────────────────────────────────────
+  const onMouseEnterTrack = () => { pausedRef.current = true  }
+  const onMouseLeaveTrack = () => {
+    // Only resume if not dragging
+    if (!dragRef.current.active) pausedRef.current = false
+  }
+
+  // ── Drag-to-scroll ─────────────────────────────────────────────────
   const onMouseDown = (e) => {
     const el = trackRef.current
     if (!el) return
+    pausedRef.current = true
     dragRef.current = { active: true, startX: e.pageX - el.offsetLeft, scrollLeft: el.scrollLeft }
     el.style.cursor = 'grabbing'
     el.style.userSelect = 'none'
@@ -119,15 +177,19 @@ export default function RecentKolams({ onSelectKolam }) {
       el.style.cursor = 'grab'
       el.style.userSelect = ''
     }
+    // Resume auto-scroll only if mouse is not hovering
+    // (onMouseLeaveTrack handles that case separately)
   }
 
   const getDistinctImageSrc = (item, idx) => {
+    const baseLen = baseList.length
+    const baseIdx = idx % baseLen
     if (!item.image_url || item.image_url.includes('kolam19_1.jpg')) {
-      return SYNTHETIC_PHOTOS[idx % SYNTHETIC_PHOTOS.length]
+      return SYNTHETIC_PHOTOS[baseIdx % SYNTHETIC_PHOTOS.length]
     }
-    const isDuplicate = displayList.findIndex((k) => k.image_url === item.image_url) !== idx
+    const isDuplicate = baseList.findIndex((k) => k.image_url === item.image_url) !== baseIdx
     if (isDuplicate) {
-      return SYNTHETIC_PHOTOS[idx % SYNTHETIC_PHOTOS.length]
+      return SYNTHETIC_PHOTOS[baseIdx % SYNTHETIC_PHOTOS.length]
     }
     return item.image_url
   }
@@ -164,7 +226,6 @@ export default function RecentKolams({ onSelectKolam }) {
             <button
               className="carousel-btn"
               aria-label="Scroll left"
-              disabled={!canScrollLeft}
               onClick={() => scrollBy(-1)}
             >
               <ChevronLeft size={15} strokeWidth={2.5} />
@@ -172,7 +233,6 @@ export default function RecentKolams({ onSelectKolam }) {
             <button
               className="carousel-btn"
               aria-label="Scroll right"
-              disabled={!canScrollRight}
               onClick={() => scrollBy(1)}
             >
               <ChevronRight size={15} strokeWidth={2.5} />
@@ -181,20 +241,21 @@ export default function RecentKolams({ onSelectKolam }) {
         </div>
       </div>
 
-      {/* Horizontal carousel track */}
+      {/* Horizontal auto-scrolling carousel track */}
       <div className="recent-carousel-wrapper">
         <div
           className="recent-carousel-track"
           ref={trackRef}
           onScroll={syncButtons}
+          onMouseEnter={onMouseEnterTrack}
+          onMouseLeave={onMouseLeaveTrack}
           onMouseDown={onMouseDown}
           onMouseMove={onMouseMove}
           onMouseUp={stopDrag}
-          onMouseLeave={stopDrag}
         >
           {displayList.map((item, idx) => (
             <div
-              key={item.id || idx}
+              key={`${item.id || idx}-${idx}`}
               className="recent-card archival-frame"
               onClick={() => onSelectKolam && onSelectKolam(item)}
             >
