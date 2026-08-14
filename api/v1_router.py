@@ -9,7 +9,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from api.detectors import run_classical_detector, run_ml_detector, compare_classical_and_ml_detectors
+from api.detectors import get_detector
 from backend.services.analysis_service import analyze_kolam_image
 from backend.utils.image_utils import download_image_from_url, validate_and_save_upload
 from engine.kolam_pattern import KolamPattern
@@ -70,35 +70,23 @@ async def detect_v1(
     """Upload an image -> run dot-lattice detection (classical or ML), return detected dots + graph."""
     filepath = await _resolve_image_path(image, image_url)
     
-    if detector.lower() == "ml":
-        prep, lattice, edges, G, info = run_ml_detector(filepath)
-    else:
-        prep, lattice, edges, G = run_classical_detector(filepath)
-        info = {"available": True, "status": "ok"}
+    try:
+        det_obj = get_detector(detector)
+        result = det_obj.detect(filepath)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Detector error: {e}")
 
-    dots_list = []
-    if lattice and lattice.pixel_positions:
-        for idx, (px, py) in enumerate(lattice.pixel_positions):
-            lc = lattice.lattice_coords[idx] if idx < len(lattice.lattice_coords) else (0, 0)
-            dots_list.append({
-                "pixel_x": float(px),
-                "pixel_y": float(py),
-                "lattice_x": int(lc[0]),
-                "lattice_y": int(lc[1]),
-            })
-
-    formatted_edges = [[list(a), list(b)] for a, b in edges]
+    dots_list = [{"pixel_x": float(x), "pixel_y": float(y)} for x, y in result.dots]
 
     return {
-        "detector": detector,
-        "detector_info": info,
+        "detector": result.detector,
+        "model_version": result.model_version,
         "dot_count": len(dots_list),
-        "dot_radius": float(lattice.dot_radius) if lattice else 0.0,
+        "processing_ms": round(result.processing_ms, 2),
         "dots": dots_list,
-        "edges": formatted_edges,
         "graph": {
-            "nodes": G.number_of_nodes(),
-            "edges": G.number_of_edges(),
+            "nodes": result.graph.number_of_nodes(),
+            "edges": result.graph.number_of_edges(),
         },
     }
 
@@ -124,7 +112,9 @@ async def reconstruct_v1(
 ):
     """Run engine/reconstruction.py's motif+residual reconstruction against a detected/uploaded pattern."""
     filepath = await _resolve_image_path(image, image_url)
-    prep, lattice, edges, G = run_classical_detector(filepath)
+    det_obj = get_detector("classical")
+    result = det_obj.detect(filepath)
+    G = result.graph
 
     if G.number_of_nodes() < 3:
         return {
@@ -133,7 +123,8 @@ async def reconstruct_v1(
             "is_valid": False,
         }
 
-    dots_set = set(lattice.lattice_coords)
+    dots_set = set(G.nodes())
+    edges = list(G.edges())
     source_pattern = KolamPattern(
         pattern_id=1,
         collection="uploaded",
@@ -175,5 +166,33 @@ async def compare_detectors_v1(
 ):
     """Run classical and ML detectors on the same image, return both + diff metrics."""
     filepath = await _resolve_image_path(image, image_url)
-    result = compare_classical_and_ml_detectors(filepath)
-    return result
+    det_c = get_detector("classical")
+    res_c = det_c.detect(filepath)
+    
+    res_m_dots = []
+    res_m_err = None
+    try:
+        det_m = get_detector("ml")
+        res_m = det_m.detect(filepath)
+        res_m_dots = res_m.dots
+    except Exception as e:
+        res_m_err = str(e)
+
+    dots_c = res_c.dots
+    dots_m = res_m_dots
+
+    return {
+        "classical": {
+            "dot_count": len(dots_c),
+            "dots": [{"x": float(p[0]), "y": float(p[1])} for p in dots_c],
+        },
+        "ml": {
+            "dot_count": len(dots_m),
+            "dots": [{"x": float(p[0]), "y": float(p[1])} for p in dots_m],
+            "error": res_m_err,
+        },
+        "comparison": {
+            "classical_count": len(dots_c),
+            "ml_count": len(dots_m),
+        },
+    }

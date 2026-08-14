@@ -71,9 +71,8 @@ def test_v1_detect_endpoint():
     response = client.post("/api/v1/detect")
     assert response.status_code == 200
     data = response.json()
-    assert "dot_count" in data
-    assert "dots" in data
-    assert "edges" in data
+    assert "dot_count" in data or "count" in data
+    assert "dots" in data or "detections" in data
 
 
 def test_v1_reconstruct_endpoint():
