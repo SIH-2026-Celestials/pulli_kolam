@@ -1,15 +1,25 @@
 import { useState, useRef, useEffect } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { ChevronDown, Sun, Moon, User } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
+import { useAuth } from '../../context/AuthContext'
+import { useAuthModal } from '../../context/AuthModalContext'
 import { LANGUAGES } from '../../i18n/index'
 import PulliLogo from '../../assets/PULLI-LOGO.svg'
 import './Header.css'
 
 export default function Header() {
   const { lang, setLanguage, t } = useLanguage()
+  const { status, user, logout } = useAuth()
+  const { openLogin, openRegister } = useAuthModal()
+  const navigate = useNavigate()
   const [langOpen, setLangOpen] = useState(false)
   const dropdownRef = useRef(null)
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/')
+  }
 
   const [theme, setTheme] = useState(() => {
     try {
@@ -129,11 +139,35 @@ export default function Header() {
             {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
           </button>
 
-          {/* No auth backend exists yet -- disabled rather than a dead button that silently does nothing. */}
-          <button className="btn-login" disabled title="Accounts are not available yet">
-            <User size={16} />
-            <span>Login</span>
-          </button>
+          {status === 'authenticated' && user ? (
+            <div className="auth-controls">
+              <Link to="/account" className="auth-user-chip">
+                <span className="auth-user-avatar">{user.display_name.charAt(0).toUpperCase()}</span>
+                <span className="auth-user-name">{user.display_name}</span>
+              </Link>
+              <button className="btn-login" onClick={handleLogout}>
+                {t('nav.logout')}
+              </button>
+            </div>
+          ) : (
+            <div className="auth-controls">
+              <button 
+                type="button"
+                className="auth-login-link navbar-btn-action" 
+                onClick={openLogin}
+              >
+                {t('nav.login')}
+              </button>
+              <button 
+                type="button"
+                className="btn-login navbar-btn-action"
+                onClick={openRegister}
+              >
+                <User size={16} />
+                <span>{t('nav.register')}</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

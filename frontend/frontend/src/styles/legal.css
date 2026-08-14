@@ -1,0 +1,67 @@
+.legal-page {
+  padding-bottom: var(--space-24, 96px);
+}
+
+.legal-header {
+  background-color: var(--color-paper-dark, var(--color-gold-subtle));
+}
+
+.legal-content {
+  max-width: 760px;
+}
+
+.legal-content h2 {
+  margin-top: var(--space-8, 32px);
+  margin-bottom: var(--space-2, 8px);
+}
+
+.legal-content h2:first-child {
+  margin-top: 0;
+}
+
+.legal-content p {
+  margin-bottom: var(--space-3, 12px);
+}
+
+.legal-content ul {
+  margin: 0 0 var(--space-3, 12px);
+  padding-left: 1.4rem;
+}
+
+.legal-content li {
+  margin-bottom: 6px;
+}
+
+.legal-effective-date {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-6, 24px);
+}
+
+.legal-english-notice {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  margin-bottom: var(--space-6, 24px);
+  font-style: italic;
+}
+
+.legal-contact-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 12px);
+  margin-bottom: var(--space-4, 16px);
+}
+
+.legal-contact-email {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  color: var(--color-maroon-main);
+  text-decoration: none;
+}
+
+.legal-contact-email:hover {
+  text-decoration: underline;
+}
+
+.legal-form-note {
+  color: var(--color-text-muted);
+}

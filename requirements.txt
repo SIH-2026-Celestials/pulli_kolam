@@ -20,3 +20,14 @@ torch
 fastapi
 uvicorn
 python-multipart
+
+# Used only by api/auth/ (identity/session infrastructure) -- NOT a
+# dependency of engine/ or the detector/analyze/reconstruct endpoints.
+# sqlalchemy talks to a local SQLite file by default (DATABASE_URL unset)
+# so local dev needs no database server installed; point DATABASE_URL at
+# PostgreSQL in production (see docs/DEPLOYMENT.md) and additionally
+# install psycopg2-binary there -- not installed by default here since
+# this project has no Postgres instance to develop against.
+sqlalchemy
+bcrypt
+python-dotenv

@@ -4,9 +4,13 @@
  * of the page component.
  */
 
-import { detect, analyze, reconstruct, compareDetectors, getHealth, getModelInfo } from './client';
+import {
+  detect, analyze, reconstruct, compareDetectors, getHealth, getModelInfo,
+  register, login, logout, getMe,
+} from './client';
 
 export { detect, analyze, reconstruct, compareDetectors, getHealth, getModelInfo };
+export { register, login, logout, getMe };
 
 const MATCH_TOLERANCE_PX = 6.0;
 

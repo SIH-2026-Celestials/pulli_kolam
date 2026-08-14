@@ -22,6 +22,13 @@
   flex-direction: column;
 }
 
+.generated-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .generated-title {
   font-family: var(--font-serif);
   font-size: 20px;
@@ -149,4 +156,22 @@
   font-weight: 700;
   color: var(--color-text-dark);
   white-space: nowrap;
+}
+
+/* Experimental badge on the Generated Variations card header */
+.generated-experimental-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-gold);
+  background-color: rgba(169, 120, 36, 0.1);
+  border: 1px solid rgba(169, 120, 36, 0.35);
+  border-radius: 4px;
+  padding: 2px 6px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: help;
+  flex-shrink: 0;
 }

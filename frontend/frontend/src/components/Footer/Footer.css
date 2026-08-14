@@ -31,6 +31,22 @@
   color: #D4B07B;
 }
 
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.footer-link {
+  color: #E8E0D5;
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  color: #FFFFFF;
+  text-decoration: underline;
+}
+
 .footer-pattern {
   position: absolute;
   bottom: 0;

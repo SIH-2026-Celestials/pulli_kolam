@@ -154,11 +154,20 @@ export default function GeneratedVariations() {
       {/* HEADER ROW */}
       <div className="generated-header-row">
         <div className="generated-title-group">
-          <h2 className="generated-title">{t('variations.title')}</h2>
+          <div className="generated-title-row">
+            <h2 className="generated-title">{t('variations.title')}</h2>
+            <span className="generated-experimental-badge" title="Novel generation requires a backend endpoint that is not yet available">
+              ⚗ Experimental
+            </span>
+          </div>
           <p className="generated-subtitle">{t('variations.subtitle')}</p>
         </div>
 
-        <button className="btn-generate-more" onClick={handleGenerateMore}>
+        <button
+          className="btn-generate-more"
+          onClick={handleGenerateMore}
+          title="Cycles through pre-computed example patterns. Real ML generation requires the /api/v1/generate endpoint (not yet available)."
+        >
           <RotateCw size={14} className="refresh-icon" />
           <span>{t('variations.generateMore')}</span>
         </button>

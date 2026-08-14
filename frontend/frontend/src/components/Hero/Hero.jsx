@@ -74,6 +74,8 @@ export default function Hero() {
       {/* Subtle Background Corner Decorative SVG Elements */}
       <KolamCornerDecoration position="top-left" />
       <KolamCornerDecoration position="top-right" />
+      <KolamCornerDecoration position="bottom-left" />
+      <KolamCornerDecoration position="bottom-right" />
       <KolamGridPattern opacity={0.03} />
 
       <div className="hero-container">

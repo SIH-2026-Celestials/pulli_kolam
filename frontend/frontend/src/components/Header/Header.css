@@ -105,6 +105,92 @@
   gap: 16px;
 }
 
+.auth-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.auth-login-link {
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.auth-login-link:hover {
+  color: #FFFFFF;
+  text-decoration: underline;
+}
+
+.auth-user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #F7E8D0;
+  padding: 4px 10px 4px 4px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.auth-user-chip:hover {
+  border-color: var(--color-gold);
+  color: #FFFFFF;
+}
+
+.auth-user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--color-gold);
+  color: var(--color-header-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.auth-user-name {
+  font-size: 14px;
+  font-weight: 500;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* No hamburger/drawer redesign here -- this just keeps every nav item
+   reachable (wrapped, not clipped or overflowing) below the width the
+   fixed-gap flex row above was designed for. */
+@media (max-width: 1360px) {
+  .navbar-clone {
+    height: auto;
+    padding: 12px 0;
+  }
+
+  .navbar-inner {
+    flex-wrap: wrap;
+    row-gap: 12px;
+    padding: 0 20px;
+  }
+
+  .navbar-nav {
+    order: 3;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 16px 24px;
+    justify-content: center;
+  }
+
+  .navbar-controls {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+
 .btn-lang {
   display: flex;
   align-items: center;
@@ -146,7 +232,7 @@
   gap: 8px;
   background: transparent;
   border: 1px solid var(--color-gold);
-  color: #F7E8D0;
+  color: #FFFFFF;
   padding: 7px 18px;
   border-radius: 6px;
   font-size: 14px;
@@ -233,5 +319,17 @@
   margin-left: auto;
   font-size: 12px;
   color: var(--color-gold, #B88735);
+}
+
+/* Reset buttons used as navbar actions to prevent browser styling */
+.navbar-btn-action {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  outline: none;
 }
 

@@ -54,9 +54,16 @@
  * @property {{agreeing_dots: number, classical_only: number, ml_only: number}} agreement
  *
  * @typedef {Object} ApiError
- * @property {'network'|'timeout'|'invalid_image'|'model_unavailable'|'backend_unavailable'|'unknown'} kind
+ * @property {'network'|'timeout'|'invalid_image'|'model_unavailable'|'backend_unavailable'|'unauthorized'|'conflict'|'invalid_input'|'unknown'} kind
  * @property {string} message
  * @property {number} [status]
+ *
+ * @typedef {Object} User
+ * @property {number} id
+ * @property {string} email
+ * @property {string} display_name
+ * @property {string} created_at
+ * @property {string|null} last_login_at
  */
 
 export {};
