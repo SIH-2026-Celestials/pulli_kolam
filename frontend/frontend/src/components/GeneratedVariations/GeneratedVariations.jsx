@@ -112,11 +112,24 @@ export default function GeneratedVariations() {
 
   const saveCandidatesToHistory = (candList) => {
     if (candList && candList.length > 0) {
-      candList.forEach((c) => {
+      const syntheticPhotos = [
+        '/synthetic/kolam19_k1.jpg',
+        '/synthetic/kolam19_k2.jpg',
+        '/synthetic/kolam19_k3.jpg',
+        '/synthetic/kolam19_k27.jpg',
+        '/synthetic/kolam19_k50.jpg',
+        '/synthetic/kolam29_k1.jpg',
+        '/synthetic/kolam29_k2.jpg'
+      ]
+      candList.forEach((c, idx) => {
+        const photoUrl = c.id.startsWith('sample_')
+          ? syntheticPhotos[idx % syntheticPhotos.length]
+          : generationExportUrl(c.id, 'png')
+
         addRecentKolam({
           id: c.id,
           title: `Generated Kolam Pattern (Seed ${c.seed})`,
-          image_url: c.id.startsWith('sample_') ? '/static/synthetic/kolam19_1.jpg' : generationExportUrl(c.id, 'png'),
+          image_url: photoUrl,
           grid_size: c.analysis?.graph?.vertices ? `${c.analysis.graph.vertices} dots` : '—',
           symmetry: c.analysis?.symmetry?.coverage != null
             ? `D4 (${(c.analysis.symmetry.coverage * 100).toFixed(0)}%)`

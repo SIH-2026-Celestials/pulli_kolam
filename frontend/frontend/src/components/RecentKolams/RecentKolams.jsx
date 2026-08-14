@@ -2,6 +2,16 @@ import { useAuth } from '../../context/AuthContext'
 import { Database, HardDrive } from 'lucide-react'
 import './RecentKolams.css'
 
+const SYNTHETIC_PHOTOS = [
+  '/synthetic/kolam19_k1.jpg',
+  '/synthetic/kolam19_k2.jpg',
+  '/synthetic/kolam19_k3.jpg',
+  '/synthetic/kolam19_k27.jpg',
+  '/synthetic/kolam19_k50.jpg',
+  '/synthetic/kolam29_k1.jpg',
+  '/synthetic/kolam29_k2.jpg'
+]
+
 const MOCK_KOLAM_ITEMS = [
   {
     id: 'mock_1',
@@ -59,18 +69,21 @@ export default function RecentKolams({ onSelectKolam }) {
 
   const displayList = (recentKolams && recentKolams.length > 0) ? recentKolams : MOCK_KOLAM_ITEMS
 
+  const getDistinctImageSrc = (item, idx) => {
+    if (!item.image_url || item.image_url.includes('kolam19_1.jpg')) {
+      return SYNTHETIC_PHOTOS[idx % SYNTHETIC_PHOTOS.length]
+    }
+    // If multiple items in recent storage have identical image_url, map distinct photos by index
+    const isDuplicate = displayList.findIndex((k) => k.image_url === item.image_url) !== idx
+    if (isDuplicate) {
+      return SYNTHETIC_PHOTOS[idx % SYNTHETIC_PHOTOS.length]
+    }
+    return item.image_url
+  }
+
   const handleImageError = (e, index) => {
-    // Fallback to real synthetic photo on image load error
-    const fallbacks = [
-      '/synthetic/kolam19_k1.jpg',
-      '/synthetic/kolam19_k2.jpg',
-      '/synthetic/kolam19_k3.jpg',
-      '/synthetic/kolam19_k27.jpg',
-      '/synthetic/kolam19_k50.jpg',
-      '/synthetic/kolam29_k1.jpg',
-    ]
     e.target.onerror = null
-    e.target.src = fallbacks[index % fallbacks.length]
+    e.target.src = SYNTHETIC_PHOTOS[index % SYNTHETIC_PHOTOS.length]
   }
 
   return (
@@ -104,7 +117,7 @@ export default function RecentKolams({ onSelectKolam }) {
           >
             <div className="recent-card-img">
               <img
-                src={item.image_url || `/synthetic/kolam19_k${(idx % 3) + 1}.jpg`}
+                src={getDistinctImageSrc(item, idx)}
                 alt={item.title}
                 onError={(e) => handleImageError(e, idx)}
               />
