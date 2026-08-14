@@ -40,10 +40,19 @@ DEFAULT_TORCH_THREADS = 4  # leaves headroom for other concurrent torch processe
 
 
 def _compute_loss(out: dict, batch: dict, criterion) -> dict:
+    """`out`'s logits have T+1 positions (index 0 = hidden state right
+    after the prepended CONDITION token, predicting target[0]; index T
+    = hidden state after the LAST input token, which has no
+    corresponding target since targets are the inputs shifted left by
+    one -- see dataset.py's collate_batch docstring). Slice off that
+    unused final position before comparing against the T-length
+    targets."""
     mask = batch["loss_mask"]
+    T = mask.size(1)
     n = mask.sum().clamp(min=1)
 
     def masked_ce(logits, target):
+        logits = logits[:, :T, :]
         loss_per_pos = criterion(logits.transpose(1, 2), target)  # (B, T)
         return (loss_per_pos * mask).sum() / n
 

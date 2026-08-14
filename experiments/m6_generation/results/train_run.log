@@ -1,0 +1,7 @@
+train examples: 7700, val examples: 1650, vocab size: 220
+model parameters: 506052
+epoch   0  train_total=10.5271  val_total=9.2193  time=148.2s
+epoch   1  train_total=9.1140  val_total=8.8969  time=140.0s
+epoch   2  train_total=8.8379  val_total=8.6916  time=144.5s
+epoch   3  train_total=8.6281  val_total=8.5478  time=166.5s
+epoch   4  train_total=8.4440  val_total=8.3950  time=177.8s

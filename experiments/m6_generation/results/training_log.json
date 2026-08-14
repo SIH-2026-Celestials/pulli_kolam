@@ -1,0 +1,52 @@
+{
+  "n_train_examples": 7700,
+  "n_val_examples": 1650,
+  "vocab_size": 220,
+  "n_parameters": 506052,
+  "config": {
+    "vocab_size": 220,
+    "d_model": 128,
+    "n_layers": 3,
+    "n_heads": 4,
+    "dim_feedforward": 256,
+    "dropout": 0.1,
+    "max_seq_len": 160
+  },
+  "args": {
+    "epochs": 1,
+    "batch_size": 32,
+    "lr": 0.0003,
+    "patience": 4,
+    "max_grad_norm": 1.0,
+    "d_model": 128,
+    "n_layers": 3,
+    "n_heads": 4,
+    "max_seq_len": 160,
+    "torch_threads": 4,
+    "resume": false,
+    "seed": 6363
+  },
+  "history": [
+    {
+      "epoch": 0,
+      "train_loss": {
+        "total": 10.527068371594694,
+        "motif": 1.890967096035906,
+        "x": 3.4808691200873665,
+        "y": 3.490834264834392,
+        "transform": 1.6643978777762765
+      },
+      "val_loss": {
+        "total": 9.219314850293673,
+        "motif": 1.2431362259846468,
+        "x": 3.1990813246140113,
+        "y": 3.204945926482861,
+        "transform": 1.572151413330665
+      },
+      "epoch_time_seconds": 151.20881128311157
+    }
+  ],
+  "best_val_loss": 9.219314850293673,
+  "total_training_time_seconds": 151.2462329864502,
+  "checkpoint_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m6_generation\\results\\generator_v1_best.pt"
+}
