@@ -1,0 +1,97 @@
+{
+  "n_total_candidates": 500,
+  "n_valid_no_repair": 5,
+  "n_valid_after_repair": 354,
+  "n_invalid_total": 141,
+  "n_invalid_connectivity": 141,
+  "n_invalid_parity_only": 0,
+  "n_invalid_other_unclassified": 0,
+  "fraction_valid_no_repair": 0.01,
+  "fraction_valid_after_repair": 0.708,
+  "fraction_invalid_connectivity": 0.282,
+  "fraction_invalid_parity_only": 0.0,
+  "multiplicity_violation_rate_valid_no_repair": 0.0,
+  "multiplicity_violation_rate_valid_after_repair": 0.9745762711864406,
+  "repair_effect_on_valid_candidates": {
+    "n_dots_before_vs_after": "not tracked per-record in benchmark_report.json (n_dots is constant per layout, not affected by repair)",
+    "connected_components_valid_after_repair": {
+      "n": 354,
+      "mean": 1,
+      "median": 1.0,
+      "min": 1,
+      "max": 1
+    },
+    "n_odd_degree_nodes_valid_after_repair_should_be_0": {
+      "n": 354,
+      "mean": 0,
+      "median": 0.0,
+      "min": 0,
+      "max": 0
+    },
+    "repair_edges_applied_distribution": {
+      "n": 354,
+      "mean": 23.39830508474576,
+      "median": 19.0,
+      "min": 2,
+      "max": 90
+    },
+    "symmetry_coverage_valid_no_repair": {
+      "n": 5,
+      "mean": 0.2305159831431802,
+      "median": 0.2391304347826087,
+      "min": 0.1702127659574468,
+      "max": 0.29347826086956524
+    },
+    "symmetry_coverage_valid_after_repair": {
+      "n": 354,
+      "mean": 0.2173270041389101,
+      "median": 0.21360844017094016,
+      "min": 0.09375,
+      "max": 0.3645833333333333
+    },
+    "symmetry_coverage_invalid": {
+      "n": 141,
+      "mean": 0.2135173319985597,
+      "median": 0.2157258064516129,
+      "min": 0.125,
+      "max": 0.32608695652173914
+    }
+  },
+  "multiplicity_3_root_cause": {
+    "code_location": "engine/learned_generation.py:65 DEFAULT_REPAIR_MAX_MULTIPLICITY = 3",
+    "search_phase_cap": "engine/novel_generation.py DEFAULT_MAX_MULTIPLICITY = 2 (respected during initial candidate construction)",
+    "repair_phase_cap": "engine/learned_generation.py DEFAULT_REPAIR_MAX_MULTIPLICITY = 3 (ONE HIGHER than search's own cap)",
+    "mechanism": "repair_multiplicity's route-doubling loop (engine/learned_generation.py:295-303) walks diagnose_validity's Chinese-Postman corrections and increments an edge's strand count each time that edge appears on a correction path, skipped only once it reaches max_repair_multiplicity=3 -- so any edge that search left at multiplicity 2 AND that also lies on an odd-degree correction path gets pushed to 3 by design, not by accident.",
+    "classification": "C: absent from the real training distribution (max observed = 2, repair's cap of 3 is unsupported by evidence)",
+    "real_data_max_multiplicity": 2,
+    "real_data_multiplicity_3plus_fraction": 0.0
+  },
+  "invalid_connectivity_component_stats": {
+    "n": 141,
+    "mean": 2.3333333333333335,
+    "median": 2,
+    "min": 2,
+    "max": 4
+  },
+  "invalid_connectivity_nodes_outside_stats": {
+    "n": 141,
+    "mean": 7.723404255319149,
+    "median": 4,
+    "min": 1,
+    "max": 56
+  },
+  "invalid_parity_odd_node_stats": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "min": null,
+    "max": null
+  },
+  "invalid_parity_correction_cost_stats": {
+    "n": 0,
+    "mean": null,
+    "median": null,
+    "min": null,
+    "max": null
+  }
+}

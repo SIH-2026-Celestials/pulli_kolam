@@ -73,6 +73,11 @@ const kn = {
     complexityVal: 'ಮಧ್ಯಮ',
     generating: 'ರಚಿಸಲಾಗುತ್ತಿದೆ…',
     errorPrefix: 'ಜನರೇಶನ್ ವಿಫಲವಾಗಿದೆ:',
+    seedLabel: 'Seed',
+    seedPlaceholder: 'Random',
+    countLabel: 'Candidates',
+    download: 'Download SVG',
+    empty: 'No valid candidates in this batch — try Generate More.',
   },
   multilingual: {
     title: 'ಬಹುಭಾಷಾ ಬೆಂಬಲ',

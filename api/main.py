@@ -45,6 +45,7 @@ import tempfile
 import time
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -53,6 +54,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from api.canonical import graph_to_json, motif_placements_to_json, reconstruction_to_json, validity_to_json  # noqa: E402
 from api.detectors import get_detector  # noqa: E402
 from api.generation_service import get_generation_service  # noqa: E402
+from api.routes_generations import router as generations_router  # noqa: E402
 from api.schemas import (  # noqa: E402
     AnalyzeResponse,
     CompareDetectorsResponse,
@@ -85,6 +87,31 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
+
+app.include_router(generations_router)
+
+
+@app.on_event("startup")
+def _init_platform_db():
+    """M7 platform integration: create tables (if missing) and seed the
+    model registry on process start. Idempotent -- safe on every
+    restart. Runs AFTER app construction so import-time failures in
+    api/db/* (e.g. sqlalchemy missing) don't prevent the existing
+    detect/analyze/reconstruct/generate endpoints from working; a
+    failure here is logged, not fatal, since the legacy endpoints above
+    have zero dependency on the database."""
+    try:
+        from api.db.database import get_session, init_db
+        from api.db.seed import seed_models
+
+        init_db()
+        session = get_session()
+        try:
+            seed_models(session)
+        finally:
+            session.close()
+    except Exception as e:  # noqa: BLE001 -- platform DB is additive, must never block legacy endpoints from serving
+        print(f"[pulli-api] platform DB init/seed failed (legacy endpoints unaffected): {type(e).__name__}: {e}", file=sys.stderr)
 
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp", "image/bmp"}
 
@@ -505,6 +532,10 @@ def generate(request: GenerateRequest):
     lattice_width, lattice_height = service.reference_lattice_dims()
     return {
         "success": True,
+        # See GenerateResponse.generator's docstring in api/schemas.py --
+        # this endpoint only ever calls engine.learned_generation (M5), so
+        # this is a constant, not a computed/inferred value.
+        "generator": "m5",
         "model": {
             "name": "PlacementScorer (learned, imitation-trained MLP) + multi-restart guided search",
             "version": service.scorer.metadata.get("seed"),
@@ -535,3 +566,21 @@ def http_exception_handler(request, exc):
     else:
         content = {"success": False, "error": str(exc.detail), "code": "ERROR"}
     return JSONResponse(status_code=exc.status_code, content=content)
+
+
+@app.exception_handler(RequestValidationError)
+def validation_exception_handler(request, exc):
+    # RequestValidationError is NOT an HTTPException (it's raised by
+    # FastAPI's own request-parsing layer, e.g. a missing required
+    # multipart field or a malformed JSON body, before any endpoint
+    # function runs) -- so it never reaches http_exception_handler above
+    # despite that handler's docstring claim. Without this, callers saw
+    # FastAPI's default {"detail": [...]} shape instead of this module's
+    # {"success": false, "error", "code"} envelope. exc.errors()[0] is
+    # used (not the full list) to keep the message short and readable,
+    # matching every other error path in this module.
+    first = exc.errors()[0] if exc.errors() else {}
+    loc = ".".join(str(p) for p in first.get("loc", []) if p != "body")
+    msg = first.get("msg", "invalid request")
+    message = f"{loc}: {msg}" if loc else msg
+    return JSONResponse(status_code=422, content={"success": False, "error": message, "code": "VALIDATION_ERROR"})

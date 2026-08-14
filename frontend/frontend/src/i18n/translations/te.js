@@ -73,6 +73,11 @@ const te = {
     complexityVal: 'మధ్యస్థం',
     generating: 'జనరేట్ అవుతోంది…',
     errorPrefix: 'జనరేషన్ విఫలమైంది:',
+    seedLabel: 'Seed',
+    seedPlaceholder: 'Random',
+    countLabel: 'Candidates',
+    download: 'Download SVG',
+    empty: 'No valid candidates in this batch — try Generate More.',
   },
   multilingual: {
     title: 'బహుభాషా మద్దతు',

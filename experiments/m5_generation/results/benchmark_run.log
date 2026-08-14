@@ -25,3 +25,82 @@ motif library size: 29 (from [('kolam19', 323), ('kolam19', 387), ('kolam29', 51
 240/500 generated, 171 valid so far, elapsed 2620.2s
 250/500 generated, 178 valid so far, elapsed 2684.8s
 260/500 generated, 185 valid so far, elapsed 2791.7s
+270/500 generated, 194 valid so far, elapsed 2930.0s
+280/500 generated, 201 valid so far, elapsed 3037.0s
+290/500 generated, 210 valid so far, elapsed 3191.8s
+300/500 generated, 217 valid so far, elapsed 3339.8s
+310/500 generated, 223 valid so far, elapsed 3463.3s
+320/500 generated, 231 valid so far, elapsed 3555.8s
+330/500 generated, 237 valid so far, elapsed 3662.0s
+340/500 generated, 244 valid so far, elapsed 3783.7s
+350/500 generated, 252 valid so far, elapsed 3924.9s
+360/500 generated, 258 valid so far, elapsed 4045.6s
+370/500 generated, 266 valid so far, elapsed 4228.0s
+380/500 generated, 272 valid so far, elapsed 4380.7s
+390/500 generated, 279 valid so far, elapsed 4495.7s
+400/500 generated, 286 valid so far, elapsed 4574.1s
+410/500 generated, 292 valid so far, elapsed 4688.3s
+420/500 generated, 300 valid so far, elapsed 4833.0s
+430/500 generated, 308 valid so far, elapsed 4946.5s
+440/500 generated, 317 valid so far, elapsed 5097.8s
+450/500 generated, 324 valid so far, elapsed 5238.3s
+460/500 generated, 330 valid so far, elapsed 5345.7s
+470/500 generated, 337 valid so far, elapsed 5425.5s
+480/500 generated, 344 valid so far, elapsed 5507.4s
+490/500 generated, 350 valid so far, elapsed 5607.2s
+500/500 generated, 359 valid so far, elapsed 5729.6s
+{
+  "n_generated": 500,
+  "n_valid": 359,
+  "validity_rate": 0.718,
+  "n_connected_all_nodes": 359,
+  "connectivity_rate": 0.718,
+  "n_multiplicity_violations": 345,
+  "multiplicity_violation_rate": 0.69,
+  "avg_symmetry_coverage": 0.216384566385374,
+  "avg_generation_latency_seconds": 11.418538754940032,
+  "total_benchmark_time_seconds": 5729.638760566711,
+  "seed_reproducibility_checks": [
+    {
+      "seed": 0,
+      "reproducible": true
+    },
+    {
+      "seed": 10,
+      "reproducible": true
+    },
+    {
+      "seed": 20,
+      "reproducible": true
+    }
+  ],
+  "novelty": {
+    "n_candidates": 359,
+    "n_unique_fingerprints": 359,
+    "unique_rate": 1.0,
+    "exact_topological_duplicate_rate": 0.0,
+    "exact_coordinate_duplicate_rate": 0.0,
+    "near_duplicate_rate": 0.0,
+    "near_duplicate_threshold": 0.9,
+    "n_coordinate_comparable_pairs": 359
+  },
+  "motif_library_size": 29,
+  "n_layouts": 75,
+  "n_restarts_per_candidate": 6,
+  "scorer_metadata": {
+    "architecture": "MLP (16 -> 32 -> 16 -> 1)",
+    "n_parameters": 1089,
+    "n_train_examples": 528175,
+    "n_val_examples": 108690,
+    "n_test_examples": 122675,
+    "epochs": 60,
+    "batch_size": 256,
+    "lr": 0.001,
+    "train_time_seconds": 1684.3,
+    "final_val_acc": 0.9014168977737427,
+    "test_acc": 0.9031832218170166,
+    "test_auc": 0.9624778497533204,
+    "trivial_baseline_acc": 0.800000011920929,
+    "seed": 5252
+  }
+}

@@ -1,0 +1,305 @@
+{
+  "n_patterns": 500,
+  "collections": [
+    "kolam19",
+    "kolam29"
+  ],
+  "analysis_time_seconds": 137.696129322052,
+  "A_edge_multiplicity": {
+    "n_total_distinct_edges_measured": 181966,
+    "multiplicity_1_count": 135660,
+    "multiplicity_1_fraction": 0.7455238890781795,
+    "multiplicity_2_count": 46306,
+    "multiplicity_2_fraction": 0.25447611092182054,
+    "multiplicity_3plus_count": 0,
+    "multiplicity_3plus_fraction": 0.0,
+    "max_observed_multiplicity": 2,
+    "n_patterns_with_multiplicity_gt2": 0,
+    "fraction_patterns_with_multiplicity_gt2": 0.0,
+    "full_histogram": {
+      "1": 135660,
+      "2": 46306
+    }
+  },
+  "B_node_degree": {
+    "min": 2,
+    "max": 4,
+    "mean": 3.55719005173596,
+    "median": 4.0,
+    "percentiles": {
+      "p0": 2,
+      "p5": 2,
+      "p25": 4,
+      "p50": 4,
+      "p75": 4,
+      "p95": 4,
+      "p100": 4
+    },
+    "distribution": {
+      "2": 28416,
+      "4": 99928
+    }
+  },
+  "C_connectivity": {
+    "mean_connected_components": 1,
+    "fraction_fully_connected": 1.0,
+    "n_fully_connected": 500,
+    "component_size_distribution": {
+      "180": 6,
+      "184": 17,
+      "188": 32,
+      "192": 54,
+      "196": 52,
+      "200": 65,
+      "204": 44,
+      "208": 51,
+      "212": 32,
+      "216": 21,
+      "220": 13,
+      "224": 5,
+      "228": 3,
+      "232": 2,
+      "236": 1,
+      "240": 1,
+      "244": 1,
+      "436": 1,
+      "444": 1,
+      "448": 2,
+      "452": 3,
+      "456": 5,
+      "460": 8,
+      "464": 16,
+      "468": 6,
+      "472": 5,
+      "476": 4,
+      "480": 7,
+      "484": 11,
+      "488": 6,
+      "492": 5,
+      "496": 2,
+      "500": 5,
+      "504": 4,
+      "508": 3,
+      "512": 1,
+      "516": 3,
+      "520": 1,
+      "536": 1
+    }
+  },
+  "D_edge_locality": {
+    "edge_length_percentiles": {
+      "p0": 1.4142135623730951,
+      "p5": 1.4142135623730951,
+      "p25": 1.4142135623730951,
+      "p50": 1.4142135623730951,
+      "p75": 2.0,
+      "p95": 2.0,
+      "p100": 2.0
+    },
+    "edge_length_mean": 1.575041029688199,
+    "nearest_neighbor_distance_percentiles": {
+      "p0": 1.4142135623730951,
+      "p5": 1.4142135623730951,
+      "p25": 1.4142135623730951,
+      "p50": 1.4142135623730951,
+      "p75": 1.4142135623730951,
+      "p95": 2.0,
+      "p100": 2.0
+    },
+    "nearest_neighbor_distance_mean": 1.450288922366574,
+    "n_long_edges_gt_sqrt2": 62672,
+    "long_edge_fraction": 0.27454966005467163
+  },
+  "E_dot_utilization": {
+    "mean_utilization_fraction": 0.16309594198009783,
+    "median_utilization_fraction": 0.16326530612244897,
+    "percentiles": {
+      "p0": 0.14413223140495868,
+      "p5": 0.15020408163265306,
+      "p25": 0.156734693877551,
+      "p50": 0.16326530612244897,
+      "p75": 0.16979591836734695,
+      "p95": 0.17959183673469387,
+      "p100": 0.19918367346938776
+    }
+  },
+  "F_symmetry": {
+    "mean_coverage": 0.19737456383684523,
+    "median_coverage": 0.19,
+    "percentiles": {
+      "p0": 0.11065573770491803,
+      "p5": 0.13671875,
+      "p25": 0.16326530612244897,
+      "p50": 0.19,
+      "p75": 0.22340425531914893,
+      "p95": 0.28431372549019607,
+      "p100": 0.3829787234042553
+    },
+    "fraction_high_symmetry_ge_0.5": 0.0
+  },
+  "G_structural_complexity": {
+    "n_nodes": {
+      "mean": 256.688,
+      "median": 204.0,
+      "percentiles": {
+        "p0": 180,
+        "p5": 188,
+        "p25": 196,
+        "p50": 204,
+        "p75": 220,
+        "p95": 488,
+        "p100": 536
+      }
+    },
+    "n_distinct_edges": {
+      "mean": 363.932,
+      "median": 290.0,
+      "percentiles": {
+        "p0": 202,
+        "p5": 238,
+        "p25": 264,
+        "p50": 290,
+        "p75": 334,
+        "p95": 732,
+        "p100": 856
+      }
+    },
+    "n_edge_instances_multiplicity_weighted": {
+      "mean": 456.544,
+      "median": 364.0,
+      "percentiles": {
+        "p0": 296,
+        "p5": 316,
+        "p25": 340,
+        "p50": 364,
+        "p75": 400,
+        "p95": 892,
+        "p100": 1012
+      }
+    },
+    "fraction_eulerian_circuit_closed_loop": 1.0,
+    "fraction_eulerian_path_open_stroke": 0.0,
+    "fraction_neither_hard_gate_failure": 0.0
+  },
+  "H_motifs": {
+    "n_motif_induction_failures": 0,
+    "n_distinct_motif_shapes_across_corpus": 361,
+    "motif_shape_frequency_top20": [
+      {
+        "motif_edge_count": 3,
+        "count": 455
+      },
+      {
+        "motif_edge_count": 4,
+        "count": 441
+      },
+      {
+        "motif_edge_count": 5,
+        "count": 419
+      },
+      {
+        "motif_edge_count": 5,
+        "count": 384
+      },
+      {
+        "motif_edge_count": 4,
+        "count": 381
+      },
+      {
+        "motif_edge_count": 4,
+        "count": 370
+      },
+      {
+        "motif_edge_count": 4,
+        "count": 322
+      },
+      {
+        "motif_edge_count": 4,
+        "count": 282
+      },
+      {
+        "motif_edge_count": 6,
+        "count": 265
+      },
+      {
+        "motif_edge_count": 3,
+        "count": 185
+      },
+      {
+        "motif_edge_count": 6,
+        "count": 181
+      },
+      {
+        "motif_edge_count": 4,
+        "count": 150
+      },
+      {
+        "motif_edge_count": 3,
+        "count": 143
+      },
+      {
+        "motif_edge_count": 3,
+        "count": 141
+      },
+      {
+        "motif_edge_count": 2,
+        "count": 118
+      },
+      {
+        "motif_edge_count": 2,
+        "count": 116
+      },
+      {
+        "motif_edge_count": 6,
+        "count": 100
+      },
+      {
+        "motif_edge_count": 8,
+        "count": 94
+      },
+      {
+        "motif_edge_count": 2,
+        "count": 70
+      },
+      {
+        "motif_edge_count": 4,
+        "count": 62
+      }
+    ],
+    "motif_size_distribution": {
+      "2": 305,
+      "3": 989,
+      "4": 2093,
+      "5": 911,
+      "6": 646,
+      "7": 125,
+      "8": 342,
+      "9": 94,
+      "10": 147,
+      "11": 56,
+      "12": 70,
+      "13": 16,
+      "14": 16,
+      "15": 2,
+      "16": 7,
+      "18": 1,
+      "19": 2,
+      "20": 1,
+      "21": 1
+    },
+    "motif_size_mean": 4.882211538461538,
+    "n_motif_types_per_pattern": {
+      "mean": 11.648,
+      "median": 11.0,
+      "percentiles": {
+        "p0": 6,
+        "p5": 8,
+        "p25": 10,
+        "p50": 11,
+        "p75": 13,
+        "p95": 17,
+        "p100": 21
+      }
+    }
+  }
+}

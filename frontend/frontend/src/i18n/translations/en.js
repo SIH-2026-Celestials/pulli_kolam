@@ -73,6 +73,11 @@ const en = {
     complexityVal: 'Medium',
     generating: 'Generating…',
     errorPrefix: 'Generation failed:',
+    seedLabel: 'Seed',
+    seedPlaceholder: 'Random',
+    countLabel: 'Candidates',
+    download: 'Download SVG',
+    empty: 'No valid candidates in this batch — try Generate More.',
   },
   multilingual: {
     title: 'Multilingual Support',

@@ -43,6 +43,23 @@
 !/docs/DEPLOYMENT_AUDIT.md
 !/docs/DEPLOYMENT.md
 
+# M5.1 evidence-driven analysis (real-data structural distributions,
+# benchmark failure-mode breakdown, counterfactual repair-strategy
+# experiment) and the resulting constraint spec -- institutional
+# memory the next generator design is built on, not scratch notes.
+!/experiments/m5_generation/README.md
+!/experiments/m5_generation/M5_1_PIPELINE_AUDIT.md
+!/experiments/m5_generation/M5_1_CONSTRAINT_SPEC.md
+!/experiments/m5_generation/results/benchmark_failure_analysis.md
+
+# M6 generator architecture audit and the evidence-driven V2 design/
+# training/benchmark specs -- institutional memory, referenced directly
+# from the M5.1/M6 planning work above.
+!/experiments/m6_generation/ARCHITECTURE.md
+!/experiments/m6_generation/M6_V2_DESIGN.md
+!/experiments/m6_generation/M6_V2_TRAINING_SPEC.md
+!/experiments/m6_generation/GENERATOR_BENCHMARK_SPEC.md
+
 # Python
 __pycache__/
 *.pyc
@@ -61,3 +78,10 @@ one-stroke-dotted-pulli-kolam.zip
 # OS
 .DS_Store
 Thumbs.db
+
+# M7 platform: local SQLite database + rendered-SVG artifact store --
+# runtime-generated data, not source (see api/db/database.py's module
+# docstring: DATABASE_URL points a real deployment at Postgres instead).
+api/db/*.db
+api/storage/artifacts/*.svg
+!api/storage/artifacts/.gitkeep

@@ -5,3 +5,12 @@ epoch   1  train_total=9.1140  val_total=8.8969  time=140.0s
 epoch   2  train_total=8.8379  val_total=8.6916  time=144.5s
 epoch   3  train_total=8.6281  val_total=8.5478  time=166.5s
 epoch   4  train_total=8.4440  val_total=8.3950  time=177.8s
+epoch   5  train_total=8.2826  val_total=8.2946  time=180.1s
+epoch   6  train_total=8.1461  val_total=8.1968  time=171.7s
+epoch   7  train_total=8.0192  val_total=8.1130  time=168.6s
+epoch   8  train_total=7.8974  val_total=8.0357  time=169.0s
+epoch   9  train_total=7.7975  val_total=8.0130  time=173.1s
+epoch  10  train_total=7.6995  val_total=7.9449  time=159.3s
+epoch  11  train_total=7.6202  val_total=7.9457  time=172.4s
+best_val_loss=7.9449  total_time=1971.5s
+wrote C:\Users\chauh\OneDrive\Desktop\PULLI\experiments\m6_generation\results\training_log.json

@@ -167,6 +167,14 @@ class GeneratedCandidate(BaseModel):
 
 class GenerateResponse(BaseModel):
     success: bool
+    # Additive (integration phase): names which generation implementation
+    # produced these candidates, WITHOUT exposing internal module/class
+    # names (see `model.name` for that detail). Only "m5" exists today --
+    # this field exists so a future generator (e.g. an M5.1/M6V2 swap
+    # behind engine.generation_contract) can be distinguished by callers
+    # without a response-shape change. Never fabricated: hardcoded to the
+    # one generator this endpoint actually calls.
+    generator: str = "m5"
     model: dict
     constraints: GenerationConstraintsInfo
     candidates: list[GeneratedCandidate]

@@ -141,3 +141,43 @@ export function generate(options = {}) {
     GENERATE_TIMEOUT_MS
   );
 }
+
+/**
+ * M7 platform: PERSISTED generation -- same underlying M5 search as
+ * generate() above (same latency profile, same timeout), but each
+ * candidate is written to the database and individually retrievable
+ * afterward via getGeneration(id) (generation history). Response
+ * candidates include `id` (for later lookup) and `analysis` (the full
+ * Mathematics panel data), so the initial call already has everything
+ * needed for the main studio view -- getGeneration/getGenerationGraph
+ * are for on-demand detail (history browsing, graph view), not
+ * required for the primary render.
+ * @param {{seed?: number, count?: number, verify_recognizer?: boolean}} [options]
+ */
+export function createGeneration(options = {}) {
+  return request(
+    '/api/v1/generations',
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(options) },
+    GENERATE_TIMEOUT_MS
+  );
+}
+
+/** @param {string} id GenerationResult id */
+export function getGeneration(id) {
+  return request(`/api/v1/generations/${id}`);
+}
+
+/** @param {string} id GenerationResult id */
+export function getGenerationMathematics(id) {
+  return request(`/api/v1/generations/${id}/mathematics`);
+}
+
+/** @param {string} id GenerationResult id */
+export function getGenerationGraph(id) {
+  return request(`/api/v1/generations/${id}/graph`);
+}
+
+/** @returns {Promise<{data: any, error: null} | {data: null, error: import('./types').ApiError}>} */
+export function listModels() {
+  return request('/api/v1/models');
+}
