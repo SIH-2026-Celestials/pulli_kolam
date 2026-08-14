@@ -2,27 +2,28 @@
 
     generate(request) -> GenerationServiceResult (request persisted, N candidates)
 
-Internally reuses `api.generation_service.get_generation_service()` (the
-EXISTING lazy M5 loader, UNMODIFIED) and `engine.learned_generation`
-(M5's OWN algorithm, UNMODIFIED, no rewrite, no checkpoint change) --
-this module adds PERSISTENCE and ANALYSIS/VERIFICATION around M5, it
-does not touch M5 itself. No FastAPI import anywhere in this file --
-callable from a script, a test, or (as api/routes_generations.py does)
-a request handler, identically.
+Depends on the `Generator` PROTOCOL (api/services/generator_interface.py),
+not on `engine.learned_generation` directly -- `M5Generator` is the only
+registered implementation today, but every call site here goes through
+`Generator.generate_one(seed)`, so a future `M6Generator` (once M6 V2 is
+production-ready -- NOT built in this task) can be registered without
+touching this file's generation loop. M5 itself remains completely
+unmodified, no rewrite, no checkpoint change.
+
+Artifacts go through `ArtifactStore` (api/services/artifact_store.py),
+not raw `pathlib.Path` calls -- same swap-later-without-touching-callers
+principle, for storage instead of generation.
 
 MODEL REGISTRY ENFORCEMENT: this service resolves the "production"
 M5 ModelVersion from the database (api.db.seed's seeded row) and
 refuses to run if none exists with status="production" -- it will
-NEVER invoke a "research" status model (M6) for live generation, this
-is checked explicitly (see `_resolve_production_generator`), not just
-documented.
+NEVER invoke a "research" status model (M6) for live generation.
 """
 
 from __future__ import annotations
 
 import time
 from dataclasses import dataclass
-from pathlib import Path
 
 from sqlalchemy.orm import Session
 
@@ -37,10 +38,10 @@ from api.db.models import (
     PatternVersion,
     VerificationResult,
 )
+from api.logging_config import log_event
 from api.services.analysis import analyze_all
+from api.services.artifact_store import get_artifact_store
 from api.services.verification import verify_structural, verify_with_recognizer
-
-_STORAGE_DIR = Path(__file__).resolve().parent.parent / "storage" / "artifacts"
 
 
 @dataclass
@@ -101,15 +102,14 @@ def generate(
     """
     import os
 
-    from api.generation_service import get_generation_service
-    from engine.learned_generation import generate_novel_kolam_learned
+    from api.services.generator_interface import M5Generator
     from engine.render import render_generated_kolam_svg
 
     production_mv = _resolve_production_generator(session)
 
-    m5_service = get_generation_service()
-    if not m5_service.available:
-        raise GenerationUnavailableError(m5_service.load_error or "M5 generation service unavailable")
+    generator = M5Generator()  # the ONLY registered Generator implementation -- see module docstring
+    if not generator.available:
+        raise GenerationUnavailableError(generator.load_error or "generator unavailable")
 
     request_row = GenerationRequest(params={"seed": seed, "count": count, "verify_recognizer": verify_recognizer})
     session.add(request_row)
@@ -119,21 +119,26 @@ def generate(
     session.add(run_row)
     session.flush()
 
+    log_event(
+        "generation_run_started", generation_id=run_row.id, request_id=request_row.id,
+        generator=generator.name, seed=seed, candidate_count=count,
+    )
+
     base_seed = seed if seed is not None else int.from_bytes(os.urandom(4), "big")
-    _STORAGE_DIR.mkdir(parents=True, exist_ok=True)
+    store = get_artifact_store()
 
     candidates: list[GenerationCandidateResult] = []
     t_start = time.monotonic()
+    n_valid = 0
 
     for i in range(count):
         this_seed = base_seed + i
-        _layout_name, dots = m5_service.layout_for_seed(this_seed)
         t0 = time.monotonic()
-        run_result = generate_novel_kolam_learned(
-            m5_service.motif_library, dots, scorer=m5_service.scorer, seed=this_seed,
-        )
+        gen_candidate = generator.generate_one(this_seed)
         latency_ms = (time.monotonic() - t0) * 1000
-        candidate = run_result.candidate
+        candidate = gen_candidate.structural_object
+        if candidate.is_valid:
+            n_valid += 1
 
         from engine.generation_contract import build_representation
         from engine.novelty import graph_fingerprint
@@ -189,6 +194,7 @@ def generate(
             )
         )
         verification_dict = {"structural_hard_gate": struct_v.__dict__}
+        verification_status = "valid" if struct_v.is_valid else "invalid"
 
         if verify_recognizer:
             verifier_mv = (
@@ -208,14 +214,55 @@ def generate(
                 )
             )
             verification_dict["recognizer_self_consistency"] = rec_v.__dict__
+            verification_status = "valid" if (struct_v.is_valid and rec_v.is_valid) else "invalid"
 
         svg = render_generated_kolam_svg(candidate)
-        artifact_path = _STORAGE_DIR / f"{pv_row.id}.svg"
-        artifact_path.write_text(svg, encoding="utf-8")
+        artifact_relpath = f"artifacts/{pv_row.id}.svg"
+        store.write(artifact_relpath, svg, "image/svg+xml")
         session.add(
             Artifact(
                 pattern_version_id=pv_row.id, artifact_type="svg",
-                storage_path=f"artifacts/{pv_row.id}.svg", content_type="image/svg+xml",
+                storage_path=artifact_relpath, content_type="image/svg+xml",
+            )
+        )
+
+        # PNG + JSON artifacts alongside the SVG -- Phase 14's export
+        # requirement; persisted EAGERLY (not rendered on-demand at
+        # export time) so the export endpoint is a pure read, no
+        # re-derivation. engine.render.render_generated_kolam_png only
+        # writes to a filesystem path (no in-memory bytes API) -- reuse
+        # it unmodified via a short-lived temp file, then hand the bytes
+        # to the store.
+        import json as _json
+        import os as _os
+        import tempfile as _tempfile
+
+        from engine.render import render_generated_kolam_png
+
+        png_fd, png_tmp_path = _tempfile.mkstemp(suffix=".png")
+        _os.close(png_fd)
+        try:
+            render_generated_kolam_png(candidate, png_tmp_path)
+            with open(png_tmp_path, "rb") as f:
+                png_bytes = f.read()
+        finally:
+            _os.unlink(png_tmp_path)
+
+        png_relpath = f"artifacts/{pv_row.id}.png"
+        store.write_bytes(png_relpath, png_bytes, "image/png")
+        session.add(
+            Artifact(
+                pattern_version_id=pv_row.id, artifact_type="png",
+                storage_path=png_relpath, content_type="image/png",
+            )
+        )
+
+        json_relpath = f"artifacts/{pv_row.id}.json"
+        store.write(json_relpath, _json.dumps(representation.to_dict(), indent=2), "application/json")
+        session.add(
+            Artifact(
+                pattern_version_id=pv_row.id, artifact_type="json",
+                storage_path=json_relpath, content_type="application/json",
             )
         )
 
@@ -234,9 +281,21 @@ def generate(
             )
         )
 
+        log_event(
+            "generation_candidate_completed", generation_id=run_row.id, result_id=result_row.id,
+            seed=this_seed, valid=candidate.is_valid, verification_status=verification_status,
+            duration_ms=round(latency_ms, 2),
+        )
+
     total_latency_ms = (time.monotonic() - t_start) * 1000
     run_row.total_latency_ms = total_latency_ms
     session.commit()
+
+    log_event(
+        "generation_run_completed", generation_id=run_row.id, request_id=request_row.id,
+        generator=generator.name, seed=base_seed, candidate_count=count,
+        valid_count=n_valid, duration_ms=round(total_latency_ms, 2),
+    )
 
     return GenerationServiceResult(
         run_id=run_row.id, request_id=request_row.id, model_version=production_mv.version,

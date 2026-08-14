@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import { RotateCw, Grid, GitFork, Infinity as LoopIcon, Flower2, BarChart2, Download, Info } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
-import { createGeneration, getGenerationGraph } from '../../lib/api/kolam'
+import { createGeneration, getGenerationGraph, generationExportUrl } from '../../lib/api/kolam'
 import './GeneratedVariations.css'
 
 // Server-enforced cap (api/routes_generations.py's MAX_GENERATE_COUNT) --
@@ -129,20 +129,30 @@ export default function GeneratedVariations() {
   }
 
   useEffect(() => {
-    runGenerate({ count: 2 })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let cancelled = false
+    createGeneration({ count: 2 }).then(({ data, error }) => {
+      if (cancelled) return
+      if (error) {
+        setStatus('error')
+        setErrorMsg(error.message)
+        return
+      }
+      setCandidates(data.candidates)
+      setModel(data.model_version ? { name: 'M5 (learned-scorer-guided search)', version: data.model_version } : null)
+      setStatus('success')
+    })
+    return () => { cancelled = true }
   }, [])
 
-  const downloadSvg = (candidate) => {
-    const blob = new Blob([candidate.render_svg], { type: 'image/svg+xml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `pulli-kolam-seed-${candidate.seed}.svg`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+  // Downloads go through the backend export endpoint (real persisted
+  // artifacts -- api/routes_generations.py's export_generation), not a
+  // client-side blob of the already-rendered SVG string: this is what
+  // makes PNG/JSON export possible (the frontend never rasterizes SVG
+  // itself, the backend already rendered a real PNG via engine.render
+  // at generation time). window.open triggers the browser's native
+  // download via the response's Content-Disposition header.
+  const downloadArtifact = (candidate, format) => {
+    window.open(generationExportUrl(candidate.id, format), '_blank')
   }
 
   const toggleDetail = async (candidate) => {
@@ -249,15 +259,20 @@ export default function GeneratedVariations() {
                   >
                     <Info size={13} />
                   </button>
-                  <button
-                    type="button"
-                    className="variation-download-btn"
-                    title={t('variations.download')}
-                    aria-label={`${t('variations.download')} (seed ${c.seed})`}
-                    onClick={() => downloadSvg(c)}
-                  >
-                    <Download size={13} />
-                  </button>
+                  <div className="variation-export-group" role="group" aria-label={t('variations.download')}>
+                    {['svg', 'png', 'json'].map((format) => (
+                      <button
+                        key={format}
+                        type="button"
+                        className="variation-export-btn"
+                        title={`${t('variations.download')} (${format.toUpperCase()})`}
+                        aria-label={`${t('variations.download')} ${format.toUpperCase()} (seed ${c.seed})`}
+                        onClick={() => downloadArtifact(c, format)}
+                      >
+                        {format === 'svg' ? <Download size={13} /> : format.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 {detailFor === c.id && (
                   <div className="detail-panel">
