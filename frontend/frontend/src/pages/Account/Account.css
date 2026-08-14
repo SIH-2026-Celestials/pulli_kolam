@@ -1,6 +1,7 @@
 /* ==========================================================================
    PULLI KOLAM - ARCHIVAL PROFILE & ACCOUNT DESIGN SYSTEM
    Theme: Indian Mathematical Archive & Creative Researcher Profile
+   Supports: Light Theme & Dark Theme (via tokens.css variables)
    ========================================================================== */
 
 .account-page {
@@ -44,7 +45,7 @@
 .section-divider-line {
   height: 1px;
   width: 100%;
-  background: linear-gradient(90deg, var(--color-line, #EAE2D5) 0%, rgba(234, 226, 213, 0.3) 100%);
+  background: linear-gradient(90deg, var(--color-card-border, var(--color-line, #EAE2D5)) 0%, transparent 100%);
   margin-top: 0.5rem;
 }
 
@@ -54,17 +55,16 @@
 .profile-hero-card {
   position: relative;
   overflow: hidden;
-  background-color: var(--color-paper, #FDFBF7);
-  border: 1px solid var(--color-line, #EAE2D5);
+  background-color: var(--color-paper-card, var(--color-paper, #FDFBF7));
+  border: 1px solid var(--color-card-border, var(--color-line, #EAE2D5));
   border-radius: 12px;
   margin-bottom: 2.5rem;
-  box-shadow: 0 6px 24px rgba(44, 38, 35, 0.04);
-  transition: border-color 0.2s ease;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
 }
 
 /* Top Banner Cover */
 .profile-cover-banner {
-  height: 110px;
+  height: 120px;
   background: linear-gradient(135deg, #3D040E 0%, #5A0615 50%, #7A0A1E 100%);
   position: relative;
   overflow: hidden;
@@ -93,23 +93,27 @@
   padding: 0 2rem 2rem 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
   position: relative;
-  margin-top: -48px;
+  background-color: var(--color-paper-card, var(--color-paper, #FDFBF7));
 }
 
-@media (min-width: 768px) {
-  .profile-hero-body {
-    flex-direction: row;
-    align-items: flex-start;
-  }
+/* Top Row: Avatar overlapping on Left, Actions on Right */
+.profile-top-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: -48px;
+  margin-bottom: 0.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 /* Avatar Styling */
 .profile-avatar-container {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 96px;
+  height: 96px;
   flex-shrink: 0;
 }
 
@@ -118,16 +122,16 @@
   height: 100%;
   border-radius: 50%;
   padding: 3px;
-  background: linear-gradient(135deg, #B88735 0%, #5A0615 100%);
-  box-shadow: 0 8px 20px rgba(61, 4, 14, 0.18);
+  background: linear-gradient(135deg, var(--color-gold, #B88735) 0%, #5A0615 100%);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 .profile-avatar-circle {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: linear-gradient(145deg, #3D040E 0%, #220207 100%);
-  border: 2px solid var(--color-paper, #FDFBF7);
+  background: linear-gradient(145deg, #3D040E 0%, #1F0207 100%);
+  border: 2.5px solid var(--color-paper-card, var(--color-paper, #FDFBF7));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -150,7 +154,7 @@
   height: 16px;
   border-radius: 50%;
   background-color: #10B981;
-  border: 2.5px solid var(--color-paper, #FDFBF7);
+  border: 2.5px solid var(--color-paper-card, var(--color-paper, #FDFBF7));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -170,34 +174,74 @@
   100% { transform: scale(1); opacity: 0; }
 }
 
+/* Hero Actions (Buttons aligned on top right below cover line) */
+.profile-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 54px; /* pushes buttons comfortably below cover boundary */
+}
+
+.btn-edit-profile,
+.btn-logout-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-edit-profile {
+  background-color: var(--color-paper-light, #FAF7F0);
+  border: 1px solid var(--color-card-border, var(--color-line, #EAE2D5));
+  color: var(--color-text-dark, #2C2623);
+}
+
+.btn-edit-profile:hover {
+  border-color: var(--color-gold, #B88735);
+  color: var(--color-gold, #B88735);
+}
+
+.btn-logout-action {
+  background-color: transparent;
+  border: 1px solid var(--color-card-border, var(--color-line, #EAE2D5));
+  color: var(--color-text-muted, #786F68);
+}
+
+.btn-logout-action:hover {
+  background-color: rgba(139, 0, 0, 0.08);
+  border-color: rgba(139, 0, 0, 0.4);
+  color: #E53935;
+}
+
 /* Profile Main Meta */
 .profile-main-meta {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
-  padding-top: 0.25rem;
 }
 
 .profile-identity-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.profile-name-group {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
 
-.profile-eyebrow-row {
+.profile-name-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.profile-name-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .profile-name {
@@ -212,7 +256,7 @@
 
 .profile-handle {
   font-family: var(--font-mono, monospace);
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   color: var(--color-text-muted, #786F68);
   font-weight: 500;
 }
@@ -221,10 +265,10 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 10px;
-  background-color: rgba(184, 135, 53, 0.08);
-  border: 1px solid rgba(184, 135, 53, 0.28);
-  color: #8B5A00;
+  padding: 4px 10px;
+  background-color: rgba(184, 135, 53, 0.1);
+  border: 1px solid rgba(184, 135, 53, 0.35);
+  color: var(--color-gold, #B88735);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -237,14 +281,14 @@
   margin: 0;
   line-height: 1.55;
   font-size: 0.92rem;
-  max-width: 680px;
+  max-width: 720px;
 }
 
 .bio-edit-box {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-width: 680px;
+  max-width: 720px;
 }
 
 .bio-textarea {
@@ -252,8 +296,8 @@
   font-size: 0.88rem;
   padding: 10px 12px;
   border-radius: 6px;
-  border: 1px solid var(--color-line, #EAE2D5);
-  background-color: #FAF7F0;
+  border: 1px solid var(--color-card-border, var(--color-line, #EAE2D5));
+  background-color: var(--color-paper-light, #FAF7F0);
   color: var(--color-text-dark, #2C2623);
   resize: vertical;
   font-family: inherit;
@@ -279,8 +323,8 @@
   gap: 0.65rem;
   font-size: 0.78rem;
   color: var(--color-text-muted, #786F68);
-  padding-top: 0.25rem;
-  border-top: 1px dashed var(--color-line, #EAE2D5);
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--color-card-border, var(--color-line, #EAE2D5));
 }
 
 .tag-item {
@@ -294,50 +338,8 @@
 }
 
 .dot-sep {
-  color: var(--color-line, #D6CDBF);
-}
-
-/* Hero Actions */
-.profile-hero-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-.btn-edit-profile,
-.btn-logout-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 7px 14px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.btn-edit-profile {
-  background-color: var(--color-paper, #FDFBF7);
-  border: 1px solid var(--color-line, #EAE2D5);
-  color: var(--color-text-dark, #2C2623);
-}
-
-.btn-edit-profile:hover {
-  border-color: var(--color-gold, #B88735);
-  color: #5A0615;
-  background-color: #FAF6ED;
-}
-
-.btn-logout-action {
-  background-color: transparent;
-  border: 1px solid transparent;
   color: var(--color-text-muted, #786F68);
-}
-
-.btn-logout-action:hover {
-  background-color: rgba(90, 6, 21, 0.05);
-  border-color: rgba(90, 6, 21, 0.2);
-  color: #5A0615;
+  opacity: 0.5;
 }
 
 /* ==========================================================================
@@ -348,12 +350,12 @@
 }
 
 .profile-stats-panel {
-  background-color: var(--color-paper, #FDFBF7);
-  border: 1px solid var(--color-line, #EAE2D5);
+  background-color: var(--color-paper-card, var(--color-paper, #FDFBF7));
+  border: 1px solid var(--color-card-border, var(--color-line, #EAE2D5));
   border-radius: 10px;
   display: grid;
   grid-template-columns: repeat(1, 1fr);
-  box-shadow: 0 4px 16px rgba(44, 38, 35, 0.03);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 @media (min-width: 600px) {
@@ -373,13 +375,13 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  border-bottom: 1px solid var(--color-line, #EAE2D5);
+  border-bottom: 1px solid var(--color-card-border, var(--color-line, #EAE2D5));
   transition: background-color 0.2s ease;
 }
 
 @media (min-width: 600px) {
   .stat-col:nth-child(odd) {
-    border-right: 1px solid var(--color-line, #EAE2D5);
+    border-right: 1px solid var(--color-card-border, var(--color-line, #EAE2D5));
   }
   .stat-col:nth-last-child(-n+2) {
     border-bottom: none;
@@ -389,7 +391,7 @@
 @media (min-width: 900px) {
   .stat-col {
     border-bottom: none;
-    border-right: 1px solid var(--color-line, #EAE2D5);
+    border-right: 1px solid var(--color-card-border, var(--color-line, #EAE2D5));
   }
   .stat-col:last-child {
     border-right: none;
@@ -397,7 +399,7 @@
 }
 
 .stat-col:hover {
-  background-color: rgba(244, 240, 230, 0.4);
+  background-color: var(--color-paper-light, rgba(244, 240, 230, 0.4));
 }
 
 .stat-header {
@@ -430,7 +432,7 @@
 
 .stat-subtext {
   font-size: 0.73rem;
-  color: #8C827A;
+  color: var(--color-text-muted, #8C827A);
 }
 
 /* ==========================================================================
@@ -450,14 +452,14 @@
 }
 
 .info-card {
-  background-color: var(--color-paper, #FDFBF7);
-  border: 1px solid var(--color-line, #EAE2D5);
+  background-color: var(--color-paper-card, var(--color-paper, #FDFBF7));
+  border: 1px solid var(--color-card-border, var(--color-line, #EAE2D5));
   border-radius: 10px;
   padding: 1.75rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  box-shadow: 0 4px 16px rgba(44, 38, 35, 0.03);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .card-header-bar {
@@ -465,7 +467,7 @@
   align-items: flex-start;
   justify-content: space-between;
   padding-bottom: 0.85rem;
-  border-bottom: 1px solid var(--color-line, #EAE2D5);
+  border-bottom: 1px solid var(--color-card-border, var(--color-line, #EAE2D5));
 }
 
 .card-header-text {
@@ -498,7 +500,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.85rem 0;
-  border-bottom: 1px dashed rgba(234, 226, 213, 0.8);
+  border-bottom: 1px dashed var(--color-card-border, rgba(234, 226, 213, 0.8));
   font-size: 0.88rem;
   gap: 1rem;
 }
@@ -543,15 +545,15 @@
 }
 
 .status-pill--valid {
-  background-color: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.28);
-  color: #047857;
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10B981;
 }
 
 .status-pill--gold {
-  background-color: rgba(184, 135, 53, 0.08);
-  border: 1px solid rgba(184, 135, 53, 0.28);
-  color: #8B5A00;
+  background-color: rgba(184, 135, 53, 0.1);
+  border: 1px solid rgba(184, 135, 53, 0.3);
+  color: var(--color-gold, #B88735);
 }
 
 /* Heritage Achievements Badges List */
@@ -566,8 +568,8 @@
   align-items: flex-start;
   gap: 1rem;
   padding: 12px 14px;
-  background-color: #FAF7F0;
-  border: 1px solid var(--color-line, #EAE2D5);
+  background-color: var(--color-paper-light, #FAF7F0);
+  border: 1px solid var(--color-card-border, var(--color-line, #EAE2D5));
   border-radius: 8px;
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -575,16 +577,16 @@
 .achievement-badge-item:hover {
   transform: translateY(-2px);
   border-color: var(--color-gold, #B88735);
-  box-shadow: 0 4px 12px rgba(184, 135, 53, 0.08);
+  box-shadow: 0 4px 12px rgba(184, 135, 53, 0.1);
 }
 
 .badge-emblem-wrap {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(90, 6, 21, 0.08) 0%, rgba(184, 135, 53, 0.12) 100%);
-  border: 1px solid rgba(184, 135, 53, 0.3);
-  color: #5A0615;
+  background: linear-gradient(135deg, rgba(90, 6, 21, 0.12) 0%, rgba(184, 135, 53, 0.16) 100%);
+  border: 1px solid rgba(184, 135, 53, 0.35);
+  color: var(--color-gold, #B88735);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -618,7 +620,7 @@
 .badge-tag {
   font-size: 0.62rem;
   color: var(--color-gold, #B88735);
-  background-color: rgba(184, 135, 53, 0.08);
+  background-color: rgba(184, 135, 53, 0.12);
   padding: 2px 6px;
   border-radius: 3px;
 }
@@ -651,8 +653,8 @@
 .playground-cta-banner {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #FDFBF7 0%, #F5EFE3 50%, #ECE3D2 100%);
-  border: 1px solid var(--color-line, #EAE2D5);
+  background: linear-gradient(135deg, var(--color-paper-card, #FDFBF7) 0%, var(--color-paper-light, #F5EFE3) 100%);
+  border: 1px solid var(--color-card-border, var(--color-line, #EAE2D5));
   border-radius: 12px;
   padding: 2.25rem 2rem;
   display: flex;
@@ -660,7 +662,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1.5rem;
-  box-shadow: 0 6px 20px rgba(44, 38, 35, 0.04);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
 }
 
 .cta-pattern-overlay {
@@ -727,8 +729,8 @@
 .guest-profile-banner {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #FDFBF7 0%, #F5EFE3 100%);
-  border: 1px solid var(--color-line, #EAE2D5);
+  background: linear-gradient(135deg, var(--color-paper-card, #FDFBF7) 0%, var(--color-paper-light, #F5EFE3) 100%);
+  border: 1px solid var(--color-card-border, var(--color-line, #EAE2D5));
   border-radius: 12px;
   padding: 2.25rem 2rem;
   margin-bottom: 2.5rem;
@@ -793,13 +795,13 @@
    ========================================================================== */
 .account-skeleton-box {
   padding: 3rem;
-  background-color: var(--color-paper, #FDFBF7);
-  border: 1px solid var(--color-line, #EAE2D5);
+  background-color: var(--color-paper-card, var(--color-paper, #FDFBF7));
+  border: 1px solid var(--color-card-border, var(--color-line, #EAE2D5));
   border-radius: 12px;
 }
 
 .skeleton-line {
-  background: linear-gradient(90deg, #EAE2D5 25%, #F5EFE3 50%, #EAE2D5 75%);
+  background: linear-gradient(90deg, var(--color-card-border) 25%, var(--color-paper-light) 50%, var(--color-card-border) 75%);
   background-size: 200% 100%;
   animation: skeletonPulse 1.5s infinite ease-in-out;
   border-radius: 4px;
@@ -814,6 +816,14 @@
 @media (max-width: 640px) {
   .profile-hero-body {
     padding: 0 1.25rem 1.5rem 1.25rem;
+  }
+  .profile-top-row {
+    margin-top: -42px;
+  }
+  .profile-hero-actions {
+    margin-top: 48px;
+    width: 100%;
+    justify-content: flex-start;
   }
   .profile-avatar-container {
     width: 84px;

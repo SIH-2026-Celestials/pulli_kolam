@@ -121,51 +121,52 @@ export default function Account() {
           </div>
 
           <div className="profile-hero-body">
-            {/* Avatar Component */}
-            <div className="profile-avatar-container">
-              <div className="profile-avatar-ring">
-                <div className="profile-avatar-circle">
-                  <span className="avatar-initials">
-                    {displayName.charAt(0).toUpperCase()}
-                  </span>
+            {/* Top Bar: Avatar overlapping cover on left, Actions on right */}
+            <div className="profile-top-row">
+              <div className="profile-avatar-container">
+                <div className="profile-avatar-ring">
+                  <div className="profile-avatar-circle">
+                    <span className="avatar-initials">
+                      {displayName.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
                 </div>
+                <span className="status-indicator-dot" title="Active Kolam Practitioner">
+                  <span className="status-pulse"></span>
+                </span>
               </div>
-              <span className="status-indicator-dot" title="Active Kolam Practitioner">
-                <span className="status-pulse"></span>
-              </span>
+
+              <div className="profile-hero-actions">
+                <button
+                  className="btn btn--outline btn--sm btn-edit-profile"
+                  onClick={() => setIsEditing(!isEditing)}
+                >
+                  <Edit3 size={14} />
+                  <span>{isEditing ? 'Cancel' : 'Edit Bio'}</span>
+                </button>
+
+                <button
+                  className="btn btn--outline btn--sm btn-logout-action"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                >
+                  <LogOut size={14} />
+                  <span>{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
+                </button>
+              </div>
             </div>
 
-            {/* Main Information */}
+            {/* Main Information below top bar */}
             <div className="profile-main-meta">
               <div className="profile-identity-header">
                 <div className="profile-name-group">
-                  <div className="profile-eyebrow-row">
+                  <div className="profile-name-row">
+                    <h1 className="heading-display profile-name">{displayName}</h1>
                     <span className="role-badge label-tech">
                       <ShieldCheck size={12} /> PRACTITIONER &amp; RESEARCHER
                     </span>
                   </div>
-                  <h1 className="heading-display profile-name">{displayName}</h1>
                   <span className="profile-handle label-tech">{handleName}</span>
-                </div>
-
-                {/* Actions */}
-                <div className="profile-hero-actions">
-                  <button
-                    className="btn btn--outline btn--sm btn-edit-profile"
-                    onClick={() => setIsEditing(!isEditing)}
-                  >
-                    <Edit3 size={14} />
-                    <span>{isEditing ? 'Cancel' : 'Edit Bio'}</span>
-                  </button>
-
-                  <button
-                    className="btn btn--outline btn--sm btn-logout-action"
-                    onClick={handleLogout}
-                    disabled={loggingOut}
-                  >
-                    <LogOut size={14} />
-                    <span>{loggingOut ? 'Signing out...' : 'Sign Out'}</span>
-                  </button>
                 </div>
               </div>
 
