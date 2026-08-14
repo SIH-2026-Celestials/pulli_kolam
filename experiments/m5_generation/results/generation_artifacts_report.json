@@ -1,0 +1,984 @@
+{
+  "target_n_valid": 20,
+  "max_attempts": 90,
+  "n_restarts_per_attempt": 10,
+  "n_attempts_used": 27,
+  "n_valid": 20,
+  "n_failed": 7,
+  "valid_rate_this_run": 0.7407407407407407,
+  "total_time_seconds": 728.2314727306366,
+  "motif_library_size": 29,
+  "motif_library_sources": [
+    [
+      "kolam19",
+      323
+    ],
+    [
+      "kolam19",
+      387
+    ],
+    [
+      "kolam29",
+      51
+    ],
+    [
+      "kolam19",
+      163
+    ],
+    [
+      "kolam19",
+      51
+    ]
+  ],
+  "n_test_layouts": 75,
+  "valid_records": [
+    {
+      "attempt": 1,
+      "seed": 900001,
+      "source_layout": "kolam19#387",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 148,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 15,
+        "latency_seconds": 20.30202078819275,
+        "seed": 900001
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_000_seed900001.svg"
+    },
+    {
+      "attempt": 2,
+      "seed": 900002,
+      "source_layout": "kolam29#51",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 198,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 63,
+        "latency_seconds": 58.29146409034729,
+        "seed": 900002
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_001_seed900002.svg"
+    },
+    {
+      "attempt": 3,
+      "seed": 900003,
+      "source_layout": "kolam19#163",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 141,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 5,
+        "latency_seconds": 10.047269582748413,
+        "seed": 900003
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_002_seed900003.svg"
+    },
+    {
+      "attempt": 4,
+      "seed": 900004,
+      "source_layout": "kolam19#51",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 144,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 16,
+        "latency_seconds": 13.454054594039917,
+        "seed": 900004
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_003_seed900004.svg"
+    },
+    {
+      "attempt": 6,
+      "seed": 900006,
+      "source_layout": "kolam19#109",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 148,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 17,
+        "latency_seconds": 11.967558860778809,
+        "seed": 900006
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_004_seed900006.svg"
+    },
+    {
+      "attempt": 8,
+      "seed": 900008,
+      "source_layout": "kolam19#370",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 150,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 9,
+        "latency_seconds": 18.283015966415405,
+        "seed": 900008
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_005_seed900008.svg"
+    },
+    {
+      "attempt": 9,
+      "seed": 900009,
+      "source_layout": "kolam19#95",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 148,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 15,
+        "latency_seconds": 15.407827854156494,
+        "seed": 900009
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_006_seed900009.svg"
+    },
+    {
+      "attempt": 10,
+      "seed": 900010,
+      "source_layout": "kolam19#333",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 2,
+        "total_correction_cost": 2,
+        "edge_multiplicity_max": 2,
+        "n_placements": 145,
+        "n_restarts_used": 2,
+        "repair_edges_applied": 0,
+        "latency_seconds": 2.0907626152038574,
+        "seed": 900010
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": false,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_007_seed900010.svg"
+    },
+    {
+      "attempt": 11,
+      "seed": 900011,
+      "source_layout": "kolam19#89",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 152,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 14,
+        "latency_seconds": 16.46030616760254,
+        "seed": 900011
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_008_seed900011.svg"
+    },
+    {
+      "attempt": 13,
+      "seed": 900013,
+      "source_layout": "kolam29#82",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 193,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 63,
+        "latency_seconds": 64.45142722129822,
+        "seed": 900013
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_009_seed900013.svg"
+    },
+    {
+      "attempt": 14,
+      "seed": 900014,
+      "source_layout": "kolam19#348",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 150,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 3,
+        "latency_seconds": 16.58499026298523,
+        "seed": 900014
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_010_seed900014.svg"
+    },
+    {
+      "attempt": 15,
+      "seed": 900015,
+      "source_layout": "kolam19#374",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 148,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 29,
+        "latency_seconds": 27.467560291290283,
+        "seed": 900015
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_011_seed900015.svg"
+    },
+    {
+      "attempt": 18,
+      "seed": 900018,
+      "source_layout": "kolam19#205",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 148,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 13,
+        "latency_seconds": 23.389713764190674,
+        "seed": 900018
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_012_seed900018.svg"
+    },
+    {
+      "attempt": 19,
+      "seed": 900019,
+      "source_layout": "kolam19#386",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 155,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 3,
+        "latency_seconds": 22.122856616973877,
+        "seed": 900019
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_013_seed900019.svg"
+    },
+    {
+      "attempt": 20,
+      "seed": 900020,
+      "source_layout": "kolam19#139",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 149,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 23,
+        "latency_seconds": 23.06534719467163,
+        "seed": 900020
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_014_seed900020.svg"
+    },
+    {
+      "attempt": 21,
+      "seed": 900021,
+      "source_layout": "kolam19#162",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 147,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 7,
+        "latency_seconds": 20.480905294418335,
+        "seed": 900021
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_015_seed900021.svg"
+    },
+    {
+      "attempt": 22,
+      "seed": 900022,
+      "source_layout": "kolam19#5",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 143,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 21,
+        "latency_seconds": 19.06969428062439,
+        "seed": 900022
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_016_seed900022.svg"
+    },
+    {
+      "attempt": 23,
+      "seed": 900023,
+      "source_layout": "kolam19#344",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 148,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 14,
+        "latency_seconds": 15.434125661849976,
+        "seed": 900023
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_017_seed900023.svg"
+    },
+    {
+      "attempt": 25,
+      "seed": 900025,
+      "source_layout": "kolam29#37",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 203,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 50,
+        "latency_seconds": 72.23448657989502,
+        "seed": 900025
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_018_seed900025.svg"
+    },
+    {
+      "attempt": 26,
+      "seed": 900026,
+      "source_layout": "kolam19#192",
+      "success": true,
+      "metrics": {
+        "connected_components": 1,
+        "n_nodes_outside_largest_component": 0,
+        "n_odd_degree_nodes": 0,
+        "total_correction_cost": 0,
+        "edge_multiplicity_max": 3,
+        "n_placements": 138,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 9,
+        "latency_seconds": 13.551250696182251,
+        "seed": 900026
+      },
+      "validity": {
+        "connected_components": 1,
+        "is_eulerian_circuit": true,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": true
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\valid\\valid_019_seed900026.svg"
+    }
+  ],
+  "failed_records_sample": [
+    {
+      "attempt": 0,
+      "seed": 900000,
+      "source_layout": "kolam19#323",
+      "success": false,
+      "metrics": {
+        "connected_components": 2,
+        "n_nodes_outside_largest_component": 1,
+        "n_odd_degree_nodes": 8,
+        "total_correction_cost": 17,
+        "edge_multiplicity_max": 2,
+        "n_placements": 149,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 0,
+        "latency_seconds": 24.353954315185547,
+        "seed": 900000
+      },
+      "validity": {
+        "connected_components": 2,
+        "is_eulerian_circuit": false,
+        "has_eulerian_path": false,
+        "largest_component_covers_all_nodes": false
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\failed\\failed_000_seed900000.svg"
+    },
+    {
+      "attempt": 5,
+      "seed": 900005,
+      "source_layout": "kolam19#236",
+      "success": false,
+      "metrics": {
+        "connected_components": 2,
+        "n_nodes_outside_largest_component": 4,
+        "n_odd_degree_nodes": 14,
+        "total_correction_cost": 20,
+        "edge_multiplicity_max": 2,
+        "n_placements": 146,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 0,
+        "latency_seconds": 13.149119138717651,
+        "seed": 900005
+      },
+      "validity": {
+        "connected_components": 2,
+        "is_eulerian_circuit": false,
+        "has_eulerian_path": false,
+        "largest_component_covers_all_nodes": false
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\failed\\failed_001_seed900005.svg"
+    },
+    {
+      "attempt": 7,
+      "seed": 900007,
+      "source_layout": "kolam29#47",
+      "success": false,
+      "metrics": {
+        "connected_components": 2,
+        "n_nodes_outside_largest_component": 1,
+        "n_odd_degree_nodes": 40,
+        "total_correction_cost": 68,
+        "edge_multiplicity_max": 2,
+        "n_placements": 200,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 0,
+        "latency_seconds": 89.4430639743805,
+        "seed": 900007
+      },
+      "validity": {
+        "connected_components": 2,
+        "is_eulerian_circuit": false,
+        "has_eulerian_path": false,
+        "largest_component_covers_all_nodes": false
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\failed\\failed_002_seed900007.svg"
+    },
+    {
+      "attempt": 12,
+      "seed": 900012,
+      "source_layout": "kolam19#191",
+      "success": false,
+      "metrics": {
+        "connected_components": 2,
+        "n_nodes_outside_largest_component": 56,
+        "n_odd_degree_nodes": 4,
+        "total_correction_cost": 2,
+        "edge_multiplicity_max": 2,
+        "n_placements": 154,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 0,
+        "latency_seconds": 11.857800960540771,
+        "seed": 900012
+      },
+      "validity": {
+        "connected_components": 2,
+        "is_eulerian_circuit": false,
+        "has_eulerian_path": false,
+        "largest_component_covers_all_nodes": false
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\failed\\failed_003_seed900012.svg"
+    },
+    {
+      "attempt": 16,
+      "seed": 900016,
+      "source_layout": "kolam19#339",
+      "success": false,
+      "metrics": {
+        "connected_components": 4,
+        "n_nodes_outside_largest_component": 3,
+        "n_odd_degree_nodes": 16,
+        "total_correction_cost": 25,
+        "edge_multiplicity_max": 2,
+        "n_placements": 145,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 0,
+        "latency_seconds": 18.858714818954468,
+        "seed": 900016
+      },
+      "validity": {
+        "connected_components": 4,
+        "is_eulerian_circuit": false,
+        "has_eulerian_path": false,
+        "largest_component_covers_all_nodes": false
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\failed\\failed_004_seed900016.svg"
+    },
+    {
+      "attempt": 17,
+      "seed": 900017,
+      "source_layout": "kolam19#262",
+      "success": false,
+      "metrics": {
+        "connected_components": 2,
+        "n_nodes_outside_largest_component": 1,
+        "n_odd_degree_nodes": 14,
+        "total_correction_cost": 11,
+        "edge_multiplicity_max": 2,
+        "n_placements": 148,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 0,
+        "latency_seconds": 26.811703205108643,
+        "seed": 900017
+      },
+      "validity": {
+        "connected_components": 2,
+        "is_eulerian_circuit": false,
+        "has_eulerian_path": false,
+        "largest_component_covers_all_nodes": false
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\failed\\failed_005_seed900017.svg"
+    },
+    {
+      "attempt": 24,
+      "seed": 900024,
+      "source_layout": "kolam19#243",
+      "success": false,
+      "metrics": {
+        "connected_components": 2,
+        "n_nodes_outside_largest_component": 11,
+        "n_odd_degree_nodes": 12,
+        "total_correction_cost": 18,
+        "edge_multiplicity_max": 2,
+        "n_placements": 153,
+        "n_restarts_used": 10,
+        "repair_edges_applied": 0,
+        "latency_seconds": 21.15316653251648,
+        "seed": 900024
+      },
+      "validity": {
+        "connected_components": 2,
+        "is_eulerian_circuit": false,
+        "has_eulerian_path": false,
+        "largest_component_covers_all_nodes": false
+      },
+      "novelty": {
+        "n_candidates": 1,
+        "n_unique_fingerprints": 1,
+        "unique_rate": 1.0,
+        "exact_topological_duplicate_rate": 0.0,
+        "exact_coordinate_duplicate_rate": 0.0,
+        "near_duplicate_rate": 0.0,
+        "near_duplicate_threshold": 0.9,
+        "n_coordinate_comparable_pairs": 1
+      },
+      "svg_path": "C:\\Users\\chauh\\OneDrive\\Desktop\\PULLI\\experiments\\m5_generation\\artifacts\\failed\\failed_006_seed900024.svg"
+    }
+  ],
+  "n_failed_total": 7
+}

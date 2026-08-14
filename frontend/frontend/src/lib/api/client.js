@@ -18,9 +18,9 @@ function apiError(kind, message, status, code) {
  * @param {RequestInit} options
  * @returns {Promise<{data: any, error: null} | {data: null, error: import('./types').ApiError}>}
  */
-async function request(path, options = {}) {
+async function request(path, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const res = await fetch(`${API_BASE}${path}`, { ...options, signal: controller.signal });
@@ -119,4 +119,25 @@ export function compareDetectors(imageFile) {
   const form = new FormData();
   form.append('image', imageFile);
   return request('/api/v1/compare-detectors', { method: 'POST', body: form });
+}
+
+// Generation runs a real multi-restart structural search per candidate
+// (engine.learned_generation) -- observed latency is ~10-55s PER
+// CANDIDATE, not a fast lookup, so this needs a much longer client
+// timeout than the 30s default every other (near-instant) endpoint uses.
+const GENERATE_TIMEOUT_MS = 240000;
+
+/**
+ * M5: learned-scorer-guided structural generation. `seed` omitted lets
+ * the backend pick a random seed (returned in the response, reusable
+ * for a reproducible re-generation); `count` bounds how many candidates
+ * come back in one call (server-enforced cap, see api/main.py).
+ * @param {{seed?: number, count?: number}} [options]
+ */
+export function generate(options = {}) {
+  return request(
+    '/api/v1/generate',
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(options) },
+    GENERATE_TIMEOUT_MS
+  );
 }

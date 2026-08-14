@@ -71,6 +71,8 @@ const kn = {
     complexity: 'ಸಂಕೀರ್ಣತೆ',
     strokeVal: 'ಏಕ ನಿರಂತರ',
     complexityVal: 'ಮಧ್ಯಮ',
+    generating: 'ರಚಿಸಲಾಗುತ್ತಿದೆ…',
+    errorPrefix: 'ಜನರೇಶನ್ ವಿಫಲವಾಗಿದೆ:',
   },
   multilingual: {
     title: 'ಬಹುಭಾಷಾ ಬೆಂಬಲ',

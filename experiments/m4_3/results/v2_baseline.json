@@ -1,0 +1,174 @@
+{
+  "phase": "0 -- V2 baseline freeze",
+  "v2_checkpoint_path": "experiments\\m4_2\\results\\dot_heatmap_net_v2.pt",
+  "v2_checkpoint_sha256": "9da73c87abb4a85c2255140b31569e3ab0930f79552ca34876276d0ea005b7f5",
+  "v2_config": {
+    "model": "DotHeatmapNetV2",
+    "model_input_size": 256,
+    "output_stride": 2,
+    "heatmap_size": 128,
+    "sigma_cells": 1.2,
+    "confidence_threshold": 0.6,
+    "min_peak_distance_heatmap_cells": 2.0,
+    "model_version": "m4.2-128",
+    "training_data": "experiments/m4_2/data (135 patterns, kolam19+kolam29, kolam109 excluded)"
+  },
+  "synthetic_test_from_evaluate_m4_2_json": {
+    "classical": {
+      "n_images": 60,
+      "mean_recall": 0.1998249299719888,
+      "mean_precision": 0.9997757847533632,
+      "mean_f1": 0.19979913599875412,
+      "mean_localization_error_px": 0.7718029645669575,
+      "mean_latency_ms": 19.123056666285265
+    },
+    "ml": {
+      "n_images": 60,
+      "mean_recall": 0.9978662633263756,
+      "mean_precision": 0.9985115669315001,
+      "mean_f1": 0.9981842908375141,
+      "mean_localization_error_px": 2.7433869253692267,
+      "mean_latency_ms": 125.1663400005782
+    }
+  },
+  "synthetic_val_from_evaluate_m4_2_json": {
+    "classical": {
+      "n_images": 45,
+      "mean_recall": 0.1084303017957189,
+      "mean_precision": 0.9961469710540516,
+      "mean_f1": 0.11141466727570594,
+      "mean_localization_error_px": 1.1117501589842622,
+      "mean_latency_ms": 19.019577784153324
+    },
+    "ml": {
+      "n_images": 45,
+      "mean_recall": 0.9990418095612902,
+      "mean_precision": 0.999521154546368,
+      "mean_f1": 0.9992803867088917,
+      "mean_localization_error_px": 2.7308312577169223,
+      "mean_latency_ms": 132.32102666709883
+    }
+  },
+  "real_no_dot_fp_rate_from_evaluate_m4_2_json": {
+    "n_images": 18,
+    "classical_fp_rate": 0.3333333333333333,
+    "ml_fp_rate": 1.0
+  },
+  "real_in_scope_detection_counts_from_evaluate_m4_2_json": {
+    "classical": [
+      {
+        "file": "kolam2_tshrinivasan.jpg",
+        "n_detected": 1,
+        "latency_ms": 99.08240000368096
+      },
+      {
+        "file": "kolam_attur1_infofarmer.jpg",
+        "n_detected": 12,
+        "latency_ms": 255.06910000694916
+      },
+      {
+        "file": "kolam_naduveetu_meenakshisundaram.jpg",
+        "n_detected": 0,
+        "latency_ms": 262.9853000107687
+      },
+      {
+        "file": "muggu_kollam_sirensongs.jpg",
+        "n_detected": 4,
+        "latency_ms": 114.42460000398569
+      }
+    ],
+    "ml": [
+      {
+        "file": "kolam2_tshrinivasan.jpg",
+        "n_detected": 58,
+        "latency_ms": 102.26580000016838
+      },
+      {
+        "file": "kolam_attur1_infofarmer.jpg",
+        "n_detected": 297,
+        "latency_ms": 174.153900006786
+      },
+      {
+        "file": "kolam_naduveetu_meenakshisundaram.jpg",
+        "n_detected": 563,
+        "latency_ms": 160.2816999948118
+      },
+      {
+        "file": "muggu_kollam_sirensongs.jpg",
+        "n_detected": 151,
+        "latency_ms": 127.16729997191578
+      }
+    ]
+  },
+  "structural_metrics": {
+    "synthetic_test": {
+      "per_image_n": 60,
+      "aggregate": {
+        "n_images": 60,
+        "mean_n_dots": 258.28333333333336,
+        "mean_connected_components": 5.266666666666667,
+        "mean_odd_degree_nodes": 54.833333333333336,
+        "mean_edges": 421.35,
+        "n_reconstruction_valid": 10,
+        "reconstruction_valid_rate": 0.16666666666666666,
+        "mean_latency_ms": 101.61129166657095
+      }
+    },
+    "real_in_scope_prediction_only": {
+      "kolam2_tshrinivasan.jpg": {
+        "n_dots": 58,
+        "trace_path_crashed": false,
+        "n_edges": 266,
+        "connected_components": 16,
+        "is_eulerian_circuit": false,
+        "has_eulerian_path": false,
+        "largest_component_covers_all_nodes": false,
+        "n_odd_degree_nodes": 22,
+        "reconstruction_valid": false,
+        "latency_ms": 94.94550000090385,
+        "detector_crashed": false
+      },
+      "kolam_attur1_infofarmer.jpg": {
+        "n_dots": 297,
+        "trace_path_crashed": false,
+        "n_edges": 107,
+        "connected_components": 236,
+        "is_eulerian_circuit": false,
+        "has_eulerian_path": true,
+        "largest_component_covers_all_nodes": false,
+        "n_odd_degree_nodes": 2,
+        "reconstruction_valid": false,
+        "latency_ms": 157.18500000002678,
+        "detector_crashed": false
+      },
+      "kolam_naduveetu_meenakshisundaram.jpg": {
+        "n_dots": 563,
+        "trace_path_crashed": false,
+        "n_edges": 11700,
+        "connected_components": 226,
+        "is_eulerian_circuit": false,
+        "has_eulerian_path": false,
+        "largest_component_covers_all_nodes": false,
+        "n_odd_degree_nodes": 120,
+        "reconstruction_valid": false,
+        "latency_ms": 126.13670000064303,
+        "detector_crashed": false
+      },
+      "muggu_kollam_sirensongs.jpg": {
+        "n_dots": 151,
+        "trace_path_crashed": false,
+        "n_edges": 1523,
+        "connected_components": 30,
+        "is_eulerian_circuit": false,
+        "has_eulerian_path": false,
+        "largest_component_covers_all_nodes": false,
+        "n_odd_degree_nodes": 56,
+        "reconstruction_valid": false,
+        "latency_ms": 86.97279999978491,
+        "detector_crashed": false
+      }
+    },
+    "note": "real_in_scope_prediction_only has NO ground-truth graph -- these are the graph/reconstruction properties of V2's OWN predicted dot lattice, not a verified match to the true kolam. Never compare to a fabricated GT."
+  },
+  "note": "V2 checkpoint and experiments/m4_2/data/ were not modified by this script -- read-only load + inference only."
+}

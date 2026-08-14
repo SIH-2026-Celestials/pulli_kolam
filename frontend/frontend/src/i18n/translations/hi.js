@@ -71,6 +71,8 @@ const hi = {
     complexity: 'जटिलता',
     strokeVal: 'एकल सतत',
     complexityVal: 'मध्यम',
+    generating: 'जनरेट हो रहा है…',
+    errorPrefix: 'जनरेशन विफल:',
   },
   multilingual: {
     title: 'बहुभाषी समर्थन',

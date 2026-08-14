@@ -4,9 +4,9 @@
  * of the page component.
  */
 
-import { detect, analyze, reconstruct, compareDetectors, getHealth, getModelInfo } from './client';
+import { detect, analyze, reconstruct, compareDetectors, generate, getHealth, getModelInfo } from './client';
 
-export { detect, analyze, reconstruct, compareDetectors, getHealth, getModelInfo };
+export { detect, analyze, reconstruct, compareDetectors, generate, getHealth, getModelInfo };
 
 const MATCH_TOLERANCE_PX = 6.0;
 

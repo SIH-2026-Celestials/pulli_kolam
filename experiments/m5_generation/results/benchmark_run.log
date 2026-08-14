@@ -1,0 +1,19 @@
+motif library size: 29 (from [('kolam19', 323), ('kolam19', 387), ('kolam29', 51), ('kolam19', 163), ('kolam19', 51)])
+10/500 generated, 6 valid so far, elapsed 103.0s
+20/500 generated, 13 valid so far, elapsed 177.1s
+30/500 generated, 19 valid so far, elapsed 261.4s
+40/500 generated, 26 valid so far, elapsed 357.1s
+50/500 generated, 35 valid so far, elapsed 478.0s
+60/500 generated, 41 valid so far, elapsed 580.1s
+70/500 generated, 50 valid so far, elapsed 741.3s
+80/500 generated, 56 valid so far, elapsed 867.6s
+90/500 generated, 64 valid so far, elapsed 963.8s
+100/500 generated, 71 valid so far, elapsed 1027.3s
+110/500 generated, 77 valid so far, elapsed 1129.2s
+120/500 generated, 85 valid so far, elapsed 1256.7s
+130/500 generated, 91 valid so far, elapsed 1358.2s
+140/500 generated, 99 valid so far, elapsed 1499.3s
+150/500 generated, 106 valid so far, elapsed 1637.1s
+160/500 generated, 113 valid so far, elapsed 1741.2s
+170/500 generated, 121 valid so far, elapsed 1819.4s
+180/500 generated, 128 valid so far, elapsed 1906.6s

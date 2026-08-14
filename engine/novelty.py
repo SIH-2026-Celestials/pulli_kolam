@@ -197,3 +197,82 @@ def novelty_report(
         "near_duplicate_threshold": near_duplicate_threshold,
         "n_coordinate_comparable_pairs": n_comparable_pairs,
     }
+
+
+def _candidate_validity_score(candidate: "GeneratedKolam") -> float:
+    """Continuous partial-credit companion to the boolean `is_valid` gate
+    (engine.validity's own check_validity/is_valid_single_stroke stay the
+    strict pass/fail authority -- this never replaces them). 1.0 for a
+    fully valid candidate; otherwise a heuristic score in [0, 1) that
+    decreases with how far diagnose_validity's own graded diagnosis says
+    the candidate is from validity (more stranded nodes / odd-degree
+    nodes / correction cost = lower score). This is explicitly a
+    heuristic, not a probability or a certified distance -- documented as
+    such so it is never mistaken for a formal metric."""
+    if candidate.is_valid:
+        return 1.0
+    d = candidate.diagnosis
+    penalty = d["n_nodes_outside_largest_component"] + d["n_odd_degree_nodes"] + d["total_correction_cost"]
+    return 1.0 / (1.0 + penalty)
+
+
+def per_candidate_novelty(
+    candidates: "list[GeneratedKolam]",
+    sources: "list[KolamPattern]",
+    source_ids: "list[str] | None" = None,
+    candidate_ids: "list[str] | None" = None,
+) -> "list[dict]":
+    """Per-candidate novelty/validity report (OBJECTIVE 3's explicit
+    output shape: source_id, candidate_id, novelty_score, validity_score
+    -- one row per candidate, not just a batch aggregate like
+    novelty_report above).
+
+    novelty_score in [0, 1], computed WITHOUT fabricating a continuous
+    graph-edit-distance (expensive and not implemented here honestly):
+      - if the candidate shares a source's exact dot layout, novelty_score
+        = 1 - coordinate_similarity against the MOST similar such source
+        (a real, exact computation -- see coordinate_similarity).
+      - otherwise (no layout-comparable source), novelty_score is 1.0
+        unless the candidate's D4/translation-canonical graph_fingerprint
+        EXACTLY matches some source's fingerprint (a real structural
+        duplicate up to symmetry), in which case it is 0.0. This is a
+        coarser, honestly-labeled signal for the layout-incomparable
+        case -- not a continuous edit-distance.
+
+    `nearest_source_id` is the source that produced novelty_score (via
+    whichever branch applied), or None if no source was comparable at
+    all (e.g. `sources` is empty).
+    """
+    source_ids = source_ids or [f"{s.collection}#{s.pattern_id}" for s in sources]
+    candidate_ids = candidate_ids or [str(i) for i in range(len(candidates))]
+    source_fingerprints = [(sid, graph_fingerprint(s.graph)) for sid, s in zip(source_ids, sources)]
+
+    rows = []
+    for cid, c in zip(candidate_ids, candidates):
+        best_sim, best_sim_source = None, None
+        for sid, s in zip(source_ids, sources):
+            sim = coordinate_similarity(c.graph, s)
+            if sim is None:
+                continue
+            if best_sim is None or sim > best_sim:
+                best_sim, best_sim_source = sim, sid
+
+        if best_sim is not None:
+            novelty_score = 1.0 - best_sim
+            nearest_source_id = best_sim_source
+        else:
+            fp = graph_fingerprint(c.graph)
+            match = next((sid for sid, sfp in source_fingerprints if sfp == fp and fp != ()), None)
+            novelty_score = 0.0 if match is not None else 1.0
+            nearest_source_id = match
+
+        rows.append(
+            {
+                "candidate_id": cid,
+                "source_id": nearest_source_id,
+                "novelty_score": novelty_score,
+                "validity_score": _candidate_validity_score(c),
+                "is_valid": c.is_valid,
+            }
+        )
+    return rows

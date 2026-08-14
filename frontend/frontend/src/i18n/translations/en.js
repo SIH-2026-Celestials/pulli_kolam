@@ -71,6 +71,8 @@ const en = {
     complexity: 'Complexity',
     strokeVal: 'Single Continuous',
     complexityVal: 'Medium',
+    generating: 'Generating…',
+    errorPrefix: 'Generation failed:',
   },
   multilingual: {
     title: 'Multilingual Support',

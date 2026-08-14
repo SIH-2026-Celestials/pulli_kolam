@@ -71,6 +71,8 @@ const te = {
     complexity: 'సంక్లిష్టత',
     strokeVal: 'ఒకే నిరంతర',
     complexityVal: 'మధ్యస్థం',
+    generating: 'జనరేట్ అవుతోంది…',
+    errorPrefix: 'జనరేషన్ విఫలమైంది:',
   },
   multilingual: {
     title: 'బహుభాషా మద్దతు',

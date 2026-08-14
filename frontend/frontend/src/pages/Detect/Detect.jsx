@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { detect, analyze, reconstruct, compareDetectors, getModelInfo } from '../../lib/api/kolam'
 import { categorizeCompareDots } from '../../lib/api/kolam'
+import AnalysisPipeline from '../../components/AnalysisPipeline/AnalysisPipeline'
+import GeneratedVariations from '../../components/GeneratedVariations/GeneratedVariations'
 import './Detect.css'
 
 const MODES = [
@@ -28,6 +30,9 @@ export default function Detect() {
   // not merely whether this frontend code exists.
   const [modelStatus, setModelStatus] = useState('loading')
   const [modelInfo, setModelInfo] = useState(null)
+  // Same simulated pipeline-progress animation Home.jsx uses to drive
+  // AnalysisPipeline's progress bar.
+  const [pipelineProgress, setPipelineProgress] = useState(56)
 
   useEffect(() => {
     let cancelled = false
@@ -54,6 +59,18 @@ export default function Detect() {
     setStatus('idle')
     setStage(null)
     setErrorMsg(null)
+
+    // Same simulated progress animation as Home.jsx's handleUploadImage.
+    setPipelineProgress(10)
+    let current = 10
+    const interval = setInterval(() => {
+      current += 15
+      if (current >= 100) {
+        current = 100
+        clearInterval(interval)
+      }
+      setPipelineProgress(current)
+    }, 400)
   }, [])
 
   const onDrop = useCallback((e) => {
@@ -143,6 +160,17 @@ export default function Detect() {
           </p>
         </div>
       </header>
+
+      {previewUrl && (
+        <section className="main-content-section detect-pipeline-section">
+          <div className="main-content-container">
+            <div className="main-content-grid">
+              <AnalysisPipeline customImage={previewUrl} progress={pipelineProgress} />
+              <GeneratedVariations />
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="container--narrow section detect-body-section">
         <div className="detect-grid">
