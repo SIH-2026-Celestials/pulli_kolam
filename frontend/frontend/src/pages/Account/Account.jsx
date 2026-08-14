@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate, useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import {
   User,
   Mail,
@@ -21,12 +21,10 @@ import {
   Check
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { useLanguage } from '../../context/LanguageContext'
 import RecentKolams from '../../components/RecentKolams/RecentKolams'
 import './Account.css'
 
 export default function Account() {
-  const { t } = useLanguage()
   const { status, user, logout, recentKolams } = useAuth()
   const navigate = useNavigate()
   const [loggingOut, setLoggingOut] = useState(false)
