@@ -13,3 +13,17 @@ python-multipart==0.0.26
 sqlalchemy
 bcrypt
 python-dotenv
+
+# Postgres driver for DATABASE_URL=postgresql+psycopg2://... in
+# production (api/db/database.py, api/auth/db.py). Binary wheel --
+# no local libpq/build toolchain required. SQLite (local dev default)
+# needs no driver -- it's in the Python standard library.
+psycopg2-binary==2.9.10
+
+# Schema migrations (api/db/models.py) -- see alembic/README.md.
+alembic==1.14.0
+
+# S3-compatible client for Cloudflare R2 (api/object_storage/r2.py).
+# Only imported/instantiated when STORAGE_BACKEND=r2; local dev
+# (STORAGE_BACKEND=local, the default) never touches this.
+boto3==1.35.74

@@ -17,6 +17,21 @@ class HealthResponse(BaseModel):
     # ml-gated wraps the SAME checkpoint as ml (see api/detectors.py's
     # GatedMLDetector) -- availability tracks the same checkpoint file.
     gated_detector_available: bool = False
+    # Phase 9 hardening (observability): every field below is a REAL,
+    # live-checked value at request time -- never hardcoded "true".
+    # generation_service_available reflects M5's actual lazy-singleton
+    # load state (api/generation_service.py); database_connected runs a
+    # trivial real query against api/db/database.py's session factory;
+    # artifact_storage_available checks the LocalArtifactStore's root
+    # directory is writable. Any of these can independently be False
+    # while `status` stays "ok" -- `status` reflects only "the process
+    # is up and answering", not "every subsystem is healthy"; a caller
+    # that needs subsystem-level health must read these fields, not
+    # just `status`.
+    generation_service_available: bool = False
+    generation_service_error: Optional[str] = None
+    database_connected: bool = False
+    artifact_storage_available: bool = False
 
 
 class ModelInfoResponse(BaseModel):

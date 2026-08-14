@@ -43,6 +43,12 @@
 !/docs/DEPLOYMENT_AUDIT.md
 !/docs/DEPLOYMENT.md
 
+# Product-hardening audit deliverables -- institutional memory, not
+# scratch notes (referenced directly from the audit task itself).
+!/PRODUCTION_READINESS.md
+!/FUTURE_ML_WORK.md
+!/PRODUCTION_DEPLOYMENT_READINESS.md
+
 # M5.1 evidence-driven analysis (real-data structural distributions,
 # benchmark failure-mode breakdown, counterfactual repair-strategy
 # experiment) and the resulting constraint spec -- institutional
@@ -78,6 +84,8 @@ frontend/frontend/dist/
 .env
 *.db
 *.db-journal
+*.db-wal
+*.db-shm
 
 # Raw dataset archive (redundant with extracted kolam_data/)
 one-stroke-dotted-pulli-kolam.zip

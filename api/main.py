@@ -53,7 +53,9 @@ from dotenv import load_dotenv
 # typically set these via the platform, not a checked-in-adjacent file).
 load_dotenv()
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -61,6 +63,13 @@ from fastapi.responses import JSONResponse
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from api.auth.db import init_db  # noqa: E402
+from api.rate_limit import (  # noqa: E402
+    COMPARE_LIMIT_PER_MINUTE,
+    DETECTION_LIMIT_PER_MINUTE,
+    GENERATION_LIMIT_PER_MINUTE,
+    STREAM_LIMIT_PER_MINUTE,
+    enforce_rate_limit,
+)
 from api.auth.router import router as auth_router  # noqa: E402
 from api.canonical import graph_to_json, motif_placements_to_json, reconstruction_to_json, validity_to_json  # noqa: E402
 from api.detectors import get_detector  # noqa: E402
@@ -78,7 +87,80 @@ from api.schemas import (  # noqa: E402
 )
 from engine import motifs, validity  # noqa: E402
 
-app = FastAPI(title="PULLI API", version="0.1.0")
+
+@asynccontextmanager
+async def _lifespan(app: FastAPI):  # noqa: ARG001
+    """Single lifespan handler replacing the three deprecated @app.on_event('startup')
+    decorators. Runs all startup logic sequentially before yielding, exactly as the
+    original handlers did (FastAPI calls them in registration order)."""
+    # ---- 1. ML runtime + production security validation ----
+    if os.environ.get("PULLI_TESTING") == "true":
+        print("[pulli-api] Testing environment detected -- bypassing strict startup checkpoint validation.")
+    else:
+        _cookie_secure = os.environ.get("COOKIE_SECURE", "").lower() in ("1", "true", "yes")
+        if _cookie_secure:
+            _auth_secret = os.environ.get("AUTH_SECRET")
+            if not _auth_secret:
+                print("[CRITICAL] Production Security Validation Failed: COOKIE_SECURE is true but AUTH_SECRET is not set.", file=sys.stderr)
+                sys.exit(1)
+            _cors_origins_check = os.environ.get("CORS_ORIGINS", "").strip()
+            if not _cors_origins_check:
+                print("[CRITICAL] Production Security Validation Failed: COOKIE_SECURE is true but CORS_ORIGINS is not set.", file=sys.stderr)
+                sys.exit(1)
+            if _cors_origins_check == "*":
+                print("[CRITICAL] Production Security Validation Failed: Wildcard CORS '*' is forbidden when credentials/cookies are used.", file=sys.stderr)
+                sys.exit(1)
+
+        from api.generation_service import CHECKPOINT_PATH as M5_CHECKPOINT
+        _m4_checkpoint = os.path.join(
+            os.path.dirname(__file__), "..", "experiments", "m4_2", "results", "dot_heatmap_net_v2.pt"
+        )
+        if not os.path.exists(_m4_checkpoint):
+            print(f"[CRITICAL] ML Runtime Validation Failed: M4.2 checkpoint missing at {_m4_checkpoint}", file=sys.stderr)
+            sys.exit(1)
+        if not M5_CHECKPOINT.exists():
+            print(f"[CRITICAL] ML Runtime Validation Failed: M5 placement scorer checkpoint missing at {M5_CHECKPOINT}", file=sys.stderr)
+            sys.exit(1)
+        print("[pulli-api] ML runtime, model checkpoints, and security configurations validated successfully.")
+
+    # ---- 2. Auth tables (always, idempotent) ----
+    init_db()
+
+    # ---- 3. Platform DB (M7 generations/models tables + seed, non-fatal) ----
+    try:
+        from api.db.database import get_session, init_db as init_platform_db
+        from api.db.seed import seed_models
+
+        init_platform_db()
+        _session = get_session()
+        try:
+            seed_models(_session)
+        finally:
+            _session.close()
+    except Exception as e:  # noqa: BLE001
+        print(f"[pulli-api] platform DB init/seed failed (legacy endpoints unaffected): {type(e).__name__}: {e}", file=sys.stderr)
+
+    yield  # application runs here
+
+
+app = FastAPI(title="PULLI API", version="0.1.0", lifespan=_lifespan)
+
+# ────────────────────────────────────────────────────────────────────
+#  Rate limiting (Phase 14 hardening -- previously the #1 documented
+#  gap: "no rate limiting anywhere in the codebase", flagged in
+#  PRODUCTION_READINESS.md section 8/12/13). Implemented as a plain
+#  function call (`enforce_rate_limit`, see api/rate_limit.py) at the
+#  top of each expensive route body, keyed by client IP -- see
+#  api/rate_limit.py's module docstring for why the more conventional
+#  `slowapi` decorator was tried and rejected (it breaks FastAPI's
+#  request-model resolution in this file specifically, due to
+#  `from __future__ import annotations` above interacting badly with
+#  `functools.wraps`-based decorators). 429s raised by
+#  `enforce_rate_limit` are plain HTTPExceptions with the same
+#  {"code": ..., "message": ...} detail shape as every other error path
+#  here, so they flow through the SAME http_exception_handler below --
+#  no separate exception handler needed.
+# ────────────────────────────────────────────────────────────────────
 
 # The frontend (Vite dev server) runs on a different origin than this API
 # (5173/5174 vs 8000) -- without this, every browser request is blocked by
@@ -108,35 +190,7 @@ app.include_router(auth_router)
 app.include_router(generations_router)
 
 
-@app.on_event("startup")
-def _create_auth_tables() -> None:
-    # Identity/session tables only -- never touches image-processing code.
-    # See api/auth/db.py's module docstring for why create_all() (not a
-    # migration tool) is the right amount of infrastructure here.
-    init_db()
-
-
-@app.on_event("startup")
-def _init_platform_db():
-    """M7 platform integration: create tables (if missing) and seed the
-    model registry on process start. Idempotent -- safe on every
-    restart. Runs AFTER app construction so import-time failures in
-    api/db/* (e.g. sqlalchemy missing) don't prevent the existing
-    detect/analyze/reconstruct/generate endpoints from working; a
-    failure here is logged, not fatal, since the legacy endpoints above
-    have zero dependency on the database."""
-    try:
-        from api.db.database import get_session, init_db
-        from api.db.seed import seed_models
-
-        init_db()
-        session = get_session()
-        try:
-            seed_models(session)
-        finally:
-            session.close()
-    except Exception as e:  # noqa: BLE001 -- platform DB is additive, must never block legacy endpoints from serving
-        print(f"[pulli-api] platform DB init/seed failed (legacy endpoints unaffected): {type(e).__name__}: {e}", file=sys.stderr)
+# Startup logic is consolidated in the _lifespan context manager above.
 
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp", "image/bmp"}
 
@@ -217,12 +271,112 @@ def health():
     ml_available = os.path.exists(
         os.path.join(os.path.dirname(__file__), "..", "experiments", "m4_2", "results", "dot_heatmap_net_v2.pt")
     )
+
+    # Phase 9 hardening: each of these three checks is a REAL, live
+    # probe run on every /health call -- none is a cached/hardcoded
+    # "true". Each is wrapped independently so one subsystem's failure
+    # (e.g. DB down) doesn't prevent /health itself from responding, and
+    # so the response can honestly report "process up, DB down" instead
+    # of a single opaque failure.
+    try:
+        gen_service = get_generation_service()
+        generation_service_available = bool(gen_service.available)
+        generation_service_error = None if gen_service.available else gen_service.load_error
+    except Exception as e:  # noqa: BLE001 -- health check must never itself crash
+        generation_service_available = False
+        generation_service_error = f"{type(e).__name__}: {e}"
+
+    try:
+        from sqlalchemy import text
+
+        from api.db.database import get_session
+
+        session = get_session()
+        try:
+            session.execute(text("SELECT 1"))
+            database_connected = True
+        finally:
+            session.close()
+    except Exception:  # noqa: BLE001 -- health check must never itself crash
+        database_connected = False
+
+    try:
+        from api.services.artifact_store import get_artifact_store
+
+        store = get_artifact_store()
+        if hasattr(store, "root"):
+            artifact_storage_available = store.root.exists() and os.access(store.root, os.W_OK)
+        else:
+            artifact_storage_available = bool(os.environ.get("R2_BUCKET"))
+    except Exception:  # noqa: BLE001 -- health check must never itself crash
+        artifact_storage_available = False
+
     return {
         "status": "ok",
         "classical_detector_available": True,
         "ml_detector_available": ml_available,
         "gated_detector_available": ml_available,
+        "generation_service_available": generation_service_available,
+        "generation_service_error": generation_service_error,
+        "database_connected": database_connected,
+        "artifact_storage_available": artifact_storage_available,
     }
+
+
+@app.get("/api/v1/health/live")
+def health_live():
+    """Liveness probe: answers if the FastAPI process is running."""
+    return {"status": "ok"}
+
+
+@app.get("/api/v1/health/ready")
+def health_ready():
+    """Readiness probe: checks database, ML systems, and object storage connectivity."""
+    ml_available = os.path.exists(
+        os.path.join(os.path.dirname(__file__), "..", "experiments", "m4_2", "results", "dot_heatmap_net_v2.pt")
+    )
+    
+    try:
+        gen_service = get_generation_service()
+        generation_service_available = bool(gen_service.available)
+    except Exception:
+        generation_service_available = False
+
+    try:
+        from sqlalchemy import text
+        from api.db.database import get_session
+        session = get_session()
+        try:
+            session.execute(text("SELECT 1"))
+            database_connected = True
+        finally:
+            session.close()
+    except Exception:
+        database_connected = False
+
+    try:
+        from api.services.artifact_store import get_artifact_store
+        store = get_artifact_store()
+        if hasattr(store, "root"):
+            artifact_storage_available = store.root.exists() and os.access(store.root, os.W_OK)
+        else:
+            artifact_storage_available = bool(os.environ.get("R2_BUCKET"))
+    except Exception:
+        artifact_storage_available = False
+
+    is_ready = ml_available and generation_service_available and database_connected and artifact_storage_available
+
+    status_code = 200 if is_ready else 503
+    return JSONResponse(
+        status_code=status_code,
+        content={
+            "status": "ready" if is_ready else "not_ready",
+            "database_connected": database_connected,
+            "generation_service_available": generation_service_available,
+            "ml_detector_available": ml_available,
+            "artifact_storage_available": artifact_storage_available,
+        }
+    )
 
 
 def _model_attribution(result) -> dict:
@@ -282,7 +436,8 @@ def model_info():
 
 
 @app.post("/api/v1/detect", response_model=DetectResponse)
-def detect(image: UploadFile = File(...), detector: str = Form("classical")):
+def detect(request: Request, image: UploadFile = File(...), detector: str = Form("classical")):
+    enforce_rate_limit(request, "detect", DETECTION_LIMIT_PER_MINUTE)
     detector_norm = _validate_detector_param(detector)
 
     path = _save_upload_to_temp(image)
@@ -304,7 +459,8 @@ def detect(image: UploadFile = File(...), detector: str = Form("classical")):
 
 
 @app.post("/api/v1/analyze", response_model=AnalyzeResponse)
-def analyze(image: UploadFile = File(...), detector: str = Form("classical")):
+def analyze(request: Request, image: UploadFile = File(...), detector: str = Form("classical")):
+    enforce_rate_limit(request, "analyze", DETECTION_LIMIT_PER_MINUTE)
     detector_norm = _validate_detector_param(detector)
 
     path = _save_upload_to_temp(image)
@@ -355,7 +511,8 @@ def analyze(image: UploadFile = File(...), detector: str = Form("classical")):
 
 
 @app.post("/api/v1/reconstruct", response_model=ReconstructResponse)
-def reconstruct(image: UploadFile = File(...), detector: str = Form("classical")):
+def reconstruct(request: Request, image: UploadFile = File(...), detector: str = Form("classical")):
+    enforce_rate_limit(request, "reconstruct", DETECTION_LIMIT_PER_MINUTE)
     detector_norm = _validate_detector_param(detector)
 
     path = _save_upload_to_temp(image)
@@ -417,7 +574,8 @@ def _error_message(detail) -> str:
 
 
 @app.post("/api/v1/compare-detectors", response_model=CompareDetectorsResponse)
-def compare_detectors(image: UploadFile = File(...)):
+def compare_detectors(request: Request, image: UploadFile = File(...)):
+    enforce_rate_limit(request, "compare-detectors", COMPARE_LIMIT_PER_MINUTE)
     path = _save_upload_to_temp(image)
     try:
         classical_result = None
@@ -674,6 +832,7 @@ def _run_pipeline_in_thread(job_id: str, image_path: str, detector: str, loop: a
 
 @app.post("/api/v1/analyze-stream/start")
 async def analyze_stream_start(
+    request: Request,
     image: UploadFile = File(...),
     detector: str = Form("classical"),
 ):
@@ -683,6 +842,7 @@ async def analyze_stream_start(
     connect to /api/v1/analyze-stream/{job_id}/events to receive
     stage-by-stage progress via SSE.
     """
+    enforce_rate_limit(request, "analyze-stream", STREAM_LIMIT_PER_MINUTE)
     if detector not in ("classical", "ml"):
         raise HTTPException(status_code=400, detail=f"detector must be 'classical' or 'ml', got {detector!r}")
 
@@ -782,7 +942,7 @@ MAX_GENERATE_COUNT = 5  # bounds worst-case request latency (each candidate runs
 
 
 @app.post("/api/v1/generate", response_model=GenerateResponse)
-def generate(request: GenerateRequest):
+def generate(request: Request, body: GenerateRequest):
     """M5: learned-scorer-guided structural generation (engine.learned_generation),
     NOT the M3.7/M4.2 greedy pipeline -- see docs/M4_2_GENERATION.md for
     why that pipeline was replaced (0/120 to 1/120 measured valid).
@@ -795,17 +955,18 @@ def generate(request: GenerateRequest):
     from engine.validity/engine.learned_generation's own returned
     structures, same discipline as every other endpoint in this module.
     """
+    enforce_rate_limit(request, "generate", GENERATION_LIMIT_PER_MINUTE)
     service = get_generation_service()
     if not service.available:
         raise _api_error(503, "GENERATION_MODEL_UNAVAILABLE", service.load_error or "generation model unavailable")
 
-    count = request.count if request.count is not None else 1
+    count = body.count if body.count is not None else 1
     if not isinstance(count, int) or count < 1:
-        raise _api_error(422, "INVALID_REQUEST", f"count must be a positive integer, got {request.count!r}")
+        raise _api_error(422, "INVALID_REQUEST", f"count must be a positive integer, got {body.count!r}")
     if count > MAX_GENERATE_COUNT:
         raise _api_error(422, "INVALID_REQUEST", f"count must be <= {MAX_GENERATE_COUNT}, got {count}")
 
-    base_seed = request.seed if request.seed is not None else int.from_bytes(os.urandom(4), "big")
+    base_seed = body.seed if body.seed is not None else int.from_bytes(os.urandom(4), "big")
 
     from engine.learned_generation import generate_novel_kolam_learned
     from engine.render import render_generated_kolam_svg

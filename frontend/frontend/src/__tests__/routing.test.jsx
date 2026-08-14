@@ -17,11 +17,10 @@ const STATIC_ROUTES = [
   '/this-route-does-not-exist',
 ]
 
-// /playground renders real <canvas> 2D drawing, which jsdom can't
-// simulate without the native `canvas` package -- excluded from the
-// generic smoke-render list below, not because the route is untested,
-// but because this specific gap is an environment limitation, not app code.
-const SMOKE_ROUTES = STATIC_ROUTES.filter((r) => r !== '/playground')
+// Playground now renders the real backend-driven SVG workspace (no
+// <canvas> 2D drawing anymore), so it no longer needs the jsdom-canvas
+// exclusion that used to apply here.
+const SMOKE_ROUTES = STATIC_ROUTES
 
 function withProviders(children) {
   return (

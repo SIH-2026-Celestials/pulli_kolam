@@ -22,7 +22,11 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run test suite
-        run: pytest tests/ -v
+        env:
+          PULLI_TESTING: "true"
+        run: |
+          pytest tests/ -v
+          pytest api/tests/ -v
 
   frontend-build:
     runs-on: ubuntu-latest

@@ -177,10 +177,16 @@ your hosting platform's env config in production:
 | Variable | Local dev | Production |
 |---|---|---|
 | `CORS_ORIGINS` | unset → permissive `http://localhost:<any port>` / `http://127.0.0.1:<any port>` regex | **required** — comma-separated exact origins, e.g. `https://app.pulli.example`. Never set to `*`: `allow_credentials=True` (required for the auth session cookie to work cross-origin at all) means the CORS spec forbids a wildcard origin. |
-| `DATABASE_URL` | unset → local SQLite file `./pulli_auth.db`, zero setup | `postgresql+psycopg2://user:pass@host:5432/dbname` — install `psycopg2-binary` |
-| `AUTH_SECRET` | unset → an insecure hardcoded dev fallback is used (not logged, but not a real secret) | **required** — the app refuses to start signing sessions with the dev fallback once `COOKIE_SECURE=true`. Generate with the command in section H. |
-| `COOKIE_SECURE` | `false` (or unset) | `true` — **requires HTTPS**; browsers silently drop `Secure` cookies sent over plain HTTP, which is the most common way "login works locally but not in prod" happens |
-| `COOKIE_DOMAIN` | unset | only set if the API and frontend share a parent domain (e.g. `.pulli.example`), so the cookie is sent to both |
+| `DATABASE_URL` | unset → local SQLite file `./pulli_auth.db`, zero setup | `postgresql+psycopg2://user:pass@host:5432/dbname` — Supabase PostgreSQL connection string. |
+| `AUTH_SECRET` | unset → an insecure hardcoded dev fallback is used | **required** — the app refuses to start signing sessions with the dev fallback once `COOKIE_SECURE=true`. Generate with the command in section H. |
+| `COOKIE_SECURE` | `false` (or unset) | `true` — **requires HTTPS**; browsers silently drop `Secure` cookies sent over plain HTTP. |
+| `COOKIE_DOMAIN` | unset | only set if the API and frontend share a parent domain. |
+| `STORAGE_PROVIDER` | `local` | `r2` — switches the artifact store backend from local disk to Cloudflare R2. |
+| `R2_ENDPOINT` | unset | Cloudflare R2 S3-compatible API endpoint url. |
+| `R2_ACCESS_KEY_ID` | unset | Cloudflare R2 Access Key ID. |
+| `R2_SECRET_ACCESS_KEY` | unset | Cloudflare R2 Secret Access Key. |
+| `R2_BUCKET` | unset | Cloudflare R2 Bucket name. |
+| `R2_PUBLIC_BASE_URL` | unset | Public base URL serving objects directly (e.g. `https://pub-<hash>.r2.dev`). |
 
 Use the exact deployed frontend origin for `CORS_ORIGINS` (scheme + host,
 no path, no trailing slash), comma-separated if there is more than one
@@ -190,14 +196,15 @@ no path, no trailing slash), comma-separated if there is more than one
 
 ## H. Database & migrations
 
-There is no migration tool in this project yet. The two auth tables
-(`users`, `user_sessions`) are created via `create_all()` on startup,
-which is safe as long as you only ever *add* new tables or columns with
-server-side defaults — it will not alter an existing column's type or add
-a `NOT NULL` column to a table that already has rows. If you need an
-actual schema migration (renaming a column, adding a required field to
-`users`, etc.), introduce Alembic at that point rather than hand-editing
-production tables.
+Alembic manages database migrations for both domain and authentication schemas.
+
+To run migrations in staging/production:
+
+```bash
+alembic upgrade head
+```
+
+This applies all database schema tables deterministically. Never run `create_all()` in production.
 
 ### Cookies in production
 
@@ -210,10 +217,7 @@ Concretely:
 - If the frontend and API are on different subdomains of the same parent
   domain, set `COOKIE_DOMAIN` to the shared parent. Leave it unset for a
   single-domain deployment or for local development.
-- `CORS_ORIGINS` must list the frontend's exact production origin(s) — an
-  unset `CORS_ORIGINS` in a non-localhost deployment will simply not work,
-  since the regex fallback in `api/main.py` only matches
-  `localhost`/`127.0.0.1`.
+- `CORS_ORIGINS` must list the frontend's exact production origin(s).
 
 ### Secret generation
 
