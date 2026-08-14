@@ -146,30 +146,9 @@ export default function AuthModal() {
               <X size={20} />
             </button>
 
-        {error && (
-          <div className="auth-error-box label-tech">
-            ⚠️ {error}
-            {error.toLowerCase().includes('rate limit') && (
-              <div style={{ marginTop: '6px', fontSize: '0.68rem', color: '#8b0000' }}>
-                💡 Tip: Click <strong>"Bypass Login"</strong> below to test immediately in Guest Mode!
-              </div>
-            )}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="auth-field">
-            <label className="label-tech">EMAIL ADDRESS</label>
-            <div className="auth-input-wrapper">
-              <Mail size={16} className="auth-input-icon" />
-              <input
-                type="email"
-                required
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="input-text auth-input"
-              />
+            <div className="auth-header">
+              <h2>{t('auth.loginTitle') || 'Welcome back'}</h2>
+              <p>Sign in to continue to your account</p>
             </div>
 
             {/* Traditional Kolam Divider */}
