@@ -185,21 +185,102 @@
   mask-image: radial-gradient(ellipse 65% 55% at 80% 50%, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
 }
 
+/* Breathing Sunset Backlight Glow */
+.tamil-sunset-glow {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  animation: pulseSunsetGlow 8s ease-in-out infinite alternate;
+}
+
+.left-glow {
+  top: 140px;
+  left: 20px;
+  background: radial-gradient(circle, rgba(235, 120, 20, 0.16) 0%, rgba(139, 26, 26, 0.06) 55%, transparent 75%);
+}
+
+.right-glow {
+  top: 140px;
+  right: 20px;
+  background: radial-gradient(circle, rgba(245, 150, 30, 0.18) 0%, rgba(169, 50, 20, 0.07) 55%, transparent 75%);
+}
+
+@keyframes pulseSunsetGlow {
+  0% {
+    transform: scale(0.92) translate3d(0, 0, 0);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.12) translate3d(8px, 6px, 0);
+    opacity: 1;
+  }
+}
+
+/* Ambient Floating Diya Sparks */
+.tamil-spark-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  box-shadow: 0 0 8px 2px rgba(212, 160, 23, 0.5);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.spark-1 { top: 220px; left: 60px; animation: floatSpark 9s ease-in-out infinite; }
+.spark-2 { top: 380px; left: 40px; animation: floatSpark 12s ease-in-out infinite 3s; }
+.spark-3 { top: 240px; right: 60px; animation: floatSpark 10s ease-in-out infinite 1.5s; }
+.spark-4 { top: 410px; right: 45px; animation: floatSpark 13s ease-in-out infinite 4.5s; }
+
+@keyframes floatSpark {
+  0%, 100% { transform: translateY(0) scale(0.8); opacity: 0.3; }
+  50% { transform: translateY(-30px) scale(1.3); opacity: 0.9; }
+}
+
+/* Slowly Rotating Gold Sikku Kolam Motif */
+.tamil-floating-kolam {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+  animation: rotateKolamMotif 60s linear infinite;
+}
+
+.left-kolam {
+  top: 180px;
+  left: 20px;
+}
+
+.right-kolam {
+  top: 180px;
+  right: 20px;
+}
+
+@keyframes rotateKolamMotif {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Seamless, boundary-free, atmospheric heritage motion graphic */
 .tamil-motion-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.20; /* Balanced, subtle, non-intrusive glow */
-  filter: contrast(1.1) brightness(1.0) saturate(1.15) blur(1px);
+  opacity: 0.22; /* Balanced, rich, visible glow */
+  filter: contrast(1.12) brightness(1.02) saturate(1.2) blur(0.8px);
   transition: opacity 0.4s ease, filter 0.4s ease;
   will-change: transform, opacity;
+  z-index: 2;
+  position: relative;
 }
 
 /* Dark mode: softer, subtle tone against dark canvas */
 .dark-theme .tamil-motion-img {
-  opacity: 0.12;
-  filter: contrast(1.05) brightness(0.85) saturate(1.0) blur(1px);
+  opacity: 0.14;
+  filter: contrast(1.08) brightness(0.88) saturate(1.05) blur(0.8px);
 }
 
 .tamil-motion-wrapper.left .tamil-motion-img {
@@ -235,6 +316,7 @@
     display: none;
   }
 }
+
 
 
 
