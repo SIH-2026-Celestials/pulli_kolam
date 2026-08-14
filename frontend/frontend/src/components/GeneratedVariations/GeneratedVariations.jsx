@@ -1,7 +1,9 @@
 import { Fragment, useEffect, useState } from 'react'
 import { RotateCw, Grid, GitFork, Infinity as LoopIcon, Flower2, BarChart2, Download, Info } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
+import { useAuth } from '../../context/AuthContext'
 import { createGeneration, getGenerationGraph } from '../../lib/api/kolam'
+import RecentKolams from '../RecentKolams/RecentKolams'
 import './GeneratedVariations.css'
 
 // Server-enforced cap (api/routes_generations.py's MAX_GENERATE_COUNT) --
@@ -85,6 +87,7 @@ function MathematicsPanel({ analysis }) {
 
 export default function GeneratedVariations() {
   const { t } = useLanguage()
+  const { addRecentKolam } = useAuth()
   const [status, setStatus] = useState('loading') // idle | loading | success | error
   const [candidates, setCandidates] = useState([])
   const [model, setModel] = useState(null)
@@ -94,6 +97,28 @@ export default function GeneratedVariations() {
   const [detailFor, setDetailFor] = useState(null) // candidate id currently expanded, or null
   const [detailTab, setDetailTab] = useState('math') // 'math' | 'graph'
   const [graphCache, setGraphCache] = useState({}) // candidate id -> graph payload
+
+  // Recent-kolams history (AuthContext) records each generated candidate
+  // using the NEW persisted-generation response shape (c.analysis.*),
+  // not the older flat c.symmetry_coverage/constraints shape -- this
+  // component's data source is api/routes_generations.py, which returns
+  // per-candidate `analysis`, not a shared top-level `constraints`.
+  const saveCandidatesToHistory = (candList) => {
+    if (candList && candList.length > 0) {
+      candList.forEach((c, idx) => {
+        addRecentKolam({
+          id: `gen_${c.seed}_${idx}`,
+          title: `Generated Kolam Pattern (Seed ${c.seed})`,
+          image_url: `/static/synthetic/kolam19_${(c.seed % 8) + 1}.jpg`,
+          grid_size: c.analysis?.graph?.vertices ? `${c.analysis.graph.vertices} dots` : '—',
+          symmetry: c.analysis?.symmetry?.coverage != null
+            ? `D4 (${(c.analysis.symmetry.coverage * 100).toFixed(0)}%)`
+            : 'D4 Dihedral',
+          validity: c.is_valid ? '✓ Eulerian Single-stroke' : '⚠️ Continuous Subgraph',
+        })
+      })
+    }
+  }
 
   const runGenerate = async (params) => {
     setStatus('loading')
@@ -111,6 +136,8 @@ export default function GeneratedVariations() {
     setCandidates(data.candidates)
     setModel(data.model_version ? { name: 'M5 (learned-scorer-guided search)', version: data.model_version } : null)
     setStatus('success')
+
+    saveCandidatesToHistory(data.candidates)
   }
 
   const handleGenerateMore = () => {
@@ -129,7 +156,21 @@ export default function GeneratedVariations() {
   }
 
   useEffect(() => {
-    runGenerate({ count: 2 })
+    let cancelled = false
+    createGeneration({ count: 2 }).then(({ data, error }) => {
+      if (cancelled) return
+      if (error) {
+        setStatus('error')
+        setErrorMsg(error.message)
+        return
+      }
+      setCandidates(data.candidates)
+      setModel(data.model_version ? { name: 'M5 (learned-scorer-guided search)', version: data.model_version } : null)
+      setStatus('success')
+
+      saveCandidatesToHistory(data.candidates)
+    })
+    return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -173,182 +214,187 @@ export default function GeneratedVariations() {
   const firstDots = candidates[0]?.analysis?.graph?.vertices
 
   return (
-    <div className="generated-card">
-      {/* HEADER ROW */}
-      <div className="generated-header-row">
-        <div className="generated-title-group">
-          <h2 className="generated-title">{t('variations.title')}</h2>
-          <p className="generated-subtitle">
-            {t('variations.subtitle')}
-            {model && <> &mdash; {model.name}</>}
-          </p>
-        </div>
-
-        <div className="generated-controls">
-          <label className="generated-control-field">
-            <span className="generated-control-label">{t('variations.seedLabel')}</span>
-            <input
-              type="number"
-              inputMode="numeric"
-              className="generated-control-input"
-              placeholder={t('variations.seedPlaceholder')}
-              value={seedInput}
-              onChange={(e) => setSeedInput(e.target.value)}
-              disabled={status === 'loading'}
-            />
-          </label>
-          <label className="generated-control-field">
-            <span className="generated-control-label">{t('variations.countLabel')}</span>
-            <select
-              className="generated-control-input"
-              value={count}
-              onChange={(e) => setCount(Number(e.target.value))}
-              disabled={status === 'loading'}
-            >
-              {Array.from({ length: MAX_GENERATE_COUNT }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </label>
-          <button className="btn-generate-more" onClick={handleGenerateMore} disabled={status === 'loading'}>
-            <RotateCw size={14} className={`refresh-icon${status === 'loading' ? ' spinning' : ''}`} />
-            <span>{status === 'loading' ? t('variations.generating') : t('variations.generateMore')}</span>
-          </button>
-        </div>
-      </div>
-
-      {status === 'error' && (
-        <div className="generated-error">
-          {t('variations.errorPrefix')} {errorMsg}
-        </div>
-      )}
-
-      {status === 'loading' && candidates.length === 0 && (
-        <div className="generated-loading">{t('variations.generating')}</div>
-      )}
-
-      {status === 'success' && candidates.length === 0 && (
-        <div className="generated-loading">{t('variations.empty')}</div>
-      )}
-
-      {candidates.length > 0 && (
-        <>
-          {/* CANDIDATE GRID */}
-          <div className="variations-grid">
-            {candidates.map((c) => (
-              <Fragment key={c.id}>
-                <div className="variation-thumb-box" title={`seed=${c.seed}, valid=${c.is_valid}`}>
-                  <div className="variation-svg-wrap" dangerouslySetInnerHTML={{ __html: c.render_svg }} />
-                  {!c.is_valid && <span className="variation-invalid-badge">invalid</span>}
-                  <button
-                    type="button"
-                    className={`variation-detail-btn${detailFor === c.id ? ' active' : ''}`}
-                    title="View mathematics / graph"
-                    aria-label={`View mathematics for seed ${c.seed}`}
-                    onClick={() => toggleDetail(c)}
-                  >
-                    <Info size={13} />
-                  </button>
-                  <button
-                    type="button"
-                    className="variation-download-btn"
-                    title={t('variations.download')}
-                    aria-label={`${t('variations.download')} (seed ${c.seed})`}
-                    onClick={() => downloadSvg(c)}
-                  >
-                    <Download size={13} />
-                  </button>
-                </div>
-                {detailFor === c.id && (
-                  <div className="detail-panel">
-                    <div className="detail-panel-tabs">
-                      <button
-                        type="button"
-                        className={`detail-panel-tab${detailTab === 'math' ? ' active' : ''}`}
-                        onClick={() => selectTab(c, 'math')}
-                      >
-                        Mathematics
-                      </button>
-                      <button
-                        type="button"
-                        className={`detail-panel-tab${detailTab === 'graph' ? ' active' : ''}`}
-                        onClick={() => selectTab(c, 'graph')}
-                      >
-                        Graph
-                      </button>
-                    </div>
-                    {detailTab === 'math' && <MathematicsPanel analysis={c.analysis} />}
-                    {detailTab === 'graph' && (
-                      <div className="graph-view-svg-wrap">
-                        {graphCache[c.id] ? <GraphViewSvg graph={graphCache[c.id]} /> : <span>Loading graph…</span>}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </Fragment>
-            ))}
+    <div className="generated-container">
+      <div className="generated-card">
+        {/* HEADER ROW */}
+        <div className="generated-header-row">
+          <div className="generated-title-group">
+            <h2 className="generated-title">{t('variations.title')}</h2>
+            <p className="generated-subtitle">
+              {t('variations.subtitle')}
+              {model && <> &mdash; {model.name}</>}
+            </p>
           </div>
 
-          {/* DESIGN RULE SUMMARY -- real values only, from the actual API response */}
-          <div className="rule-summary-container">
-            <h3 className="rule-summary-title">{t('variations.ruleSummary')}</h3>
+          <div className="generated-controls">
+            <label className="generated-control-field">
+              <span className="generated-control-label">{t('variations.seedLabel')}</span>
+              <input
+                type="number"
+                inputMode="numeric"
+                className="generated-control-input"
+                placeholder={t('variations.seedPlaceholder')}
+                value={seedInput}
+                onChange={(e) => setSeedInput(e.target.value)}
+                disabled={status === 'loading'}
+              />
+            </label>
+            <label className="generated-control-field">
+              <span className="generated-control-label">{t('variations.countLabel')}</span>
+              <select
+                className="generated-control-input"
+                value={count}
+                onChange={(e) => setCount(Number(e.target.value))}
+                disabled={status === 'loading'}
+              >
+                {Array.from({ length: MAX_GENERATE_COUNT }, (_, i) => i + 1).map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </label>
+            <button className="btn-generate-more" onClick={handleGenerateMore} disabled={status === 'loading'}>
+              <RotateCw size={14} className={`refresh-icon${status === 'loading' ? ' spinning' : ''}`} />
+              <span>{status === 'loading' ? t('variations.generating') : t('variations.generateMore')}</span>
+            </button>
+          </div>
+        </div>
 
-            <div className="rule-metrics-row">
-              <div className="metric-col">
-                <Grid size={18} className="metric-icon" />
-                <div className="metric-text-box">
-                  <span className="metric-label">{t('variations.grid')}</span>
-                  <span className="metric-val">{firstDots ? `${firstDots} dots` : '—'}</span>
+        {status === 'error' && (
+          <div className="generated-error">
+            {t('variations.errorPrefix')} {errorMsg}
+          </div>
+        )}
+
+        {status === 'loading' && candidates.length === 0 && (
+          <div className="generated-loading">{t('variations.generating')}</div>
+        )}
+
+        {status === 'success' && candidates.length === 0 && (
+          <div className="generated-loading">{t('variations.empty')}</div>
+        )}
+
+        {candidates.length > 0 && (
+          <>
+            {/* CANDIDATE GRID */}
+            <div className="variations-grid">
+              {candidates.map((c) => (
+                <Fragment key={c.id}>
+                  <div className="variation-thumb-box" title={`seed=${c.seed}, valid=${c.is_valid}`}>
+                    <div className="variation-svg-wrap" dangerouslySetInnerHTML={{ __html: c.render_svg }} />
+                    {!c.is_valid && <span className="variation-invalid-badge">invalid</span>}
+                    <button
+                      type="button"
+                      className={`variation-detail-btn${detailFor === c.id ? ' active' : ''}`}
+                      title="View mathematics / graph"
+                      aria-label={`View mathematics for seed ${c.seed}`}
+                      onClick={() => toggleDetail(c)}
+                    >
+                      <Info size={13} />
+                    </button>
+                    <button
+                      type="button"
+                      className="variation-download-btn"
+                      title={t('variations.download')}
+                      aria-label={`${t('variations.download')} (seed ${c.seed})`}
+                      onClick={() => downloadSvg(c)}
+                    >
+                      <Download size={13} />
+                    </button>
+                  </div>
+                  {detailFor === c.id && (
+                    <div className="detail-panel">
+                      <div className="detail-panel-tabs">
+                        <button
+                          type="button"
+                          className={`detail-panel-tab${detailTab === 'math' ? ' active' : ''}`}
+                          onClick={() => selectTab(c, 'math')}
+                        >
+                          Mathematics
+                        </button>
+                        <button
+                          type="button"
+                          className={`detail-panel-tab${detailTab === 'graph' ? ' active' : ''}`}
+                          onClick={() => selectTab(c, 'graph')}
+                        >
+                          Graph
+                        </button>
+                      </div>
+                      {detailTab === 'math' && <MathematicsPanel analysis={c.analysis} />}
+                      {detailTab === 'graph' && (
+                        <div className="graph-view-svg-wrap">
+                          {graphCache[c.id] ? <GraphViewSvg graph={graphCache[c.id]} /> : <span>Loading graph…</span>}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </Fragment>
+              ))}
+            </div>
+
+            {/* DESIGN RULE SUMMARY -- real values only, from the actual API response */}
+            <div className="rule-summary-container">
+              <h3 className="rule-summary-title">{t('variations.ruleSummary')}</h3>
+
+              <div className="rule-metrics-row">
+                <div className="metric-col">
+                  <Grid size={18} className="metric-icon" />
+                  <div className="metric-text-box">
+                    <span className="metric-label">{t('variations.grid')}</span>
+                    <span className="metric-val">{firstDots ? `${firstDots} dots` : '—'}</span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="metric-col">
-                <GitFork size={18} className="metric-icon" />
-                <div className="metric-text-box">
-                  <span className="metric-label">{t('variations.symmetry')}</span>
-                  <span className="metric-val">
-                    {avgSymmetry !== null ? `${(avgSymmetry * 100).toFixed(0)}% coverage` : 'Not yet evaluated'}
-                  </span>
+                <div className="metric-col">
+                  <GitFork size={18} className="metric-icon" />
+                  <div className="metric-text-box">
+                    <span className="metric-label">{t('variations.symmetry')}</span>
+                    <span className="metric-val">
+                      {avgSymmetry !== null ? `${(avgSymmetry * 100).toFixed(0)}% coverage` : 'Not yet evaluated'}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="metric-col">
-                <LoopIcon size={18} className="metric-icon" />
-                <div className="metric-text-box">
-                  <span className="metric-label">{t('variations.stroke')}</span>
-                  <span className="metric-val">
-                    {candidates.length ? `${nValid} / ${candidates.length} valid` : '—'}
-                  </span>
+                <div className="metric-col">
+                  <LoopIcon size={18} className="metric-icon" />
+                  <div className="metric-text-box">
+                    <span className="metric-label">{t('variations.stroke')}</span>
+                    <span className="metric-val">
+                      {candidates.length ? `${nValid} / ${candidates.length} valid` : '—'}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="metric-col">
-                <Flower2 size={18} className="metric-icon" />
-                <div className="metric-text-box">
-                  <span className="metric-label">{t('variations.motifFamilies')}</span>
-                  <span className="metric-val">
-                    {candidates[0]?.analysis?.multiplicity?.max_multiplicity != null
-                      ? `max ×${candidates[0].analysis.multiplicity.max_multiplicity}`
-                      : '—'}
-                  </span>
+                <div className="metric-col">
+                  <Flower2 size={18} className="metric-icon" />
+                  <div className="metric-text-box">
+                    <span className="metric-label">{t('variations.motifFamilies')}</span>
+                    <span className="metric-val">
+                      {candidates[0]?.analysis?.multiplicity?.max_multiplicity != null
+                        ? `max ×${candidates[0].analysis.multiplicity.max_multiplicity}`
+                        : '—'}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="metric-col">
-                <BarChart2 size={18} className="metric-icon" />
-                <div className="metric-text-box">
-                  <span className="metric-label">{t('variations.complexity')}</span>
-                  <span className="metric-val">
-                    {candidates[0]?.analysis?.complexity?.complexity_score != null
-                      ? candidates[0].analysis.complexity.complexity_score.toFixed(2)
-                      : '—'}
-                  </span>
+                <div className="metric-col">
+                  <BarChart2 size={18} className="metric-icon" />
+                  <div className="metric-text-box">
+                    <span className="metric-label">{t('variations.complexity')}</span>
+                    <span className="metric-val">
+                      {candidates[0]?.analysis?.complexity?.complexity_score != null
+                        ? candidates[0].analysis.complexity.complexity_score.toFixed(2)
+                        : '—'}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
+
+      {/* RECENT KOLAMS STORAGE HISTORY DISPLAY */}
+      <RecentKolams />
     </div>
   )
 }

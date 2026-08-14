@@ -145,12 +145,66 @@
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
+  cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .btn-login:hover {
   background: rgba(184, 135, 53, 0.15);
   color: #FFFFFF;
+}
+
+/* User Auth Badges & Controls */
+.user-auth-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(184, 135, 53, 0.15);
+  border: 1px solid var(--color-gold);
+  border-radius: 6px;
+  padding: 4px 10px;
+}
+
+.user-email {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #F7E8D0;
+}
+
+.btn-logout {
+  background: transparent;
+  border: none;
+  color: #D4B07B;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  transition: color 0.2s ease;
+}
+
+.btn-logout:hover {
+  color: #FFFFFF;
+}
+
+.guest-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.guest-mode-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #D4B07B;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(212, 176, 123, 0.3);
 }
 
 /* ── Language Dropdown Menu ── */
@@ -218,4 +272,3 @@
   font-size: 12px;
   color: var(--color-gold, #B88735);
 }
-

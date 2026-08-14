@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { ChevronDown, Sun, User } from 'lucide-react'
+import { ChevronDown, Sun, User, LogOut, Sparkles } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
+import { useAuth } from '../../context/AuthContext'
 import { LANGUAGES } from '../../i18n/index'
 import './Header.css'
 
 export default function Header() {
   const { lang, setLanguage, t } = useLanguage()
+  const { user, isGuest, setIsAuthModalOpen, logout } = useAuth()
   const [langOpen, setLangOpen] = useState(false)
   const dropdownRef = useRef(null)
 
@@ -39,7 +41,6 @@ export default function Header() {
               <circle cx="14" cy="26" r="1.5" fill="#B88735" />
               <circle cx="26" cy="26" r="1.5" fill="#B88735" />
               <circle cx="20" cy="20" r="2" fill="#B88735" />
-              {/* Kolam interlocking loops */}
               <path d="M 20 8 C 28 8, 32 12, 32 20 C 32 28, 28 32, 20 32 C 12 32, 8 28, 8 20 C 8 12, 12 8, 20 8 Z" stroke="#B88735" strokeWidth="1.5" fill="none"/>
               <path d="M 14 14 C 20 8, 26 8, 26 14 C 32 20, 32 26, 26 26 C 20 32, 14 32, 14 26 C 8 20, 8 14, 14 14 Z" stroke="#B88735" strokeWidth="1.2" strokeDasharray="60 0" fill="none"/>
             </svg>
@@ -61,9 +62,6 @@ export default function Header() {
           <NavLink to="/detect" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
             {t('nav.detect')}
           </NavLink>
-          {/* <NavLink to="/generate" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            {t('nav.generate')}
-          </NavLink> */}
           <NavLink to="/explore" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
             {t('nav.gallery')}
           </NavLink>
@@ -115,10 +113,33 @@ export default function Header() {
             <Sun size={18} />
           </button>
 
-          <button className="btn-login">
-            <User size={16} />
-            <span>Login</span>
-          </button>
+          {/* User Auth / Guest Status Controls */}
+          {user ? (
+            <div className="user-auth-badge">
+              <span className="user-email" title={user.email}>
+                <User size={14} />
+                {user.email.split('@')[0]}
+              </span>
+              <button className="btn-logout" onClick={logout} title="Sign Out">
+                <LogOut size={14} />
+              </button>
+            </div>
+          ) : isGuest ? (
+            <div className="guest-badge-group">
+              <span className="guest-mode-tag label-tech">
+                <Sparkles size={12} /> Guest Mode
+              </span>
+              <button className="btn-login" onClick={() => setIsAuthModalOpen(true)}>
+                <User size={14} />
+                <span>Account</span>
+              </button>
+            </div>
+          ) : (
+            <button className="btn-login" onClick={() => setIsAuthModalOpen(true)}>
+              <User size={16} />
+              <span>Login / Guest</span>
+            </button>
+          )}
         </div>
       </div>
     </header>

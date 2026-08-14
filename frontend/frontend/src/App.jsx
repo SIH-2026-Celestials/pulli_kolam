@@ -1,6 +1,7 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react'
 import Header from './components/Header/Header'
 import Footer from './components/Footer/Footer'
+import AuthModal from './components/AuthModal/AuthModal'
 import Home from './pages/Home/Home'
 import Project from './pages/Project/Project'
 import HowItWorks from './pages/HowItWorks/HowItWorks'
@@ -20,6 +21,7 @@ export default function App() {
   return (
     <div className="app-shell">
       <Header />
+      <AuthModal />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/project" element={<Project />} />
