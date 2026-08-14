@@ -138,6 +138,61 @@ def _model_version_to_json(mv: ModelVersion) -> dict:
 # Generations
 # ============================================================
 
+@router.get("/generations")
+def list_generations(page: int = 1, page_size: int = 20):
+    """Paginated generation HISTORY -- Phase 13's explicit requirement.
+    Deliberately a LIGHT payload per row (no SVG, no full representation,
+    no full analysis blob) -- "avoid returning huge unnecessary payloads
+    in list endpoints" -- a caller drills into one result via
+    GET /generations/{id} for the full detail this list intentionally
+    omits."""
+    if page < 1:
+        raise _api_error(422, "INVALID_REQUEST", f"page must be >= 1, got {page}")
+    if not (1 <= page_size <= 100):
+        raise _api_error(422, "INVALID_REQUEST", f"page_size must be in [1, 100], got {page_size}")
+
+    session = get_session()
+    try:
+        total = session.query(GenerationResult).count()
+        rows = (
+            session.query(GenerationResult)
+            .order_by(GenerationResult.created_at.desc())
+            .offset((page - 1) * page_size)
+            .limit(page_size)
+            .all()
+        )
+
+        items = []
+        for r in rows:
+            run = session.get(GenerationRun, r.run_id)
+            model_version = session.get(ModelVersion, run.model_version_id) if run else None
+            pv = session.get(PatternVersion, r.pattern_version_id)
+            analysis = session.query(PatternAnalysis).filter_by(pattern_version_id=r.pattern_version_id).one_or_none()
+            items.append(
+                {
+                    "id": r.id,
+                    "run_id": r.run_id,
+                    "seed": r.seed,
+                    "is_valid": r.is_valid,
+                    "created_at": r.created_at.isoformat(),
+                    "generator": model_version.model.name if model_version else None,
+                    "generator_version": model_version.version if model_version else None,
+                    "n_dots": pv.n_dots if pv else None,
+                    "novelty_score": analysis.novelty_score if analysis else None,
+                    "symmetry_coverage": analysis.symmetry_coverage if analysis else None,
+                    "complexity_score": analysis.complexity_score if analysis else None,
+                }
+            )
+
+        return {
+            "success": True, "page": page, "page_size": page_size, "total": total,
+            "total_pages": (total + page_size - 1) // page_size if page_size else 0,
+            "items": items,
+        }
+    finally:
+        session.close()
+
+
 @router.post("/generations")
 def create_generation(body: CreateGenerationRequest):
     """Generate + PERSIST N candidates. Same underlying M5 call path as
@@ -264,6 +319,47 @@ def get_generation_graph(result_id: str):
                 "degree_distribution": rep.get("degree_distribution"),
             },
         }
+    finally:
+        session.close()
+
+
+_EXPORT_CONTENT_TYPES = {"svg": "image/svg+xml", "png": "image/png", "json": "application/json"}
+
+
+@router.get("/generations/{result_id}/export")
+def export_generation(result_id: str, format: str = "svg"):  # noqa: A002 -- "format" is the natural query param name here
+    """Phase 14: download the persisted artifact (SVG/PNG/JSON) for one
+    generation result. Reads from the SAME Artifact rows/ArtifactStore
+    api/services/generation.py already wrote at generation time -- no
+    re-rendering, no filesystem path ever exposed to the caller (the
+    response IS the file bytes, with a Content-Disposition header, not
+    a path string)."""
+    if format not in _EXPORT_CONTENT_TYPES:
+        raise _api_error(422, "INVALID_REQUEST", f"format must be one of {sorted(_EXPORT_CONTENT_TYPES)}, got {format!r}")
+
+    session = get_session()
+    try:
+        result_row = session.get(GenerationResult, result_id)
+        if result_row is None:
+            raise _api_error(404, "NOT_FOUND", f"generation result {result_id!r} not found")
+        pv = session.get(PatternVersion, result_row.pattern_version_id)
+        artifact = next((a for a in pv.artifacts if a.artifact_type == format), None)
+        if artifact is None:
+            raise _api_error(404, "NOT_FOUND", f"no {format!r} artifact available for this generation result")
+
+        from api.services.artifact_store import get_artifact_store
+
+        store = get_artifact_store()
+        content_type = _EXPORT_CONTENT_TYPES[format]
+        if format == "png":
+            content = store.read_bytes(artifact.storage_path)
+        else:
+            content = store.read(artifact.storage_path)
+        if content is None:
+            raise _api_error(404, "NOT_FOUND", "artifact record exists but the underlying file is missing")
+
+        headers = {"Content-Disposition": f'attachment; filename="pulli-kolam-{result_id}.{format}"'}
+        return Response(content=content, media_type=content_type, headers=headers)
     finally:
         session.close()
 

@@ -177,6 +177,30 @@ export function getGenerationGraph(id) {
   return request(`/api/v1/generations/${id}/graph`);
 }
 
+/**
+ * M7 platform: paginated generation history -- a LIGHT payload per row
+ * (no SVG/representation, see api/routes_generations.py's list_generations),
+ * for a history browser to page through without fetching full detail
+ * for every row.
+ * @param {number} [page]
+ * @param {number} [pageSize]
+ */
+export function listGenerations(page = 1, pageSize = 20) {
+  return request(`/api/v1/generations?page=${page}&page_size=${pageSize}`);
+}
+
+/**
+ * M7 platform: build a direct download URL for a generation result's
+ * artifact (SVG/PNG/JSON). Not fetched through `request()` -- this is
+ * meant for a plain `<a href>`/`window.open`, so the browser handles
+ * the download natively via the backend's Content-Disposition header.
+ * @param {string} id GenerationResult id
+ * @param {'svg'|'png'|'json'} format
+ */
+export function generationExportUrl(id, format = 'svg') {
+  return `${API_BASE}/api/v1/generations/${id}/export?format=${format}`;
+}
+
 /** @returns {Promise<{data: any, error: null} | {data: null, error: import('./types').ApiError}>} */
 export function listModels() {
   return request('/api/v1/models');

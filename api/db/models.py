@@ -120,7 +120,7 @@ class GenerationRun(Base):
     model_version_id: Mapped[str] = mapped_column(String(36), ForeignKey("model_versions.id"), nullable=False)
     candidate_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     total_latency_ms: Mapped[float] = mapped_column(Float, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
 
     request: Mapped["GenerationRequest"] = relationship(back_populates="runs")
     model_version: Mapped["ModelVersion"] = relationship()
@@ -159,7 +159,7 @@ class PatternVersion(Base):
     __tablename__ = "pattern_versions"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    pattern_id: Mapped[str] = mapped_column(String(36), ForeignKey("patterns.id"), nullable=False)
+    pattern_id: Mapped[str] = mapped_column(String(36), ForeignKey("patterns.id"), nullable=False, index=True)
     representation_json: Mapped[dict] = mapped_column(JSON, nullable=False)
     fingerprint: Mapped[str] = mapped_column(Text, nullable=True, index=True)
     n_dots: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -232,7 +232,7 @@ class VerificationResult(Base):
     __tablename__ = "verification_results"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    pattern_version_id: Mapped[str] = mapped_column(String(36), ForeignKey("pattern_versions.id"), nullable=False)
+    pattern_version_id: Mapped[str] = mapped_column(String(36), ForeignKey("pattern_versions.id"), nullable=False, index=True)
     model_version_id: Mapped[str] = mapped_column(String(36), ForeignKey("model_versions.id"), nullable=True)
     method: Mapped[str] = mapped_column(String(32), nullable=False)  # "structural_hard_gate" | "recognizer_self_consistency"
     is_valid: Mapped[bool] = mapped_column(Boolean, nullable=False)
@@ -278,7 +278,7 @@ class GenerationResult(Base):
     __tablename__ = "generation_results"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    run_id: Mapped[str] = mapped_column(String(36), ForeignKey("generation_runs.id"), nullable=False)
+    run_id: Mapped[str] = mapped_column(String(36), ForeignKey("generation_runs.id"), nullable=False, index=True)
     pattern_version_id: Mapped[str] = mapped_column(String(36), ForeignKey("pattern_versions.id"), nullable=False)
     seed: Mapped[int] = mapped_column(Integer, nullable=False)
     is_valid: Mapped[bool] = mapped_column(Boolean, nullable=False)

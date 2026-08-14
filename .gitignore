@@ -79,9 +79,11 @@ one-stroke-dotted-pulli-kolam.zip
 .DS_Store
 Thumbs.db
 
-# M7 platform: local SQLite database + rendered-SVG artifact store --
+# M7 platform: local SQLite database + rendered artifact store --
 # runtime-generated data, not source (see api/db/database.py's module
 # docstring: DATABASE_URL points a real deployment at Postgres instead).
 api/db/*.db
 api/storage/artifacts/*.svg
+api/storage/artifacts/*.png
+api/storage/artifacts/*.json
 !api/storage/artifacts/.gitkeep
