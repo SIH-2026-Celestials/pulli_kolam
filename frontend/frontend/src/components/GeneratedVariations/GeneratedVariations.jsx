@@ -103,13 +103,26 @@ export default function GeneratedVariations() {
   // older flat c.symmetry_coverage/constraints shape -- this component's
   // data source is api/routes_generations.py, which returns per-candidate
   // `analysis`, not a shared top-level `constraints`.
+  //
+  // image_url MUST be the real backend-rendered artifact for THIS
+  // candidate (generationExportUrl(c.id, 'png'), reads the PNG
+  // api/services/generation.py already persisted at generation time --
+  // see api/routes_generations.py's export_generation) -- a prior
+  // version of this function used a fixed cycle of 8 static sample
+  // images under a path (/static/synthetic/...) that does not exist
+  // anywhere in this project (confirmed: no such directory under
+  // frontend/frontend/public/), so every history thumbnail was a
+  // broken image link showing an unrelated dataset sample instead of
+  // the pattern actually generated. `c.id` is only present on
+  // candidates from POST /api/v1/generations (this component's own
+  // data source), so this never has a missing-id case to guard against.
   const saveCandidatesToHistory = (candList) => {
     if (candList && candList.length > 0) {
-      candList.forEach((c, idx) => {
+      candList.forEach((c) => {
         addRecentKolam({
-          id: `gen_${c.seed}_${idx}`,
+          id: c.id,
           title: `Generated Kolam Pattern (Seed ${c.seed})`,
-          image_url: `/static/synthetic/kolam19_${(c.seed % 8) + 1}.jpg`,
+          image_url: generationExportUrl(c.id, 'png'),
           grid_size: c.analysis?.graph?.vertices ? `${c.analysis.graph.vertices} dots` : '—',
           symmetry: c.analysis?.symmetry?.coverage != null
             ? `D4 (${(c.analysis.symmetry.coverage * 100).toFixed(0)}%)`
