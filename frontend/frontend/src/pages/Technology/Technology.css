@@ -81,6 +81,13 @@
   gap: var(--space-6);
 }
 
+@media (max-width: 768px) {
+  .stack-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+}
+
 .stack-card {
   display: flex;
   flex-direction: column;

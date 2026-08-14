@@ -14,7 +14,7 @@ export default function Footer() {
 
       <div className="footer-inner">
         <div className="footer-left">
-          <span>&copy; 2024 PULLI &ndash; Kolam Design-Principle Engine</span>
+          <span>&copy; 2026 PULLI &ndash; Kolam Design-Principle Engine</span>
         </div>
 
         <div className="footer-center">

@@ -428,3 +428,37 @@
   cursor: help;
   flex-shrink: 0;
 }
+
+/* ── RESPONSIVE MEDIA QUERIES ── */
+@media (max-width: 768px) {
+  .generated-card {
+    padding: 18px 16px;
+  }
+
+  .generated-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .variations-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .rule-metrics-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .metric-col {
+    border-right: none;
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .rule-metrics-row {
+    grid-template-columns: 1fr;
+  }
+}

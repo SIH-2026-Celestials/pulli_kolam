@@ -49,6 +49,14 @@
   margin-top: 32px;
 }
 
+@media (max-width: 768px) {
+  .learn-modules-grid,
+  .why-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
 .why-card {
   display: flex;
   flex-direction: column;
