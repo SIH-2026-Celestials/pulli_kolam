@@ -121,15 +121,17 @@ export default function Playground() {
   }, [])
 
   const loadHistory = useCallback(() => {
-    setHistoryStatus('loading')
-    listGenerations(1, 20).then(({ data, error }) => {
-      if (error) {
-        setHistoryStatus('error')
-        return
-      }
-      setHistory(data.items || [])
-      setHistoryStatus('success')
-    })
+    setTimeout(() => {
+      setHistoryStatus('loading')
+      listGenerations(1, 20).then(({ data, error }) => {
+        if (error) {
+          setHistoryStatus('error')
+          return
+        }
+        setHistory(data.items || [])
+        setHistoryStatus('success')
+      })
+    }, 0)
   }, [])
 
   useEffect(() => {

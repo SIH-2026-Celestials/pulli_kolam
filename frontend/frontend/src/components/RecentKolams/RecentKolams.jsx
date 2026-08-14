@@ -178,6 +178,7 @@ export default function RecentKolams({ onSelectKolam }) {
               className="carousel-btn"
               aria-label="Scroll left"
               onClick={() => scrollBy(-1)}
+              disabled={!canScrollLeft}
             >
               <ChevronLeft size={15} strokeWidth={2.5} />
             </button>
@@ -185,6 +186,7 @@ export default function RecentKolams({ onSelectKolam }) {
               className="carousel-btn"
               aria-label="Scroll right"
               onClick={() => scrollBy(1)}
+              disabled={!canScrollRight}
             >
               <ChevronRight size={15} strokeWidth={2.5} />
             </button>
