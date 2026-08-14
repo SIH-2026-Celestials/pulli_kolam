@@ -176,3 +176,36 @@ class M42PhotoVerifier:
                 f"agreement_fraction={fusion.agreement_fraction}"
             ),
         )
+
+
+class PatternVerifier(Protocol):
+    """The GENERATED-PATTERN verifier interface, structurally distinct
+    from `PhotoVerifier` above (real-photo input) -- never conflated:
+    a `PatternVerifier` always verifies a structural candidate object
+    (a `GeneratedKolam`/`nx.MultiGraph`, never image bytes)."""
+
+    def verify(self, candidate) -> StructuralVerification: ...
+
+
+class StructuralVerifier:
+    """Class-shaped wrapper around `verify_structural` (unmodified --
+    no new verification logic here, purely an interface adapter so
+    `PatternVerifier` implementations can be selected/composed
+    polymorphically, e.g. by `api/services/generation.py`)."""
+
+    def verify(self, candidate) -> StructuralVerification:
+        return verify_structural(candidate)
+
+
+class M42RecognizerVerifier:
+    """Class-shaped wrapper around `verify_with_recognizer` (unmodified
+    -- the FROZEN M4.2 detector, never retrained, never modified). Optional
+    because of latency: `api/services/generation.py` only invokes this
+    when the caller explicitly opts in (`verify_recognizer=True`),
+    exactly like the un-wrapped function it delegates to."""
+
+    def __init__(self, detector_name: str = "ml-gated"):
+        self.detector_name = detector_name
+
+    def verify(self, candidate) -> StructuralVerification:
+        return verify_with_recognizer(candidate, detector_name=self.detector_name)

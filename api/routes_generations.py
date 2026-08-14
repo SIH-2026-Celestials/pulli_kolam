@@ -225,10 +225,30 @@ def create_generation(body: CreateGenerationRequest):
                     "id": c.generation_result_id,
                     "pattern_version_id": c.pattern_version_id,
                     "seed": c.seed,
+                    # `status`/`is_valid` say the SAME thing two ways
+                    # deliberately: `is_valid` is the original field the
+                    # frontend already consumes (kept, unchanged, for
+                    # backward compatibility); `status` is the exact
+                    # field name this task's canonical pipeline spec
+                    # asks for. Never diverge -- both are always derived
+                    # from the one real is_valid boolean, never set
+                    # independently.
+                    "status": "valid" if c.is_valid else "invalid",
                     "is_valid": c.is_valid,
-                    "render_svg": c.svg,
-                    "latency_ms": round(c.latency_ms, 2),
-                    "analysis": c.analysis,
+                    "svg": c.svg,
+                    "render_svg": c.svg,  # kept for existing frontend callers -- see `svg` for the canonical name
+                    "graph": {
+                        "dot_points": c.representation.get("dot_points"),
+                        "edges": c.representation.get("edges"),
+                        "degree_distribution": c.representation.get("degree_distribution"),
+                    },
+                    "mathematics": c.analysis,
+                    "analysis": c.analysis,  # kept for existing frontend callers -- see `mathematics` for the canonical name
+                    "verification": c.verification,
+                    "novelty": c.analysis.get("novelty"),
+                    "generation_time_ms": round(c.latency_ms, 2),
+                    "latency_ms": round(c.latency_ms, 2),  # kept for existing frontend callers
+                    "metadata": {"generator": "M5", "model_version": result.model_version, "seed": c.seed},
                 }
                 for c in result.candidates
             ],
