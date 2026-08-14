@@ -149,79 +149,80 @@
   }
 }
 
-/* ── TAMIL PARALLAX GOPURAMS STYLES ── */
-.gopuram-parallax-root {
+/* ── TAMIL PARALLAX MOTION GRAPHICS STYLES ── */
+.tamil-motion-root {
   position: fixed;
   inset: 0;
-  z-index: 0; /* Behind page text/buttons but in front of body background */
+  z-index: 0; /* Behind foreground cards & text, above base canvas */
   pointer-events: none;
   overflow: hidden;
 }
 
-.gopuram-parallax-wrapper {
+.tamil-motion-wrapper {
   position: absolute;
-  width: 320px;
-  height: 800px;
+  width: 340px;
+  height: 900px;
   will-change: transform;
 }
 
-.gopuram-parallax-wrapper.left {
+.tamil-motion-wrapper.left {
   left: 0;
-  top: 100px;
-  -webkit-mask-image: radial-gradient(ellipse at left center, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 0) 80%);
-  mask-image: radial-gradient(ellipse at left center, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 0) 80%);
+  top: 80px;
+  -webkit-mask-image: radial-gradient(ellipse at left center, rgba(0, 0, 0, 1) 10%, rgba(0, 0, 0, 0) 75%);
+  mask-image: radial-gradient(ellipse at left center, rgba(0, 0, 0, 1) 10%, rgba(0, 0, 0, 0) 75%);
 }
 
-.gopuram-parallax-wrapper.right {
+.tamil-motion-wrapper.right {
   right: 0;
-  top: 100px;
-  -webkit-mask-image: radial-gradient(ellipse at right center, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 0) 80%);
-  mask-image: radial-gradient(ellipse at right center, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 0) 80%);
+  top: 80px;
+  -webkit-mask-image: radial-gradient(ellipse at right center, rgba(0, 0, 0, 1) 10%, rgba(0, 0, 0, 0) 75%);
+  mask-image: radial-gradient(ellipse at right center, rgba(0, 0, 0, 1) 10%, rgba(0, 0, 0, 0) 75%);
 }
 
-/* Actual Dravidian Gopuram Image with Ken Burns animation */
-.gopuram-motion-img {
+/* Subtle, borderless, atmospheric heritage motion graphic */
+.tamil-motion-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.1; /* Subtly 0.1 visible background texture */
-  filter: grayscale(100%) sepia(100%) hue-rotate(190deg) saturate(220%) brightness(0.9) contrast(1.15) blur(0.5px);
+  opacity: 0.1; /* 0.1 subtle opacity */
+  filter: grayscale(10%) sepia(30%) contrast(1.1) brightness(0.95) blur(0.5px);
   will-change: transform;
 }
 
-.gopuram-parallax-wrapper.left .gopuram-motion-img {
-  animation: kenBurnsLeft 48s ease-in-out infinite alternate;
+.tamil-motion-wrapper.left .tamil-motion-img {
+  animation: kenBurnsMotionLeft 50s ease-in-out infinite alternate;
 }
 
-.gopuram-parallax-wrapper.right .gopuram-motion-img {
-  animation: kenBurnsRight 52s ease-in-out infinite alternate;
+.tamil-motion-wrapper.right .tamil-motion-img {
+  animation: kenBurnsMotionRight 55s ease-in-out infinite alternate;
 }
 
-/* Ken Burns Camera Pan & Zoom motions */
-@keyframes kenBurnsLeft {
+/* Subtle continuous pan-and-zoom motion */
+@keyframes kenBurnsMotionLeft {
   0% {
-    transform: scale(1.03) translate(0, 0);
+    transform: scale(1.02) translate3d(0, 0, 0);
   }
   100% {
-    transform: scale(1.15) translate(-15px, -10px);
+    transform: scale(1.14) translate3d(-15px, -12px, 0);
   }
 }
 
-@keyframes kenBurnsRight {
+@keyframes kenBurnsMotionRight {
   0% {
-    transform: scale(1.03) translate(0, 0);
+    transform: scale(1.02) translate3d(0, 0, 0);
   }
   100% {
-    transform: scale(1.15) translate(15px, -10px);
+    transform: scale(1.14) translate3d(15px, -12px, 0);
   }
 }
 
-/* Responsive hides to guarantee it never overlaps central layouts on tablet/mobile */
+/* Responsive hides: hide on screens <= 1280px to guarantee zero clutter on tablet/mobile */
 @media (max-width: 1280px) {
-  .gopuram-parallax-root {
+  .tamil-motion-root {
     display: none;
   }
 }
+
 
 
 

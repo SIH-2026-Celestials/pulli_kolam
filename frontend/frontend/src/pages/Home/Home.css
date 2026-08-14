@@ -1,6 +1,6 @@
 .home-clone-main {
   width: 100%;
-  background-color: var(--color-paper);
+  background-color: transparent;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -9,7 +9,7 @@
 .main-content-section {
   width: 100%;
   padding: 0 0 48px 0;
-  background-color: var(--color-paper);
+  background-color: transparent;
 }
 
 .main-content-container {
