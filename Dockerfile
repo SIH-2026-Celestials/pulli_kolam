@@ -28,7 +28,8 @@ WORKDIR /app
 # installs by default on Linux), then the rest of the API's pinned
 # dependency set.
 COPY requirements-engine.txt requirements-ml.txt requirements-api.txt ./
-RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch==2.11.0 \
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch==2.11.0 \
     && pip install --no-cache-dir -r requirements-api.txt
 
 # Runtime source -- engine/ (deterministic research engine, unmodified)
