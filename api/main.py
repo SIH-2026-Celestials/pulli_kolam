@@ -539,6 +539,10 @@ def _run_pipeline_in_thread(job_id: str, image_path: str, detector: str, loop: a
         emit("stage_completed", payload)
 
     def stage_failed(stage_id: str, idx: int, message: str) -> None:
+        # Ensure message is always a plain string even if an HTTPException
+        # detail dict is passed through inadvertently.
+        if not isinstance(message, str):
+            message = str(message)
         emit("stage_failed", {
             "job_id": job_id, "stage": stage_id,
             "stage_index": idx, "status": "failed", "message": message,
@@ -550,6 +554,15 @@ def _run_pipeline_in_thread(job_id: str, image_path: str, detector: str, loop: a
         asyncio.run_coroutine_threadsafe(queue.put(None), loop)  # sentinel
 
     try:
+        # FIX: Give the SSE client 150 ms to connect before the first event
+        # fires.  The thread-pool worker starts immediately after POST /start
+        # returns; on fast machines the first stage_started can race the
+        # browser opening its EventSource.  The asyncio.Queue already buffers
+        # every event so nothing is ever lost, but this makes the race window
+        # essentially zero and avoids confusing "already completed" initial states.
+        import time as _time
+        _time.sleep(0.15)
+
         # ── STAGE 0: upload_image (already done, just signal it) ──────
         stage_started("upload_image", 0, "Image received.")
         stage_completed("upload_image", 0, "Image uploaded successfully.")
@@ -559,7 +572,10 @@ def _run_pipeline_in_thread(job_id: str, image_path: str, detector: str, loop: a
         try:
             det_result = _run_detector(detector, image_path)
         except HTTPException as exc:
-            stage_failed("detect_dots", 1, exc.detail)
+            # FIX: exc.detail is a dict {code, message} from _api_error --
+            # _error_message() extracts the human-readable string so the
+            # frontend receives a proper string, not a serialised dict.
+            stage_failed("detect_dots", 1, _error_message(exc.detail))
             return
         stage_completed("detect_dots", 1, f"Detected {len(det_result.dots)} dots.", {
             "dot_count": len(det_result.dots),
@@ -673,9 +689,19 @@ async def analyze_stream_start(
     path = _save_upload_to_temp(image)
     job_id = str(uuid.uuid4())
 
-    loop = asyncio.get_event_loop()
+    # FIX: get_event_loop() is deprecated and raises RuntimeError in
+    # Python 3.12+ inside a running event loop.  get_running_loop() is
+    # the correct API inside an async function -- it always returns the
+    # currently-running loop without creating a new one.
+    loop = asyncio.get_running_loop()
     queue: asyncio.Queue = asyncio.Queue()
-    _STREAM_JOBS[job_id] = {"path": path, "detector": detector, "queue": queue}
+    _STREAM_JOBS[job_id] = {
+        "path": path,
+        "detector": detector,
+        "queue": queue,
+        "status": "started",       # snapshot for /status reconnect endpoint
+        "current_stage": None,
+    }
 
     # Fire-and-forget: runs the full pipeline in a thread-pool worker.
     loop.run_in_executor(
@@ -720,6 +746,36 @@ async def analyze_stream_events(job_id: str):
             "X-Accel-Buffering": "no",   # nginx: disable proxy buffering
         },
     )
+
+
+@app.get("/api/v1/analyze-stream/{job_id}/status")
+async def analyze_stream_status(job_id: str):
+    """
+    Lightweight status snapshot for the given job_id.
+
+    Allows the frontend to reconnect after a page refresh: if the job is
+    still in _STREAM_JOBS the client re-opens the /events SSE stream and
+    the queued events replay naturally.  If the job has been cleaned up
+    (pipeline finished) it returns 404 so the client knows not to reconnect.
+
+    This endpoint does NOT replay past events -- the asyncio.Queue already
+    holds every buffered event for an in-progress job.  Its only purpose
+    is to tell the client whether a given job_id is still alive.
+    """
+    job = _STREAM_JOBS.get(job_id)
+    if job is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No active analysis job with id {job_id!r}. "
+                   "The pipeline may have already completed or the server restarted.",
+        )
+    return {
+        "job_id": job_id,
+        "status": job.get("status", "running"),
+        "detector": job.get("detector"),
+        "current_stage": job.get("current_stage"),
+        "alive": True,
+    }
 
 
 MAX_GENERATE_COUNT = 5  # bounds worst-case request latency (each candidate runs up to N_RESTARTS search passes)
