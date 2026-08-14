@@ -33,7 +33,7 @@ target_metadata = [DbBase.metadata, AuthBase.metadata]
 # alembic.ini's placeholder sqlalchemy.url -- one source of truth for
 # which database migrations run against, matching what the app itself
 # connects to at runtime.
-config.set_main_option("sqlalchemy.url", DATABASE_URL)
+config.set_main_option("sqlalchemy.url", DATABASE_URL.replace("%", "%%"))
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
