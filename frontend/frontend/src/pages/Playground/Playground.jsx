@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { Play, Pause, RefreshCw, Download, Sparkles, Sliders, ShieldCheck, Save, Eye } from 'lucide-react'
+import { Play, Pause, RefreshCw, Download, Sliders, Save, Eye } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import './Playground.css'
 

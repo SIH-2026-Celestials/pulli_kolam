@@ -73,6 +73,11 @@ const ta = {
     complexityVal: 'நடுத்தரம்',
     generating: 'உருவாக்குகிறது…',
     errorPrefix: 'உருவாக்கம் தோல்வியடைந்தது:',
+    seedLabel: 'Seed',
+    seedPlaceholder: 'Random',
+    countLabel: 'Candidates',
+    download: 'Download SVG',
+    empty: 'No valid candidates in this batch — try Generate More.',
   },
   multilingual: {
     title: 'பலமொழி ஆதரவு',

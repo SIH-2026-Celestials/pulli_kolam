@@ -181,6 +181,7 @@ class KolamSequenceGenerator(nn.Module):
         self,
         grid_wh: torch.Tensor, symmetry_idx: torch.Tensor, scalars: torch.Tensor,
         max_len: int, temperature: float = 1.0, generator: "torch.Generator | None" = None,
+        min_len: int = 0, locality_radius: "int | None" = None,
     ) -> list:
         """Autoregressive sampling, ONE sequence at a time (batch size 1
         internally per call -- Phase 5's constrained generation calls
@@ -188,7 +189,36 @@ class KolamSequenceGenerator(nn.Module):
         candidates rather than needing batched sampling here). Returns a
         plain list of (motif_id, x, y, transform_id) ints, EOS excluded
         (caller decides whether to keep a sequence that hit max_len
-        without emitting EOS -- reported, not hidden, by generate.py)."""
+        without emitting EOS -- reported, not hidden, by generate.py).
+
+        `min_len` is a CONSTRAINED-DECODING floor (Phase 5's own
+        "implement hard constraints where possible" instruction, applied
+        at generation time rather than left to the model's own
+        judgment): the EOS logit is masked to -inf for steps < min_len,
+        so the model cannot terminate before laying down at least that
+        many placements. Added after diagnosing V1's raw behavior
+        (median generated length 9-18 tokens on a 49-dot lattice, vs.
+        the ~20-94 tokens real training sequences actually use --
+        severe premature termination, the dominant cause of the
+        fragmentation this repository's hard validity gate then
+        correctly rejects). Default 0 preserves the original
+        unconstrained behavior.
+
+        `locality_radius`: a SECOND constrained-decoding fix, added
+        after `min_len` alone was found (by direct measurement) NOT to
+        fix fragmentation on its own -- forcing more placements without
+        also constraining WHERE they land still produced 20-40
+        connected components on a 49-dot lattice, because the model's
+        raw x/y heads scatter points across the whole grid with little
+        spatial coherence between consecutive placements. When set, the
+        x/y logits for step > 0 are masked to the bounding box of
+        already-placed points expanded by `locality_radius` in every
+        direction -- an approximate (not exact adjacency) locality
+        constraint, since x and y are independent factorized heads (see
+        model.py's module docstring on why they're factorized) and true
+        joint "must be adjacent to an existing point" conditioning would
+        require a different (non-factorized) output head. Approximate,
+        documented as such, not claimed to be exact."""
         self.eval()
         device = grid_wh.device
         motif_seq = torch.empty((1, 0), dtype=torch.long, device=device)
@@ -197,7 +227,7 @@ class KolamSequenceGenerator(nn.Module):
         t_seq = torch.empty((1, 0), dtype=torch.long, device=device)
 
         out_tokens = []
-        for _ in range(max_len):
+        for step in range(max_len):
             if motif_seq.size(1) == 0:
                 # first step: feed a single PAD placeholder as input so
                 # forward()'s token embedding has SOMETHING to embed at
@@ -219,11 +249,36 @@ class KolamSequenceGenerator(nn.Module):
                 probs = torch.softmax(logits, dim=-1)
                 return torch.multinomial(probs, 1, generator=generator).item()
 
-            next_motif = sample("motif_logits", self.config.vocab_size)
+            if step < min_len:
+                motif_logits = out["motif_logits"][0, last].clone()
+                motif_logits[EOS_MOTIF_ID] = float("-inf")
+                probs = torch.softmax(motif_logits / max(temperature, 1e-6), dim=-1)
+                next_motif = torch.multinomial(probs, 1, generator=generator).item()
+            else:
+                next_motif = sample("motif_logits", self.config.vocab_size)
             if next_motif == EOS_MOTIF_ID:
                 break
-            next_x = sample("x_logits", MAX_GRID)
-            next_y = sample("y_logits", MAX_GRID)
+
+            if locality_radius is not None and out_tokens:
+                xs = [t[1] for t in out_tokens]
+                ys = [t[2] for t in out_tokens]
+                x_lo, x_hi = max(0, min(xs) - locality_radius), min(MAX_GRID - 1, max(xs) + locality_radius)
+                y_lo, y_hi = max(0, min(ys) - locality_radius), min(MAX_GRID - 1, max(ys) + locality_radius)
+
+                x_logits = out["x_logits"][0, last].clone()
+                x_mask = torch.full_like(x_logits, float("-inf"))
+                x_mask[x_lo : x_hi + 1] = 0.0
+                x_probs = torch.softmax((x_logits + x_mask) / max(temperature, 1e-6), dim=-1)
+                next_x = torch.multinomial(x_probs, 1, generator=generator).item()
+
+                y_logits = out["y_logits"][0, last].clone()
+                y_mask = torch.full_like(y_logits, float("-inf"))
+                y_mask[y_lo : y_hi + 1] = 0.0
+                y_probs = torch.softmax((y_logits + y_mask) / max(temperature, 1e-6), dim=-1)
+                next_y = torch.multinomial(y_probs, 1, generator=generator).item()
+            else:
+                next_x = sample("x_logits", MAX_GRID)
+                next_y = sample("y_logits", MAX_GRID)
             next_t = sample("transform_logits", N_TRANSFORMS)
             out_tokens.append((next_motif, next_x, next_y, next_t))
 

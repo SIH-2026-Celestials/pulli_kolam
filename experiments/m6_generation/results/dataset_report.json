@@ -1,47 +1,47 @@
 {
-  "n_source_patterns": 9,
+  "n_source_patterns": 500,
   "n_source_patterns_by_split": {
-    "train": 3,
-    "val": 3,
-    "test": 3
+    "train": 350,
+    "val": 75,
+    "test": 75
   },
   "n_examples_by_split": {
-    "train": 66,
-    "val": 66,
-    "test": 66
+    "train": 7700,
+    "val": 1650,
+    "test": 1650
   },
-  "n_examples_total": 198,
+  "n_examples_total": 11000,
   "validity_rate_train": 1.0,
   "topology_distribution_train": {
-    "d4": 24,
-    "crop": 42
+    "d4": 2800,
+    "crop": 4900
   },
   "symmetry_distribution_train": {
-    "low_symmetry": 63,
-    "high_symmetry": 3
+    "low_symmetry": 7379,
+    "high_symmetry": 321
   },
-  "complexity_mean_train": 0.44869096872043035,
-  "complexity_min_train": 0.3333333333333333,
-  "complexity_max_train": 0.5151515151515151,
-  "n_unique_token_sequences_train": 48,
-  "structural_uniqueness_rate_train": 0.7272727272727273,
-  "duplicate_rate_train": 0.2727272727272727,
-  "vocab_size": 38,
+  "complexity_mean_train": 0.44871653402473605,
+  "complexity_min_train": 0.25,
+  "complexity_max_train": 0.5802469135802469,
+  "n_unique_token_sequences_train": 5593,
+  "structural_uniqueness_rate_train": 0.7263636363636363,
+  "duplicate_rate_train": 0.2736363636363637,
+  "vocab_size": 220,
   "unk_rate_by_split": {
     "train": {
-      "n_unk_tokens": 0,
-      "n_total_tokens": 5734,
-      "unk_rate": 0.0
+      "n_unk_tokens": 3288,
+      "n_total_tokens": 473979,
+      "unk_rate": 0.006937016196920116
     },
     "val": {
-      "n_unk_tokens": 105,
-      "n_total_tokens": 3106,
-      "unk_rate": 0.03380553766902769
+      "n_unk_tokens": 1584,
+      "n_total_tokens": 98709,
+      "unk_rate": 0.016047168951159468
     },
     "test": {
-      "n_unk_tokens": 404,
-      "n_total_tokens": 4429,
-      "unk_rate": 0.09121697900203206
+      "n_unk_tokens": 2090,
+      "n_total_tokens": 107550,
+      "unk_rate": 0.019432821943282195
     }
   },
   "crop_config": {
@@ -51,6 +51,6 @@
       9
     ]
   },
-  "build_time_seconds": 25.880713939666748,
+  "build_time_seconds": 1272.4992468357086,
   "seed": 6262
 }

@@ -73,6 +73,11 @@ const hi = {
     complexityVal: 'मध्यम',
     generating: 'जनरेट हो रहा है…',
     errorPrefix: 'जनरेशन विफल:',
+    seedLabel: 'बीज (Seed)',
+    seedPlaceholder: 'यादृच्छिक',
+    countLabel: 'उम्मीदवार',
+    download: 'SVG डाउनलोड करें',
+    empty: 'इस बैच में कोई मान्य उम्मीदवार नहीं — "और बनाएं" आज़माएं।',
   },
   multilingual: {
     title: 'बहुभाषी समर्थन',

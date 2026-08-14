@@ -1,5 +1,5 @@
 import { useAuth } from '../../context/AuthContext'
-import { History, Database, HardDrive, Sparkles } from 'lucide-react'
+import { History, Database, HardDrive } from 'lucide-react'
 import './RecentKolams.css'
 
 export default function RecentKolams({ onSelectKolam }) {

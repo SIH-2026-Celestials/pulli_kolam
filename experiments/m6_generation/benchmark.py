@@ -58,9 +58,10 @@ def run(grid, symmetry: str, complexity: float, density: float, seed: int, count
         scalars_t = torch.tensor([[complexity, density]])
 
         row = {"index": i, "seed": this_seed, "generated": True}
+        min_len = min(model.config.max_seq_len - 2, max(10, int(0.5 * width * height)))
         raw_tokens = model.generate(
             grid_wh, sym_t, scalars_t, max_len=model.config.max_seq_len - 1,
-            temperature=0.9, generator=gen,
+            temperature=0.9, generator=gen, min_len=min_len,
         )
         row["n_raw_tokens"] = len(raw_tokens)
 

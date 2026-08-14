@@ -73,6 +73,11 @@ const ml = {
     complexityVal: 'മധ്യേ',
     generating: 'ജനറേറ്റ് ചെയ്യുന്നു…',
     errorPrefix: 'ജനറേഷൻ പരാജയപ്പെട്ടു:',
+    seedLabel: 'Seed',
+    seedPlaceholder: 'Random',
+    countLabel: 'Candidates',
+    download: 'Download SVG',
+    empty: 'No valid candidates in this batch — try Generate More.',
   },
   multilingual: {
     title: 'ബഹുഭാഷാ പിന്തുണ',

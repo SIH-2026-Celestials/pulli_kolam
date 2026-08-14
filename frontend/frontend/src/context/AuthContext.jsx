@@ -47,12 +47,13 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  // Load Recent Kolams on mount or when user/guest mode changes
-  useEffect(() => {
-    loadRecentKolams()
-  }, [user, isGuest])
-
-  async function loadRecentKolams() {
+  // Returns the recent-kolams list without touching state itself -- the
+  // caller (the effect below, or any future caller) applies
+  // setRecentKolams, so this function is safe to call directly from an
+  // effect without triggering react-hooks/set-state-in-effect (that rule
+  // flags any effect that reaches a component-scope function which
+  // itself calls a setState setter, even chained via .then()).
+  async function fetchRecentKolams() {
     if (user) {
       // Authenticated User: Load from Supabase DB table
       try {
@@ -62,10 +63,7 @@ export function AuthProvider({ children }) {
           .order('created_at', { ascending: false })
           .limit(20)
 
-        if (!error && data) {
-          setRecentKolams(data)
-          return
-        }
+        if (!error && data) return data
       } catch (e) {
         console.warn('Supabase DB load warning, fallback to local storage:', e.message)
       }
@@ -74,15 +72,20 @@ export function AuthProvider({ children }) {
     // Unauthenticated / Guest Mode: Load from LocalStorage
     try {
       const stored = localStorage.getItem(LOCAL_STORAGE_RECENT_KEY)
-      if (stored) {
-        setRecentKolams(JSON.parse(stored))
-      } else {
-        setRecentKolams([])
-      }
-    } catch (e) {
-      setRecentKolams([])
+      return stored ? JSON.parse(stored) : []
+    } catch {
+      return []
     }
   }
+
+  // Load Recent Kolams on mount or when user/guest mode changes
+  useEffect(() => {
+    let cancelled = false
+    fetchRecentKolams().then((list) => {
+      if (!cancelled) setRecentKolams(list)
+    })
+    return () => { cancelled = true }
+  }, [user, isGuest])
 
   // Add a newly generated or analyzed Kolam to recent history
   async function addRecentKolam(kolamItem) {
@@ -184,6 +187,10 @@ export function AuthProvider({ children }) {
   )
 }
 
+// useAuth must live alongside its Provider (standard React context
+// pattern); a consumer hook has no meaningful separate "component" file
+// to move to.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext)
   if (!context) {

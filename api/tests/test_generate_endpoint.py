@@ -73,6 +73,55 @@ def test_generate_invalid_count_rejected():
     assert r2.status_code == 422
 
 
+def test_generate_response_identifies_generator():
+    """Integration addition: the response must name which generator
+    implementation produced it (api/schemas.py's GenerateResponse.generator),
+    so a future generator swap is distinguishable without a response-shape
+    change (see engine/generation_contract.py and INTEGRATION.md)."""
+    r = client.post("/api/v1/generate", json={"count": 1})
+    assert r.status_code == 200
+    assert r.json()["generator"] == "m5"
+
+
+def test_generate_multiple_candidates():
+    """Integration addition: count>1 must return that many independently
+    seeded candidates in one response (base_seed + i per api/main.py's
+    generate()), not just repeat count=1's behavior N times."""
+    r = client.post("/api/v1/generate", json={"seed": 500, "count": 3})
+    assert r.status_code == 200
+    body = r.json()
+    candidates = body["candidates"]
+    assert len(candidates) == 3
+    assert [c["seed"] for c in candidates] == [500, 501, 502]
+    # each candidate is a real, independently rendered SVG, not a
+    # duplicate of the first
+    assert all(c["render_svg"].startswith("<svg") for c in candidates)
+
+
+def test_generate_service_unavailable_returns_structured_error():
+    """Integration addition: if GenerationService reports unavailable
+    (checkpoint/manifest failed to load), the endpoint must return the
+    project's standard {success, error, code} envelope at 503 -- not a
+    raw exception or a silent fallback to a different generator."""
+    from api.generation_service import get_generation_service
+
+    service = get_generation_service()
+    # force the already-loaded singleton into a failure state, matching
+    # what a real checkpoint-load failure looks like from the endpoint's
+    # point of view (_load_error set, _motif_library left as-is)
+    original_error = service._load_error
+    service._load_error = "simulated checkpoint load failure"
+    try:
+        r = client.post("/api/v1/generate", json={"count": 1})
+        assert r.status_code == 503
+        body = r.json()
+        assert body["success"] is False
+        assert body["code"] == "GENERATION_MODEL_UNAVAILABLE"
+        assert "simulated checkpoint load failure" in body["error"]
+    finally:
+        service._load_error = original_error
+
+
 def test_generate_no_fabricated_novelty_claim():
     """The per-request response must not assert a specific novelty
     percentage it hasn't actually computed against ground truth (that

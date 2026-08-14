@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Lock, Mail, Sparkles, UserCheck, ShieldCheck } from 'lucide-react'
+import { X, Lock, Mail, Sparkles, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import './AuthModal.css'
 
