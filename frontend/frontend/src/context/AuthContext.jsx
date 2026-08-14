@@ -72,13 +72,18 @@ export function AuthProvider({ children }) {
   // it deliberately stays client-side only, same scope as the theme/
   // language preferences already kept in localStorage elsewhere.
   const addRecentKolam = useCallback((kolamItem) => {
+    // No fallback values for grid_size/symmetry/validity: these are
+    // real, measured properties of a specific generation. A caller that
+    // omits one genuinely doesn't have that data yet -- claiming a
+    // default like "D4 Dihedral" would misrepresent an unmeasured
+    // pattern as having a specific, verified symmetry.
     const newItem = {
       id: kolamItem.id || `kolam_${Date.now()}`,
       title: kolamItem.title || 'Generated Pulli Kolam',
-      image_url: kolamItem.image_url || kolamItem.imagePath || '/static/synthetic/kolam19_1.jpg',
-      grid_size: kolamItem.grid_size || '7×7',
-      symmetry: kolamItem.symmetry || 'D4 Dihedral',
-      validity: kolamItem.validity || '✓ Eulerian Single-stroke',
+      image_url: kolamItem.image_url || kolamItem.imagePath || null,
+      grid_size: kolamItem.grid_size || 'Not available',
+      symmetry: kolamItem.symmetry || 'Not available',
+      validity: kolamItem.validity || 'Not available',
       created_at: new Date().toISOString(),
     }
     setRecentKolams((prev) => {

@@ -1,68 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import { Database, HardDrive, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Database, HardDrive, Sparkles, ImageOff, ChevronLeft, ChevronRight } from 'lucide-react'
 import './RecentKolams.css'
-
-const SYNTHETIC_PHOTOS = [
-  '/synthetic/kolam19_k1.jpg',
-  '/synthetic/kolam19_k2.jpg',
-  '/synthetic/kolam19_k3.jpg',
-  '/synthetic/kolam19_k27.jpg',
-  '/synthetic/kolam19_k50.jpg',
-  '/synthetic/kolam29_k1.jpg',
-  '/synthetic/kolam29_k2.jpg'
-]
-
-const MOCK_KOLAM_ITEMS = [
-  {
-    id: 'mock_1',
-    title: 'Lotus Pulli Kolam (7×7)',
-    image_url: '/synthetic/kolam19_k1.jpg',
-    grid_size: '7×7 Lattice',
-    symmetry: 'D4 Dihedral',
-    validity: '✓ Eulerian Single-stroke',
-  },
-  {
-    id: 'mock_2',
-    title: 'Symmetrical Star Loop (5×5)',
-    image_url: '/synthetic/kolam19_k2.jpg',
-    grid_size: '5×5 Lattice',
-    symmetry: 'C4 Rotational',
-    validity: '✓ Eulerian Single-stroke',
-  },
-  {
-    id: 'mock_3',
-    title: 'Corner Petal Lattice (9×9)',
-    image_url: '/synthetic/kolam19_k3.jpg',
-    grid_size: '9×9 Lattice',
-    symmetry: 'D4 Dihedral',
-    validity: '✓ Eulerian Single-stroke',
-  },
-  {
-    id: 'mock_4',
-    title: 'Double-Strand Sikku Kolam (7×7)',
-    image_url: '/synthetic/kolam19_k27.jpg',
-    grid_size: '7×7 Lattice',
-    symmetry: 'D2 Mirror',
-    validity: '✓ Eulerian Single-stroke',
-  },
-  {
-    id: 'mock_5',
-    title: 'Radial Lattice Kolam (9×9)',
-    image_url: '/synthetic/kolam19_k50.jpg',
-    grid_size: '9×9 Lattice',
-    symmetry: 'D4 Dihedral',
-    validity: '✓ Eulerian Single-stroke',
-  },
-  {
-    id: 'mock_6',
-    title: 'Dense Interlocking Loop (11×11)',
-    image_url: '/synthetic/kolam29_k1.jpg',
-    grid_size: '11×11 Lattice',
-    symmetry: 'D4 Dihedral',
-    validity: '✓ Eulerian Single-stroke',
-  }
-]
 
 // Auto-scroll speed: pixels per frame (at ~60 fps ≈ 0.5px/frame = 30px/s)
 const SCROLL_SPEED = 0.5
@@ -71,8 +10,10 @@ export default function RecentKolams({ onSelectKolam }) {
   const { user, status, recentKolams } = useAuth()
   const isAuth = status === 'authenticated' && user
 
-  const baseList = (recentKolams && recentKolams.length > 0) ? recentKolams : MOCK_KOLAM_ITEMS
-  // Duplicate list for seamless infinite-loop illusion
+  // No mock/sample fallback: an empty history renders the empty state
+  // below, never a fabricated list of "recent" Kolams. Tripled only for
+  // the seamless infinite-scroll illusion (real data, repeated).
+  const baseList = recentKolams || []
   const displayList = [...baseList, ...baseList, ...baseList]
 
   const trackRef = useRef(null)
@@ -87,7 +28,7 @@ export default function RecentKolams({ onSelectKolam }) {
   // ── Auto-scroll loop ────────────────────────────────────────────────
   useEffect(() => {
     const el = trackRef.current
-    if (!el) return
+    if (!el || baseList.length === 0) return
 
     // Kick off at the midpoint of the tripled list so there's room to
     // scroll in both directions before hitting a boundary.
@@ -143,7 +84,7 @@ export default function RecentKolams({ onSelectKolam }) {
   }, [syncButtons])
 
   // ── Hover: pause / resume ──────────────────────────────────────────
-  const onMouseEnterTrack = () => { pausedRef.current = true  }
+  const onMouseEnterTrack = () => { pausedRef.current = true }
   const onMouseLeaveTrack = () => {
     // Only resume if not dragging
     if (!dragRef.current.active) pausedRef.current = false
@@ -181,22 +122,32 @@ export default function RecentKolams({ onSelectKolam }) {
     // (onMouseLeaveTrack handles that case separately)
   }
 
-  const getDistinctImageSrc = (item, idx) => {
-    const baseLen = baseList.length
-    const baseIdx = idx % baseLen
-    if (!item.image_url || item.image_url.includes('kolam19_1.jpg')) {
-      return SYNTHETIC_PHOTOS[baseIdx % SYNTHETIC_PHOTOS.length]
-    }
-    const isDuplicate = baseList.findIndex((k) => k.image_url === item.image_url) !== baseIdx
-    if (isDuplicate) {
-      return SYNTHETIC_PHOTOS[baseIdx % SYNTHETIC_PHOTOS.length]
-    }
-    return item.image_url
+  // Honest failure state: hide the broken <img>, show a neutral
+  // "preview unavailable" placeholder instead of silently swapping in
+  // an unrelated real photo that would misrepresent what this specific
+  // entry actually is.
+  const handleImageError = (e) => {
+    e.target.style.display = 'none'
+    const placeholder = e.target.nextElementSibling
+    if (placeholder) placeholder.style.display = 'flex'
   }
 
-  const handleImageError = (e, index) => {
-    e.target.onerror = null
-    e.target.src = SYNTHETIC_PHOTOS[index % SYNTHETIC_PHOTOS.length]
+  if (!recentKolams || recentKolams.length === 0) {
+    return (
+      <div className="recent-kolams-empty archival-frame">
+        <div className="empty-icon-wrap">
+          <Sparkles size={22} />
+        </div>
+        <div className="empty-text">
+          <h4 className="heading-display heading-4">No Recently Generated Kolams</h4>
+          <p className="body-text body-text--sm">
+            {isAuth
+              ? 'Your generated Kolam images will be saved automatically to your PULLI account.'
+              : 'Try analyzing or generating a Kolam above — your history is saved locally in your browser.'}
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -260,12 +211,18 @@ export default function RecentKolams({ onSelectKolam }) {
               onClick={() => onSelectKolam && onSelectKolam(item)}
             >
               <div className="recent-card-img">
-                <img
-                  src={getDistinctImageSrc(item, idx)}
-                  alt={item.title}
-                  onError={(e) => handleImageError(e, idx)}
-                  draggable="false"
-                />
+                {item.image_url && (
+                  <img
+                    src={item.image_url}
+                    alt={item.title}
+                    onError={handleImageError}
+                    draggable="false"
+                  />
+                )}
+                <div className="recent-card-img-fallback" style={!item.image_url ? { display: 'flex' } : undefined}>
+                  <ImageOff size={20} />
+                  <span>Preview unavailable</span>
+                </div>
               </div>
               <div className="recent-card-body">
                 <h4 className="heading-display heading-4 recent-card-title">{item.title}</h4>

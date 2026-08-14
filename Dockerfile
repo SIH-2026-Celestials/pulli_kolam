@@ -47,13 +47,23 @@ COPY experiments/m4_1/peak_detect.py ./experiments/m4_1/peak_detect.py
 COPY experiments/m4_2/__init__.py ./experiments/m4_2/__init__.py
 COPY experiments/m4_2/model.py ./experiments/m4_2/model.py
 COPY experiments/m4_2/ml_lattice_detector.py ./experiments/m4_2/ml_lattice_detector.py
+COPY experiments/m4_2/gated_ml_lattice_detector.py ./experiments/m4_2/gated_ml_lattice_detector.py
 COPY experiments/m4_2/results/dot_heatmap_net_v2.pt ./experiments/m4_2/results/dot_heatmap_net_v2.pt
+
+# Only the runtime-required pieces of experiments/m5_generation:
+COPY experiments/m5_generation/checkpoints/placement_scorer.pt ./experiments/m5_generation/checkpoints/placement_scorer.pt
+COPY experiments/m5_generation/data/split_manifest.json ./experiments/m5_generation/data/split_manifest.json
+
+# Seed data and migrations
+COPY alembic.ini ./alembic.ini
+COPY alembic/ ./alembic/
 
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=3)" || exit 1
+    CMD python -c "import urllib.request, os; port = os.environ.get('PORT', '8000'); urllib.request.urlopen(f'http://127.0.0.1:{port}/api/v1/health', timeout=3)" || exit 1
 
 # Production mode -- no --reload. KMP_DUPLICATE_LIB_OK is set inside
 # api/main.py itself (see its module docstring); not repeated here.
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Bind dynamically to Render/Fly.io platform PORT environment variable.
+CMD ["sh", "-c", "uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

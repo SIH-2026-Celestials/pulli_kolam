@@ -126,12 +126,30 @@
 }
 
 .recent-card-img {
+  position: relative;
   width: 100%;
   aspect-ratio: 1;
   background-color: #f6f2ec;
   border: 1px solid var(--color-line);
   overflow: hidden;
   border-radius: 4px;
+}
+
+/* Honest "preview unavailable" placeholder (see handleImageError in
+   RecentKolams.jsx) -- shown instead of silently substituting an
+   unrelated image when a card's image_url fails to load. */
+.recent-card-img-fallback {
+  display: none;
+  position: absolute;
+  inset: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  color: #888;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .recent-card-img img {

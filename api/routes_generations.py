@@ -22,10 +22,11 @@ from __future__ import annotations
 import os
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import Response
 from pydantic import BaseModel
 
+from api.rate_limit import GENERATION_LIMIT_PER_MINUTE, enforce_rate_limit
 from api.db.database import get_session
 from api.db.models import (
     GenerationRequest,
@@ -194,11 +195,17 @@ def list_generations(page: int = 1, page_size: int = 20):
 
 
 @router.post("/generations")
-def create_generation(body: CreateGenerationRequest):
+def create_generation(request: Request, body: CreateGenerationRequest):
     """Generate + PERSIST N candidates. Same underlying M5 call path as
     the legacy /api/v1/generate, plus full analysis/verification/artifact
     persistence and a stable `run_id`/per-candidate `id` for later
-    retrieval (Phase 10's generation-history requirement)."""
+    retrieval (Phase 10's generation-history requirement).
+
+    THE canonical, frontend-facing generation endpoint (see
+    PRODUCTION_READINESS.md section 1) -- this is the one that most
+    needs rate limiting, since it is the only generation path the real
+    UI calls. See api/rate_limit.py for the limit's justification."""
+    enforce_rate_limit(request, "generations", GENERATION_LIMIT_PER_MINUTE)
     count = body.count if body.count is not None else 1
     if not isinstance(count, int) or count < 1:
         raise _api_error(422, "INVALID_REQUEST", f"count must be a positive integer, got {body.count!r}")
@@ -279,12 +286,9 @@ def get_generation(result_id: str):
         svg = None
         artifact = pv.artifacts[0] if pv.artifacts else None
         if artifact is not None:
-            from pathlib import Path
-
-            storage_root = Path(__file__).resolve().parent / "storage"
-            svg_path = storage_root / artifact.storage_path
-            if svg_path.exists():
-                svg = svg_path.read_text(encoding="utf-8")
+            from api.services.artifact_store import get_artifact_store
+            store = get_artifact_store()
+            svg = store.read(artifact.storage_path)
 
         return {
             "success": True,

@@ -17,67 +17,37 @@ location, satisfying "do not expose filesystem paths to clients."
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Protocol
+import os
+from api.storage.base import Storage as ArtifactStore
+from api.storage.local import LocalStorage
 
-
-class ArtifactStore(Protocol):
-    def write(self, relative_path: str, content: str, content_type: str) -> None: ...
-    def write_bytes(self, relative_path: str, content: bytes, content_type: str) -> None: ...
-    def read(self, relative_path: str) -> "str | None": ...
-    def read_bytes(self, relative_path: str) -> "bytes | None": ...
-    def exists(self, relative_path: str) -> bool: ...
-
-
-class LocalArtifactStore:
-    """Disk-backed store rooted at `api/storage/`. Every `relative_path`
-    is resolved under this root and never allowed to escape it (rejects
-    `..` path traversal) -- the one safety property that matters even
-    for a purely local/dev store, since `relative_path` values are
-    ultimately derived from database-generated UUIDs, not raw user
-    input, but defense-in-depth costs nothing here."""
-
-    def __init__(self, root: "Path | None" = None):
-        self.root = root or (Path(__file__).resolve().parent.parent / "storage")
-        self.root.mkdir(parents=True, exist_ok=True)
-
-    def _resolve(self, relative_path: str) -> Path:
-        resolved = (self.root / relative_path).resolve()
-        if not str(resolved).startswith(str(self.root.resolve())):
-            raise ValueError(f"artifact path escapes storage root: {relative_path!r}")
-        return resolved
-
-    def write(self, relative_path: str, content: str, content_type: str) -> None:
-        path = self._resolve(relative_path)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content, encoding="utf-8")
-
-    def write_bytes(self, relative_path: str, content: bytes, content_type: str) -> None:
-        path = self._resolve(relative_path)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(content)
-
-    def read(self, relative_path: str) -> "str | None":
-        path = self._resolve(relative_path)
-        if not path.exists():
-            return None
-        return path.read_text(encoding="utf-8")
-
-    def read_bytes(self, relative_path: str) -> "bytes | None":
-        path = self._resolve(relative_path)
-        if not path.exists():
-            return None
-        return path.read_bytes()
-
-    def exists(self, relative_path: str) -> bool:
-        return self._resolve(relative_path).exists()
-
-
-_store: "LocalArtifactStore | None" = None
-
+_store: ArtifactStore | None = None
 
 def get_artifact_store() -> ArtifactStore:
     global _store
     if _store is None:
-        _store = LocalArtifactStore()
+        provider = os.environ.get("STORAGE_PROVIDER", "local").lower().strip()
+        if provider == "r2":
+            # Lazy import: boto3 is only loaded when R2 is actually requested,
+            # avoiding top-level crashes in envs without boto3 installed.
+            from api.storage.r2 import R2Storage
+            # Verify R2 config exists
+            if all(os.environ.get(k) for k in ("R2_ENDPOINT", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET")):
+                _store = R2Storage()
+            else:
+                import sys
+                print(
+                    "[pulli-api] Warning: STORAGE_PROVIDER=r2 set but credentials missing. Falling back to LocalStorage.",
+                    file=sys.stderr
+                )
+                _store = LocalStorage()
+        else:
+            _store = LocalStorage()
     return _store
+
+
+# ---------------------------------------------------------------------------
+# Backward-compatibility alias
+# Tests and legacy callers may import LocalArtifactStore by name.
+# ---------------------------------------------------------------------------
+LocalArtifactStore = LocalStorage
