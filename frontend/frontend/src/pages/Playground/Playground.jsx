@@ -342,8 +342,8 @@ export default function Playground() {
               <p className="body-text body-text--sm">
                 Generated using P5/HTML5 Canvas matrix permutations based on classical Pulli Kolam loop continuous-stroke rules.
               </p>
-              <Link to="/analyze" className="link-analyze label-tech">
-                <Eye size={14} /> Run Deep AI Analysis →
+              <Link to="/detect" className="link-analyze label-tech">
+                <Eye size={14} /> Run Deep AI Dot Detection →
               </Link>
             </div>
           </div>

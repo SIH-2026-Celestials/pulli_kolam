@@ -90,6 +90,9 @@ Thumbs.db
 # runtime-generated data, not source (see api/db/database.py's module
 # docstring: DATABASE_URL points a real deployment at Postgres instead).
 api/db/*.db
+api/db/*.db-journal
+api/db/*.db-wal
+api/db/*.db-shm
 api/storage/artifacts/*.svg
 api/storage/artifacts/*.png
 api/storage/artifacts/*.json

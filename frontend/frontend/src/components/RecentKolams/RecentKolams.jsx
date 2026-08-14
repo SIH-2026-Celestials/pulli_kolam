@@ -1,5 +1,5 @@
 import { useAuth } from '../../context/AuthContext'
-import { History, Database, HardDrive } from 'lucide-react'
+import { Database, HardDrive } from 'lucide-react'
 import './RecentKolams.css'
 
 export default function RecentKolams({ onSelectKolam }) {
@@ -9,7 +9,7 @@ export default function RecentKolams({ onSelectKolam }) {
     return (
       <div className="recent-kolams-empty archival-frame">
         <div className="empty-icon-wrap">
-          <History size={24} />
+          <img src="/kolam_tradition_icon.jpg" alt="Traditional Kolam Icon" className="kolam-icon-img" />
         </div>
         <div className="empty-text">
           <h4 className="heading-display heading-4">No Recently Generated Kolams</h4>
@@ -27,7 +27,7 @@ export default function RecentKolams({ onSelectKolam }) {
     <section className="recent-kolams-section">
       <div className="recent-header">
         <div className="recent-title-group">
-          <History size={18} className="icon-accent" />
+          <img src="/kolam_tradition_icon.jpg" alt="Traditional Kolam Icon" className="kolam-header-icon" />
           <h3 className="heading-display heading-3">Recently Generated Kolams</h3>
         </div>
 
