@@ -9,6 +9,7 @@ import Explore from './pages/Explore/Explore'
 import KolamDetail from './pages/KolamDetail/KolamDetail'
 import Analyze from './pages/Analyze/Analyze'
 import Detect from './pages/Detect/Detect'
+import Playground from './pages/Playground/Playground'
 import Learn from './pages/Learn/Learn'
 import LearnModule from './pages/Learn/LearnModule'
 import Technology from './pages/Technology/Technology'
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/analyze" element={<Analyze />} />
         
         <Route path="/detect" element={<Detect />} />
+        <Route path="/playground" element={<Playground />} />
         <Route path="/learn" element={<Learn />} />
         <Route path="/learn/:moduleSlug" element={<LearnModule />} />
         <Route path="/technology" element={<Technology />} />
