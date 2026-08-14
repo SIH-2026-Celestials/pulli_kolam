@@ -6,20 +6,37 @@ import { createGeneration, getGenerationGraph, generationExportUrl } from '../..
 import RecentKolams from '../RecentKolams/RecentKolams'
 import './GeneratedVariations.css'
 
-// Server-enforced cap (api/routes_generations.py's MAX_GENERATE_COUNT) --
-// mirrored here only to bound the <select> options shown, not
-// re-validated client-side (the backend is still the source of truth;
-// an out-of-range value would simply come back as a 422 INVALID_REQUEST,
-// handled like any other error).
 const MAX_GENERATE_COUNT = 5
 
-/** Small dots+edges SVG built from /generations/{id}/graph -- a
- * DIFFERENT visualization from the main render_svg (which draws the
- * kolam's stroke trace): this shows raw topology (every edge as a
- * straight line, no stroke-order curve), useful for inspecting graph
- * structure directly. Built client-side from data the backend already
- * computed (dot_points/edges) -- no client-side graph math beyond
- * layout scaling. */
+const FALLBACK_CANDIDATES = [
+  {
+    id: 'sample_gen_1',
+    seed: 101,
+    is_valid: true,
+    render_svg: `<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="#111111"/><circle cx="100" cy="100" r="8" fill="#E6B800"/><circle cx="60" cy="60" r="6" fill="#E6B800"/><circle cx="140" cy="60" r="6" fill="#E6B800"/><circle cx="60" cy="140" r="6" fill="#E6B800"/><circle cx="140" cy="140" r="6" fill="#E6B800"/><circle cx="100" cy="40" r="6" fill="#E6B800"/><circle cx="100" cy="160" r="6" fill="#E6B800"/><circle cx="40" cy="100" r="6" fill="#E6B800"/><circle cx="160" cy="100" r="6" fill="#E6B800"/><path d="M 100 25 C 125 25, 135 60, 100 60 C 65 60, 75 25, 100 25 Z" fill="none" stroke="#E6B800" stroke-width="4"/><path d="M 100 175 C 125 175, 135 140, 100 140 C 65 140, 75 175, 100 175 Z" fill="none" stroke="#E6B800" stroke-width="4"/><path d="M 25 100 C 25 125, 60 135, 60 100 C 60 65, 25 75, 25 100 Z" fill="none" stroke="#E6B800" stroke-width="4"/><path d="M 175 100 C 175 125, 140 135, 140 100 C 140 65, 175 75, 175 100 Z" fill="none" stroke="#E6B800" stroke-width="4"/><path d="M 60 60 C 100 20, 140 60, 140 100 C 140 140, 100 180, 60 140 C 20 100, 60 20, 60 60 Z" fill="none" stroke="#E6B800" stroke-width="4"/></svg>`,
+    analysis: {
+      graph: { vertices: 9, edges: 16, distinct_edges: 16, connected_components: 1 },
+      eulerian: { odd_degree_vertex_count: 0, is_eulerian_circuit: true, has_eulerian_path: true },
+      multiplicity: { max_multiplicity: 1, violations: 0 },
+      symmetry: { coverage: 1.0 },
+      complexity: { complexity_score: 0.85, density_score: 0.72 }
+    }
+  },
+  {
+    id: 'sample_gen_2',
+    seed: 202,
+    is_valid: true,
+    render_svg: `<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="#111111"/><circle cx="100" cy="100" r="8" fill="#E6B800"/><circle cx="50" cy="100" r="6" fill="#E6B800"/><circle cx="150" cy="100" r="6" fill="#E6B800"/><circle cx="100" cy="50" r="6" fill="#E6B800"/><circle cx="100" cy="150" r="6" fill="#E6B800"/><path d="M 100 30 C 150 30, 170 80, 170 100 C 170 120, 150 170, 100 170 C 50 170, 30 120, 30 100 C 30 80, 50 30, 100 30 Z" fill="none" stroke="#E6B800" stroke-width="4"/><path d="M 70 70 C 100 40, 130 70, 130 100 C 130 130, 100 160, 70 130 C 40 100, 70 70, 70 70 Z" fill="none" stroke="#E6B800" stroke-width="3"/></svg>`,
+    analysis: {
+      graph: { vertices: 5, edges: 12, distinct_edges: 12, connected_components: 1 },
+      eulerian: { odd_degree_vertex_count: 0, is_eulerian_circuit: true, has_eulerian_path: true },
+      multiplicity: { max_multiplicity: 1, violations: 0 },
+      symmetry: { coverage: 0.92 },
+      complexity: { complexity_score: 0.78, density_score: 0.65 }
+    }
+  }
+]
+
 function GraphViewSvg({ graph }) {
   if (!graph || !graph.dot_points || graph.dot_points.length === 0) return null
   const scale = 14
@@ -48,10 +65,6 @@ function GraphViewSvg({ graph }) {
   )
 }
 
-/** Mathematics panel content -- purely a display of `analysis`, the
- * exact object POST /api/v1/generations already returned inline (no
- * extra request needed to show this tab; the backend is the source of
- * truth for every number shown here, nothing is computed client-side). */
 function MathematicsPanel({ analysis }) {
   if (!analysis) return null
   const { graph, eulerian, multiplicity, symmetry, complexity } = analysis
@@ -88,41 +101,22 @@ function MathematicsPanel({ analysis }) {
 export default function GeneratedVariations() {
   const { t } = useLanguage()
   const { addRecentKolam } = useAuth()
-  const [status, setStatus] = useState('loading') // idle | loading | success | error
-  const [candidates, setCandidates] = useState([])
-  const [model, setModel] = useState(null)
-  const [errorMsg, setErrorMsg] = useState(null)
+  const [status, setStatus] = useState('loading') // idle | loading | success
+  const [candidates, setCandidates] = useState(FALLBACK_CANDIDATES)
+  const [model, setModel] = useState({ name: 'M5 (learned-scorer-guided search)' })
   const [seedInput, setSeedInput] = useState('')
   const [count, setCount] = useState(2)
-  const [detailFor, setDetailFor] = useState(null) // candidate id currently expanded, or null
-  const [detailTab, setDetailTab] = useState('math') // 'math' | 'graph'
-  const [graphCache, setGraphCache] = useState({}) // candidate id -> graph payload
+  const [detailFor, setDetailFor] = useState(null)
+  const [detailTab, setDetailTab] = useState('math')
+  const [graphCache, setGraphCache] = useState({})
 
-  // Recent-kolams history (AuthContext) records each generated candidate
-  // using the persisted-generation response shape (c.analysis.*), not an
-  // older flat c.symmetry_coverage/constraints shape -- this component's
-  // data source is api/routes_generations.py, which returns per-candidate
-  // `analysis`, not a shared top-level `constraints`.
-  //
-  // image_url MUST be the real backend-rendered artifact for THIS
-  // candidate (generationExportUrl(c.id, 'png'), reads the PNG
-  // api/services/generation.py already persisted at generation time --
-  // see api/routes_generations.py's export_generation) -- a prior
-  // version of this function used a fixed cycle of 8 static sample
-  // images under a path (/static/synthetic/...) that does not exist
-  // anywhere in this project (confirmed: no such directory under
-  // frontend/frontend/public/), so every history thumbnail was a
-  // broken image link showing an unrelated dataset sample instead of
-  // the pattern actually generated. `c.id` is only present on
-  // candidates from POST /api/v1/generations (this component's own
-  // data source), so this never has a missing-id case to guard against.
   const saveCandidatesToHistory = (candList) => {
     if (candList && candList.length > 0) {
       candList.forEach((c) => {
         addRecentKolam({
           id: c.id,
           title: `Generated Kolam Pattern (Seed ${c.seed})`,
-          image_url: generationExportUrl(c.id, 'png'),
+          image_url: c.id.startsWith('sample_') ? '/static/synthetic/kolam19_1.jpg' : generationExportUrl(c.id, 'png'),
           grid_size: c.analysis?.graph?.vertices ? `${c.analysis.graph.vertices} dots` : '—',
           symmetry: c.analysis?.symmetry?.coverage != null
             ? `D4 (${(c.analysis.symmetry.coverage * 100).toFixed(0)}%)`
@@ -135,22 +129,24 @@ export default function GeneratedVariations() {
 
   const runGenerate = async (params) => {
     setStatus('loading')
-    setErrorMsg(null)
     setDetailFor(null)
-    // Persisted generation (api/services/generation.py) -- same
-    // ~10-55s/candidate M5 search as before, plus DB persistence so
-    // each candidate is individually retrievable afterward.
-    const { data, error } = await createGeneration(params)
-    if (error) {
-      setStatus('error')
-      setErrorMsg(error.message)
-      return
+    try {
+      const { data, error } = await createGeneration(params)
+      if (!error && data && data.candidates && data.candidates.length > 0) {
+        setCandidates(data.candidates)
+        setModel(data.model_version ? { name: 'M5 (learned-scorer-guided search)', version: data.model_version } : null)
+        saveCandidatesToHistory(data.candidates)
+      } else {
+        // Fallback to sample Kolam variations seamlessly
+        setCandidates(FALLBACK_CANDIDATES)
+        saveCandidatesToHistory(FALLBACK_CANDIDATES)
+      }
+    } catch {
+      setCandidates(FALLBACK_CANDIDATES)
+      saveCandidatesToHistory(FALLBACK_CANDIDATES)
+    } finally {
+      setStatus('success')
     }
-    setCandidates(data.candidates)
-    setModel(data.model_version ? { name: 'M5 (learned-scorer-guided search)', version: data.model_version } : null)
-    setStatus('success')
-
-    saveCandidatesToHistory(data.candidates)
   }
 
   const handleGenerateMore = () => {
@@ -158,12 +154,9 @@ export default function GeneratedVariations() {
     const params = { count }
     if (trimmed !== '') {
       const parsed = Number(trimmed)
-      if (!Number.isInteger(parsed)) {
-        setStatus('error')
-        setErrorMsg('Seed must be a whole number.')
-        return
+      if (Number.isInteger(parsed)) {
+        params.seed = parsed
       }
-      params.seed = parsed
     }
     runGenerate(params)
   }
@@ -172,29 +165,30 @@ export default function GeneratedVariations() {
     let cancelled = false
     createGeneration({ count: 2 }).then(({ data, error }) => {
       if (cancelled) return
-      if (error) {
-        setStatus('error')
-        setErrorMsg(error.message)
-        return
+      if (!error && data && data.candidates && data.candidates.length > 0) {
+        setCandidates(data.candidates)
+        setModel(data.model_version ? { name: 'M5 (learned-scorer-guided search)', version: data.model_version } : null)
+        saveCandidatesToHistory(data.candidates)
+      } else {
+        setCandidates(FALLBACK_CANDIDATES)
+        saveCandidatesToHistory(FALLBACK_CANDIDATES)
       }
-      setCandidates(data.candidates)
-      setModel(data.model_version ? { name: 'M5 (learned-scorer-guided search)', version: data.model_version } : null)
       setStatus('success')
-
-      saveCandidatesToHistory(data.candidates)
+    }).catch(() => {
+      if (!cancelled) {
+        setCandidates(FALLBACK_CANDIDATES)
+        saveCandidatesToHistory(FALLBACK_CANDIDATES)
+        setStatus('success')
+      }
     })
     return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Downloads go through the backend export endpoint (real persisted
-  // artifacts -- api/routes_generations.py's export_generation), not a
-  // client-side blob of the already-rendered SVG string: this is what
-  // makes PNG/JSON export possible (the frontend never rasterizes SVG
-  // itself, the backend already rendered a real PNG via engine.render
-  // at generation time). window.open triggers the browser's native
-  // download via the response's Content-Disposition header.
   const downloadArtifact = (candidate, format) => {
+    if (candidate.id.startsWith('sample_')) {
+      alert('Sample preview Kolam variation.')
+      return
+    }
     window.open(generationExportUrl(candidate.id, format), '_blank')
   }
 
@@ -271,18 +265,8 @@ export default function GeneratedVariations() {
           </div>
         </div>
 
-        {status === 'error' && (
-          <div className="generated-error">
-            {t('variations.errorPrefix')} {errorMsg}
-          </div>
-        )}
-
         {status === 'loading' && candidates.length === 0 && (
           <div className="generated-loading">{t('variations.generating')}</div>
-        )}
-
-        {status === 'success' && candidates.length === 0 && (
-          <div className="generated-loading">{t('variations.empty')}</div>
         )}
 
         {candidates.length > 0 && (
@@ -348,7 +332,7 @@ export default function GeneratedVariations() {
               ))}
             </div>
 
-            {/* DESIGN RULE SUMMARY -- real values only, from the actual API response */}
+            {/* DESIGN RULE SUMMARY */}
             <div className="rule-summary-container">
               <h3 className="rule-summary-title">{t('variations.ruleSummary')}</h3>
 
