@@ -376,7 +376,25 @@ export default function Detect() {
                   <p className="detect-error" role="alert">{reconstruction.error}</p>
                 )}
                 {reconstruction.reconstruction?.note && (
-                  <p className="detect-error" role="alert">{reconstruction.reconstruction.note}</p>
+                  <>
+                    <p className="detect-error" role="alert">{reconstruction.reconstruction.note}</p>
+                    {mode === 'classical' && (
+                      // Classical requires >=3 detected dots to fit a lattice at all
+                      // (engine.image_io.detect_lattice's documented guard against
+                      // fitting a lattice from too few points) -- a real, measured
+                      // limitation on real photographs, not a bug. ML detects
+                      // substantially more dots on the same real photos (see
+                      // docs/M4_1_ML_COMPLETION_REPORT.md), so it's worth surfacing
+                      // as a concrete next step rather than leaving the user with
+                      // just a dead end.
+                      <p className="body-text body-text--sm detect-placeholder">
+                        The classical detector found too few dots to fit a lattice on this
+                        image. Try switching to the <strong>ML</strong> mode above and
+                        re-running — it typically detects substantially more dots on real
+                        photographs.
+                      </p>
+                    )}
+                  </>
                 )}
                 {reconstruction.reconstruction && reconstruction.reconstruction.is_valid !== undefined && (
                   <>
