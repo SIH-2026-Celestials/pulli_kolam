@@ -23,15 +23,11 @@ import Terms from './pages/Terms/Terms'
 import Contact from './pages/Contact/Contact'
 import NotFound from './pages/NotFound/NotFound'
 import KolamGridPattern from './components/kolam/KolamGridPattern'
-import TamilCultureBackground from './components/kolam/TamilCultureBackground'
-import TamilParallaxGopuram from './components/kolam/TamilParallaxGopuram'
 import './styles/global.css'
 
 export default function App() {
   return (
     <div className="app-shell">
-      <TamilParallaxGopuram />
-      <TamilCultureBackground />
       <KolamGridPattern opacity={0.015} />
       <Header />
       <AuthModal />

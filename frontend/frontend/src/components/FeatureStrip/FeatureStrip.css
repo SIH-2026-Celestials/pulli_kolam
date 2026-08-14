@@ -1,6 +1,6 @@
 .feature-strip-section {
   width: 100%;
-  background-color: transparent;
+  background-color: var(--color-paper);
   padding: 12px 0 32px 0;
 }
 
