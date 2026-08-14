@@ -1,0 +1,56 @@
+{
+  "n_source_patterns": 9,
+  "n_source_patterns_by_split": {
+    "train": 3,
+    "val": 3,
+    "test": 3
+  },
+  "n_examples_by_split": {
+    "train": 66,
+    "val": 66,
+    "test": 66
+  },
+  "n_examples_total": 198,
+  "validity_rate_train": 1.0,
+  "topology_distribution_train": {
+    "d4": 24,
+    "crop": 42
+  },
+  "symmetry_distribution_train": {
+    "low_symmetry": 63,
+    "high_symmetry": 3
+  },
+  "complexity_mean_train": 0.44869096872043035,
+  "complexity_min_train": 0.3333333333333333,
+  "complexity_max_train": 0.5151515151515151,
+  "n_unique_token_sequences_train": 48,
+  "structural_uniqueness_rate_train": 0.7272727272727273,
+  "duplicate_rate_train": 0.2727272727272727,
+  "vocab_size": 38,
+  "unk_rate_by_split": {
+    "train": {
+      "n_unk_tokens": 0,
+      "n_total_tokens": 5734,
+      "unk_rate": 0.0
+    },
+    "val": {
+      "n_unk_tokens": 105,
+      "n_total_tokens": 3106,
+      "unk_rate": 0.03380553766902769
+    },
+    "test": {
+      "n_unk_tokens": 404,
+      "n_total_tokens": 4429,
+      "unk_rate": 0.09121697900203206
+    }
+  },
+  "crop_config": {
+    "n_crops_per_pattern_target": 14,
+    "crop_radius_range": [
+      3,
+      9
+    ]
+  },
+  "build_time_seconds": 25.880713939666748,
+  "seed": 6262
+}
