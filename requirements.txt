@@ -1,18 +1,14 @@
-numpy
-pandas
-networkx
-matplotlib
-scipy
-scikit-image
-opencv-python
-pytest
+# Full local development environment: everything needed to run the
+# engine, the ML detector, the API, AND the test suite / research
+# scripts (plot_kolam.py, analyze_symmetry.py, etc.).
+#
+# Split into requirements-engine.txt / requirements-ml.txt /
+# requirements-api.txt (see docs/DEPLOYMENT_AUDIT.md item 2) so the
+# API container can install only what it actually needs -- this file
+# stays the single entry point for local dev and CI, unchanged in
+# behavior.
 
-# Used only by experiments/m4_1/ and experiments/m4_2/ (learned
-# lattice-detection experiments) -- NOT a dependency of engine/, which
-# remains pure numpy/scipy/opencv/networkx. Already present in this
-# project's development environment prior to M4.1; declared here for
-# reproducibility, not newly introduced for convenience.
-torch
+-r requirements-api.txt
 
 # Used only by api/ (M4.2 REST service) -- NOT a dependency of engine/.
 # Already present in this project's development environment prior to
@@ -31,3 +27,13 @@ python-multipart
 sqlalchemy
 bcrypt
 python-dotenv
+
+# Used only by top-level research/plotting scripts (plot_kolam.py,
+# analyze_symmetry.py, etc.) -- NOT imported by engine/ or api/.
+matplotlib==3.10.0
+
+pytest==8.3.4
+
+# Pillow (engine/render.py's PNG dependency) is pulled in transitively
+# via -r requirements-api.txt -> requirements-ml.txt ->
+# requirements-engine.txt above -- pinned there, not duplicated here.

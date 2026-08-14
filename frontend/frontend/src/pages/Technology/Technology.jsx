@@ -5,7 +5,7 @@ export default function Technology() {
   return (
     <main id="main-content" className="technology-page">
       <header className="technology-header section section--bordered">
-        <div className="container">
+        <div className="container--narrow">
           <p className="eyebrow eyebrow--accent">System Architecture</p>
           <h1 className="heading-display heading-2 technology-title">
             Technology
@@ -17,7 +17,7 @@ export default function Technology() {
       </header>
 
       {/* Architecture diagram */}
-      <section className="container section section--bordered">
+      <section className="container--narrow section section--bordered">
         <div className="technology-grid">
           <div className="technology-col-left">
             <p className="eyebrow">Data &amp; Analysis Pipeline</p>
@@ -34,7 +34,7 @@ export default function Technology() {
             <div className="technology-card diagram-card">
               <h3 className="eyebrow">System Architecture</h3>
               <div className="architecture-flow label-tech">
-                <div className="arch-node">Dataset (Kaggle — kolam19 / kolam29 / kolam109)</div>
+                <div className="arch-node">Dataset (Kaggle - kolam19 / kolam29 / kolam109)</div>
                 <div className="arch-arrow">↓</div>
                 <div className="arch-node">Parser (CSV Coordinate Polyline Trace)</div>
                 <div className="arch-arrow">↓</div>
@@ -55,7 +55,7 @@ export default function Technology() {
 
       {/* Tech stack */}
       <section className="section technology-stack-section">
-        <div className="container">
+        <div className="container--narrow">
           <div className="section-title-block">
             <p className="eyebrow eyebrow--accent">Stack Specification</p>
             <h2 className="heading-display heading-2">TECHNOLOGY STACK</h2>
@@ -99,7 +99,7 @@ export default function Technology() {
 
       {/* Technical notes */}
       <section className="section technology-details-section">
-        <div className="container">
+        <div className="container--narrow">
           <h2 className="heading-display heading-3 section-title">Key Implementation Principles</h2>
 
           <div className="technology-cards-grid">

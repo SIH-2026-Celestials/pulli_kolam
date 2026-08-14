@@ -9,11 +9,11 @@ export const TRANSLATIONS = { en, hi, ta, te, kn, ml }
 
 export const LANGUAGES = [
   { code: 'en', label: 'English',    nativeName: 'English',    script: 'A' },
-  { code: 'ta', label: 'Tamil',      nativeName: 'தமிழ்',      script: 'த' },
-  { code: 'hi', label: 'Hindi',      nativeName: 'हिन्दी',     script: 'ह' },
-  { code: 'te', label: 'Telugu',     nativeName: 'తెలుగు',    script: 'తె' },
-  { code: 'kn', label: 'Kannada',    nativeName: 'ಕನ್ನಡ',    script: 'ಕ' },
-  { code: 'ml', label: 'Malayalam',  nativeName: 'മലയാളം',  script: 'മ' },
+  { code: 'ta', label: 'Tamil',      nativeName: 'தமிழ்(Tamil)',      script: 'த' },
+  { code: 'hi', label: 'Hindi',      nativeName: 'हिन्दी(Hindi)',     script: 'ह' },
+  { code: 'te', label: 'Telugu',     nativeName: 'తెలుగు(Telugu)',    script: 'తె' },
+  { code: 'kn', label: 'Kannada',    nativeName: 'ಕನ್ನಡ(Kannada)',    script: 'ಕ' },
+  { code: 'ml', label: 'Malayalam',  nativeName: 'മലയാളം(Malayalam)',  script: 'മ' },
 ]
 
 export const ALL_LANGUAGES = [

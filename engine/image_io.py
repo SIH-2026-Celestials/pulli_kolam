@@ -239,6 +239,26 @@ def detect_lattice(preprocessed: Preprocessed) -> Lattice:
     return Lattice([tuple(p) for p in pixel_positions], lattice_coords, R)
 
 
+def is_traceable(lattice: Lattice) -> bool:
+    """True iff `lattice` is well-formed enough for trace_path to safely
+    consume: `lattice_coords` is either empty (zero usable detections) or
+    index-aligned 1:1 with `pixel_positions`. Guards the one documented,
+    reproduced asymmetric shape -- 1-2 `pixel_positions` with 0
+    `lattice_coords`, which `_fit_lattice_coords` (and, by construction,
+    any conforming ML detector) can legitimately produce when too few
+    points were found to fit a lattice -- that crashes trace_path with
+    IndexError (see docs/ML_CONTRACT.md Section 5,
+    tests/test_ml_contract.py::test_asymmetric_lattice_shape_is_a_documented_unfixed_blocker).
+    `engine.ml_contract.assert_conforms` cannot catch this by itself (0
+    coords is a legal value of its own shape invariant); this is the
+    upstream gate callers should use INSTEAD of calling trace_path
+    directly on a lattice they haven't checked. trace_path itself is not
+    modified -- callers treat a non-traceable lattice the same as a
+    zero-detection one (no edges), per the empty-detection convention
+    docs/ML_CONTRACT.md already recommends detectors follow."""
+    return len(lattice.lattice_coords) == len(lattice.pixel_positions)
+
+
 def trace_path(preprocessed: Preprocessed, lattice: Lattice) -> list[tuple[Point, Point]]:
     """Skeletonize the ink mask and use dot-hub-removal + connected
     components to recover which dots are directly joined by a stroke.
@@ -306,7 +326,13 @@ def build_graph(image_path: str) -> nx.MultiGraph:
     exact node/edge format engine/graph_io.py produces from CSVs."""
     preprocessed = preprocess(image_path)
     lattice = detect_lattice(preprocessed)
-    edges = trace_path(preprocessed, lattice)
+    # Gate at the boundary rather than inside trace_path itself -- see
+    # is_traceable's docstring. detect_lattice's own output always
+    # satisfies this (its `< 3 points` branch is the one asymmetric
+    # case), so this is a no-op for every existing synthetic-corpus
+    # test; it only changes behavior for the documented real-photo edge
+    # case that used to crash here.
+    edges = trace_path(preprocessed, lattice) if is_traceable(lattice) else []
 
     G = nx.MultiGraph()
     G.add_nodes_from(lattice.lattice_coords)

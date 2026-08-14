@@ -1,4 +1,3 @@
-import React from 'react'
 import './kolam.css'
 
 export default function TamilCultureBackground() {

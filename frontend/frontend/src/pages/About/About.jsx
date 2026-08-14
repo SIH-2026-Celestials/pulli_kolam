@@ -7,7 +7,7 @@ export default function About() {
   return (
     <main id="main-content" className="about-page">
       <header className="about-header section">
-        <div className="container">
+        <div className="container--narrow">
           <p className="eyebrow eyebrow--accent">{t('pages.about.eyebrow')}</p>
           <h1 className="heading-display heading-2 about-title">
             {t('pages.about.title')}
@@ -18,7 +18,7 @@ export default function About() {
         </div>
       </header>
 
-      <section className="container section about-content">
+      <section className="container--narrow section about-content">
         <div className="about-grid">
           {/* Main overview */}
           <div className="about-main">

@@ -88,11 +88,14 @@ export default function Header() {
           <NavLink to="/detect" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
             {t('nav.detect')}
           </NavLink>
-          <NavLink to="/generate" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-            {t('nav.generate')}
+          <NavLink to="/playground" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+            Playground
           </NavLink>
           <NavLink to="/explore" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
             {t('nav.gallery')}
+          </NavLink>
+          <NavLink to="/learn" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+            Learn
           </NavLink>
           <NavLink to="/about" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
             {t('nav.about')}
@@ -151,14 +154,14 @@ export default function Header() {
             </div>
           ) : (
             <div className="auth-controls">
-              <button 
+              <button
                 type="button"
-                className="auth-login-link navbar-btn-action" 
+                className="auth-login-link navbar-btn-action"
                 onClick={openLogin}
               >
                 {t('nav.login')}
               </button>
-              <button 
+              <button
                 type="button"
                 className="btn-login navbar-btn-action"
                 onClick={openRegister}

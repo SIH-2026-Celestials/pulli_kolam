@@ -1,4 +1,4 @@
-# PROJECT STATUS — PULLI Kolam Design-Principle Engine
+# PROJECT STATUS - PULLI Kolam Design-Principle Engine
 
 **Last Updated:** 2026-08-13 (merged changes)  
 **Branch:** `master`
@@ -33,7 +33,7 @@ PULLI is a computational platform that uses ML, computer vision, and graph theor
 | Milestone | Status | Notes |
 |---|---|---|
 | Project scaffold (React + Vite) | ✅ Complete | Vite v8, React 19 |
-| Design system (tokens, global styles) | ✅ Complete | Playfair Display + Inter, maroon/gold palette. Aligned color variables to the heritage editorial palette (deep maroon `#5A0615`, antique gold `#A97824`, warm ivory `#FBF8F1`, cream `#F5F0E6`, borders warm beige `#E6DCCB`). |
+| Design system (tokens, global styles) | ✅ Complete | Playfair Display + Inter, maroon/gold palette. Aligned color variables to the heritage editorial palette (deep maroon `#5A0615`, antique gold `#A97824`, warm ivory `#FBF8F1`, cream `#F5F0E6`, borders warm beige `#E6DCCB`). Was Home-page-only for a while - Analyze/About/Gallery/How it Works/Generate referenced a shared `.container`/`.section`/`.eyebrow`/`.heading-display`/`.btn*` utility layer and a `--space-*`/`--color-ink`/`--color-line`/etc. token set that had never been defined, so those pages rendered as unstyled HTML. Fixed via `tokens.css` additions + new `utilities.css`. |
 | Navbar component | ✅ Complete | Deep maroon, gold active underline, Login button |
 | Theme toggle button | ✅ Complete | Default theme light, persists theme state via localStorage, toggles '.dark-theme' class on the documentElement and changes icon dynamically between Sun/Moon. |
 | Reusable Decorative System | ✅ Complete | Created `KolamCornerDecoration`, `KolamDecoration` (divider/border), `KolamGridPattern` (subtle repeating dot lattices), and `KolamMotif` for inline decorations. |
@@ -51,7 +51,7 @@ PULLI is a computational platform that uses ML, computer vision, and graph theor
 | How it Works page | ✅ Complete | Routed at `/how-it-works` |
 | Generate page | ✅ Complete | Routed at `/generate`; fixes navbar link that previously 404'd blank (no matching route) |
 | 404 / catch-all route | ✅ Complete | Prevents blank page on unmatched routes |
-| Gallery page (kolam archive browser) | ✅ Complete | Search/filter by number, 400-pattern grid, Load More pagination — moved up from "In Progress" below, it was already functionally complete |
+| Gallery page (kolam archive browser) | ✅ Complete | Search/filter by number, 400-pattern grid, Load More pagination - moved up from "In Progress" below, it was already functionally complete |
 | `npm run build` | ✅ Passing | Zero errors, clean production bundle |
 
 ---
@@ -83,7 +83,7 @@ PULLI is a computational platform that uses ML, computer vision, and graph theor
 
 | Metric | Value |
 |---|---|
-| Dataset | `kolam19` — 400 patterns |
+| Dataset | `kolam19` - 400 patterns |
 | Dot Lattice | 37 × 37 |
 | Evaluation Sample | 15 patterns |
 | Fixed Radius Edge Recall | 82.8% |
@@ -102,7 +102,7 @@ PULLI is a computational platform that uses ML, computer vision, and graph theor
 The Home page frontend has been implemented as a **pixel-accurate clone** of the reference design:
 
 - **Navbar**: Deep maroon (`#500914`), PULLI brand, nav links with gold active underline, Login
-- **Hero**: 3-column layout — typography + actions | center Kolam SVG | AI meets tradition card
+- **Hero**: 3-column layout - typography + actions | center Kolam SVG | AI meets tradition card
 - **Feature Strip**: 5 feature items with vertical dividers
 - **Analysis Panel**: 8-step live pipeline, 5 visualization stages, 56% building graph progress
 - **Variations Panel**: 4 generated Kolam thumbnails, Design Rule Summary

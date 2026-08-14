@@ -8,9 +8,9 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 const DEFAULT_TIMEOUT_MS = 30000;
 
-/** @param {string} kind @param {string} message @param {number} [status] @returns {import('./types').ApiError} */
-function apiError(kind, message, status) {
-  return { kind, message, status };
+/** @param {string} kind @param {string} message @param {number} [status] @param {string} [code] @returns {import('./types').ApiError} */
+function apiError(kind, message, status, code) {
+  return { kind, message, status, code };
 }
 
 /**
@@ -18,9 +18,9 @@ function apiError(kind, message, status) {
  * @param {RequestInit} options
  * @returns {Promise<{data: any, error: null} | {data: null, error: import('./types').ApiError}>}
  */
-async function request(path, options = {}) {
+async function request(path, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     // 'include' on every request (not just auth ones) so the session
@@ -43,22 +43,32 @@ async function request(path, options = {}) {
     }
 
     if (!res.ok) {
+      // The backend attaches a stable machine-readable `code` alongside
+      // the human-readable `error` message (see api/main.py's
+      // _api_error) -- prefer switching on status code (stable contract)
+      // with `code` carried through for callers that want finer-grained
+      // handling than the `kind` bucket below provides.
+      const message = body.error || body.detail || `Request failed (${res.status})`;
+      const code = body.code;
       if (res.status === 401) {
-        return { data: null, error: apiError('unauthorized', body.error || body.detail || 'Not authenticated', res.status) };
+        return { data: null, error: apiError('unauthorized', message, res.status, code) };
       }
       if (res.status === 409) {
-        return { data: null, error: apiError('conflict', body.error || body.detail || 'Already exists', res.status) };
-      }
-      if (res.status === 422) {
-        return { data: null, error: apiError('invalid_input', describeValidationError(body), res.status) };
+        return { data: null, error: apiError('conflict', message, res.status, code) };
       }
       if (res.status === 503) {
-        return { data: null, error: apiError('model_unavailable', body.error || 'Model unavailable', res.status) };
+        return { data: null, error: apiError('model_unavailable', message, res.status, code) };
       }
-      if (res.status === 400) {
-        return { data: null, error: apiError('invalid_image', body.error || body.detail || 'Invalid request', res.status) };
+      if (res.status === 413) {
+        return { data: null, error: apiError('upload_too_large', message, res.status, code) };
       }
-      return { data: null, error: apiError('unknown', body.error || body.detail || `Request failed (${res.status})`, res.status) };
+      if (res.status === 415 || res.status === 400) {
+        return { data: null, error: apiError('invalid_image', message, res.status, code) };
+      }
+      if (res.status === 422) {
+        return { data: null, error: apiError('invalid_input', describeValidationError(body) || message, res.status, code) };
+      }
+      return { data: null, error: apiError('unknown', message, res.status, code) };
     }
 
     return { data: body, error: null };
@@ -171,4 +181,89 @@ export function logout() {
 /** @returns {Promise<{data: import('./types').User, error: null} | {data: null, error: import('./types').ApiError}>} */
 export function getMe() {
   return request('/api/v1/auth/me');
+}
+
+// Generation runs a real multi-restart structural search per candidate
+// (engine.learned_generation) -- observed latency is ~10-55s PER
+// CANDIDATE, not a fast lookup, so this needs a much longer client
+// timeout than the 30s default every other (near-instant) endpoint uses.
+const GENERATE_TIMEOUT_MS = 240000;
+
+/**
+ * M5: learned-scorer-guided structural generation. `seed` omitted lets
+ * the backend pick a random seed (returned in the response, reusable
+ * for a reproducible re-generation); `count` bounds how many candidates
+ * come back in one call (server-enforced cap, see api/main.py).
+ * @param {{seed?: number, count?: number}} [options]
+ */
+export function generate(options = {}) {
+  return request(
+    '/api/v1/generate',
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(options) },
+    GENERATE_TIMEOUT_MS
+  );
+}
+
+/**
+ * M7 platform: PERSISTED generation -- same underlying M5 search as
+ * generate() above (same latency profile, same timeout), but each
+ * candidate is written to the database and individually retrievable
+ * afterward via getGeneration(id) (generation history). Response
+ * candidates include `id` (for later lookup) and `analysis` (the full
+ * Mathematics panel data), so the initial call already has everything
+ * needed for the main studio view -- getGeneration/getGenerationGraph
+ * are for on-demand detail (history browsing, graph view), not
+ * required for the primary render.
+ * @param {{seed?: number, count?: number, verify_recognizer?: boolean}} [options]
+ */
+export function createGeneration(options = {}) {
+  return request(
+    '/api/v1/generations',
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(options) },
+    GENERATE_TIMEOUT_MS
+  );
+}
+
+/** @param {string} id GenerationResult id */
+export function getGeneration(id) {
+  return request(`/api/v1/generations/${id}`);
+}
+
+/** @param {string} id GenerationResult id */
+export function getGenerationMathematics(id) {
+  return request(`/api/v1/generations/${id}/mathematics`);
+}
+
+/** @param {string} id GenerationResult id */
+export function getGenerationGraph(id) {
+  return request(`/api/v1/generations/${id}/graph`);
+}
+
+/**
+ * M7 platform: paginated generation history -- a LIGHT payload per row
+ * (no SVG/representation, see api/routes_generations.py's list_generations),
+ * for a history browser to page through without fetching full detail
+ * for every row.
+ * @param {number} [page]
+ * @param {number} [pageSize]
+ */
+export function listGenerations(page = 1, pageSize = 20) {
+  return request(`/api/v1/generations?page=${page}&page_size=${pageSize}`);
+}
+
+/**
+ * M7 platform: build a direct download URL for a generation result's
+ * artifact (SVG/PNG/JSON). Not fetched through `request()` -- this is
+ * meant for a plain `<a href>`/`window.open`, so the browser handles
+ * the download natively via the backend's Content-Disposition header.
+ * @param {string} id GenerationResult id
+ * @param {'svg'|'png'|'json'} format
+ */
+export function generationExportUrl(id, format = 'svg') {
+  return `${API_BASE}/api/v1/generations/${id}/export?format=${format}`;
+}
+
+/** @returns {Promise<{data: any, error: null} | {data: null, error: import('./types').ApiError}>} */
+export function listModels() {
+  return request('/api/v1/models');
 }

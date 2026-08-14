@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Eye, EyeOff, X, Loader2 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useAuthModal } from '../../context/AuthModalContext'
@@ -38,8 +38,6 @@ export default function AuthModal() {
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [regError, setRegError] = useState(null)
   const [regSubmitting, setRegSubmitting] = useState(false)
-
-  const cardRef = useRef(null)
 
   // Manage body scroll when modal opens
   useEffect(() => {
@@ -374,7 +372,6 @@ export default function AuthModal() {
               </button>
             </p>
           </div>
-
         </div>
       </div>
     </div>

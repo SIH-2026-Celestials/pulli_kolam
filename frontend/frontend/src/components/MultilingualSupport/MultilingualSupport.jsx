@@ -36,7 +36,7 @@ export default function MultilingualSupport() {
                 className={`ml-lang-btn${isSelected ? ' ml-lang-btn--selected' : ''}`}
                 onClick={() => setLanguage(l.code)}
                 aria-pressed={isSelected}
-                aria-label={`${l.label} — ${l.nativeName}`}
+                aria-label={`${l.label} - ${l.nativeName}`}
               >
                 <span className="ml-lang-icon" aria-hidden="true">{l.script}</span>
                 <span className="ml-lang-name">
@@ -95,7 +95,7 @@ export default function MultilingualSupport() {
                     className={`ml-lang-btn${isSelected ? ' ml-lang-btn--selected' : ''}${isPreview ? ' ml-lang-btn--preview' : ''}`}
                     onClick={() => { if (!isPreview) { setLanguage(l.code); setModalOpen(false) } }}
                     aria-pressed={isSelected}
-                    aria-label={`${l.label} — ${l.nativeName}${isPreview ? ' (coming soon)' : ''}`}
+                    aria-label={`${l.label} - ${l.nativeName}${isPreview ? ' (coming soon)' : ''}`}
                     disabled={isPreview}
                   >
                     <span className="ml-lang-icon" aria-hidden="true">{l.script}</span>

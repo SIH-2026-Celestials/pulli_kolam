@@ -1,0 +1,56 @@
+.concept-card {
+  position: relative;
+  background-color: #FFFFFF; /* Pure white card background */
+  border: 1px solid var(--color-card-border);
+  border-radius: 12px;
+  padding: 24px 24px 24px 44px; /* Space for the left kolam icon */
+  margin: 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.01);
+}
+
+/* Single traditional Sikku/Kambi Kolam icon in dark brown */
+.concept-card::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 24px;
+  width: 20px;
+  height: 20px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none'><path d='M 12,2 C 17,2 22,7 22,12 C 22,17 17,22 12,22 C 7,22 2,17 2,12 C 2,7 7,2 12,2 Z' stroke='%235A524C' stroke-width='1.2'/><path d='M 12,2 C 12,7 7,12 2,12 C 7,12 12,17 12,22 C 12,17 17,12 22,12 C 17,12 12,7 12,2 Z' stroke='%235A524C' stroke-width='0.8'/><circle cx='12' cy='12' r='1' fill='%235A524C'/><circle cx='6' cy='6' r='0.8' fill='%235A524C'/><circle cx='18' cy='6' r='0.8' fill='%235A524C'/><circle cx='6' cy='18' r='0.8' fill='%235A524C'/><circle cx='18' cy='18' r='0.8' fill='%235A524C'/></svg>");
+  background-repeat: no-repeat;
+  background-size: 20px 20px;
+  opacity: 0.85;
+}
+
+.concept-card__term {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-maroon-main);
+}
+
+.concept-card__def {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--color-text-body);
+}
+
+.concept-card__formula {
+  margin-top: 8px;
+  padding: 10px 14px;
+  background-color: var(--color-paper-light);
+  border: 1px solid var(--color-card-border);
+  color: var(--color-maroon-main);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  display: inline-block;
+  align-self: flex-start;
+  border-radius: 4px;
+}

@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { detect, analyze, reconstruct, compareDetectors } from '../../lib/api/kolam'
+import { detect, analyze, reconstruct, compareDetectors, getModelInfo } from '../../lib/api/kolam'
 import { categorizeCompareDots } from '../../lib/api/kolam'
 import { validateImageFile } from '../../lib/validateImageFile'
+import AnalysisPipeline from '../../components/AnalysisPipeline/AnalysisPipeline'
+import GeneratedVariations from '../../components/GeneratedVariations/GeneratedVariations'
 import './Detect.css'
 
 const MODES = [
@@ -17,18 +19,37 @@ export default function Detect() {
   const [previewUrl, setPreviewUrl] = useState(null)
   const [mode, setMode] = useState('classical')
   const [status, setStatus] = useState('idle') // idle | loading | success | error
+  const [stage, setStage] = useState(null) // detecting | analyzing | reconstructing (only while status === 'loading')
   const [errorMsg, setErrorMsg] = useState(null)
   const [detectResult, setDetectResult] = useState(null)
   const [compareResult, setCompareResult] = useState(null)
   const [analysis, setAnalysis] = useState(null)
   const [reconstruction, setReconstruction] = useState(null)
-  const [reconstructing, setReconstructing] = useState(false)
-  const [reconstructError, setReconstructError] = useState(null)
-  const [analysisError, setAnalysisError] = useState(null)
   const [imgNaturalSize, setImgNaturalSize] = useState(null)
   const [imgRenderedSize, setImgRenderedSize] = useState(null)
   const imgRef = useRef(null)
   const fileInputRef = useRef(null)
+  // 'loading' | 'available' | 'unavailable' -- reflects GET /api/v1/model,
+  // not merely whether this frontend code exists.
+  const [modelStatus, setModelStatus] = useState('loading')
+  const [modelInfo, setModelInfo] = useState(null)
+  // Same simulated pipeline-progress animation Home.jsx uses to drive
+  // AnalysisPipeline's progress bar.
+  const [pipelineProgress, setPipelineProgress] = useState(56)
+
+  useEffect(() => {
+    let cancelled = false
+    getModelInfo().then(({ data }) => {
+      if (cancelled) return
+      if (data && data.ml_checkpoint_exists) {
+        setModelInfo(data)
+        setModelStatus('available')
+      } else {
+        setModelStatus('unavailable')
+      }
+    })
+    return () => { cancelled = true }
+  }, [])
 
   const onFileSelected = useCallback((f) => {
     if (!f) return
@@ -45,11 +66,22 @@ export default function Detect() {
     setDetectResult(null)
     setCompareResult(null)
     setAnalysis(null)
-    setAnalysisError(null)
     setReconstruction(null)
-    setReconstructError(null)
     setStatus('idle')
+    setStage(null)
     setErrorMsg(null)
+
+    // Same simulated progress animation as Home.jsx's handleUploadImage.
+    setPipelineProgress(10)
+    let current = 10
+    const interval = setInterval(() => {
+      current += 15
+      if (current >= 100) {
+        current = 100
+        clearInterval(interval)
+      }
+      setPipelineProgress(current)
+    }, 400)
   }, [])
 
   // A file handed off from the homepage's upload CTA (Hero.jsx) arrives
@@ -84,54 +116,57 @@ export default function Detect() {
     setDetectResult(null)
     setCompareResult(null)
     setAnalysis(null)
-    setAnalysisError(null)
     setReconstruction(null)
-    setReconstructError(null)
 
     if (mode === 'compare') {
+      setStage('detecting')
       const { data, error } = await compareDetectors(file)
       if (error) {
         setStatus('error')
+        setStage(null)
         setErrorMsg(describeError(error))
         return
       }
       setCompareResult(data)
       setStatus('success')
+      setStage(null)
       return
     }
 
+    setStage('detecting')
     const { data, error } = await detect(file, mode)
     if (error) {
       setStatus('error')
+      setStage(null)
       setErrorMsg(describeError(error))
       return
     }
     setDetectResult(data)
 
-    const { data: analyzeData, error: analyzeErr } = await analyze(file, mode)
-    if (analyzeData) {
-      setAnalysis(analyzeData)
-    } else if (analyzeErr) {
-      // Detection succeeded (result above is real and shown); only the
-      // follow-up structural-analysis call failed -- say that specifically
-      // rather than silently omitting the section or claiming everything failed.
-      setAnalysisError(describeError(analyzeErr))
-    }
-
-    setStatus('success')
-  }
-
-  const handleReconstruct = async () => {
-    if (!file || mode === 'compare') return
-    setReconstructing(true)
-    setReconstructError(null)
-    const { data, error } = await reconstruct(file, mode)
-    setReconstructing(false)
-    if (error) {
-      setReconstructError(describeError(error))
+    setStage('analyzing')
+    const { data: analyzeData, error: analyzeError } = await analyze(file, mode)
+    if (analyzeError) {
+      // Detection succeeded but analysis failed -- still show the real
+      // detection result rather than discarding it; report analysis
+      // failure honestly instead of pretending nothing happened.
+      setStatus('error')
+      setStage(null)
+      setErrorMsg(describeError(analyzeError))
       return
     }
-    setReconstruction(data)
+    setAnalysis(analyzeData)
+
+    setStage('reconstructing')
+    const { data: reconstructData, error: reconstructError } = await reconstruct(file, mode)
+    // Reconstruction is best-effort: an uploaded photo may not carry
+    // enough structure to reconstruct even when detection/analysis
+    // succeeded. Never fabricate a result -- an error or an explicit
+    // "nothing to reconstruct" note is shown as-is, not hidden.
+    if (reconstructData) setReconstruction(reconstructData)
+    else if (reconstructError) setReconstruction({ error: describeError(reconstructError) })
+
+    setStage(null)
+    setStatus('success')
   }
 
   const scale = imgNaturalSize && imgRenderedSize ? imgRenderedSize.width / imgNaturalSize.width : 1
@@ -149,7 +184,7 @@ export default function Detect() {
   return (
     <main id="main-content" className="detect-page">
       <header className="detect-header section section--bordered">
-        <div className="container">
+        <div className="container--narrow">
           <p className="eyebrow eyebrow--accent">Live Detection Workflow</p>
           <h1 className="heading-display heading-hero detect-title">Detect &amp; Analyze a Kolam</h1>
           <p className="body-text detect-sub">
@@ -159,7 +194,18 @@ export default function Detect() {
         </div>
       </header>
 
-      <section className="container section detect-body-section">
+      {previewUrl && (
+        <section className="main-content-section detect-pipeline-section">
+          <div className="main-content-container">
+            <div className="main-content-grid">
+              <AnalysisPipeline customImage={previewUrl} progress={pipelineProgress} />
+              <GeneratedVariations />
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="container--narrow section detect-body-section">
         <div className="detect-grid">
           {/* UPLOAD PANEL */}
           <div className="detect-upload-panel archival-frame">
@@ -215,25 +261,20 @@ export default function Detect() {
               </div>
             </div>
 
-            <button className="btn-primary analyze-btn" disabled={!file || status === 'loading'} onClick={handleAnalyze}>
-              {status === 'loading' ? 'Analyzing…' : 'Analyze Kolam'}
-            </button>
+            <p className="label-tech model-status-line">
+              ML MODEL: {modelStatus === 'loading' && '…'}
+              {modelStatus === 'available' && (
+                <span className="text-valid">● Available{modelInfo?.ml_model_version ? ` — ${modelInfo.ml_model_version}` : ''} (CPU)</span>
+              )}
+              {modelStatus === 'unavailable' && <span>○ Unavailable</span>}
+            </p>
 
-            {mode !== 'compare' && status === 'success' && detectResult && (
-              <button
-                className="btn btn--outline reconstruct-btn"
-                disabled={reconstructing}
-                onClick={handleReconstruct}
-              >
-                {reconstructing ? 'Reconstructing…' : 'Reconstruct from Motifs'}
-              </button>
-            )}
+            <button className="btn-primary analyze-btn" disabled={!file || status === 'loading'} onClick={handleAnalyze}>
+              {status === 'loading' ? stageLabel(stage) : 'Analyze Kolam'}
+            </button>
 
             {status === 'error' && (
               <p className="detect-error" role="alert">{errorMsg}</p>
-            )}
-            {reconstructError && (
-              <p className="detect-error" role="alert">{reconstructError}</p>
             )}
           </div>
 
@@ -258,8 +299,11 @@ export default function Detect() {
                   <div className="step-row"><span className="label-tech">Detected dots</span><strong>{detectResult.count}</strong></div>
                   <div className="step-row"><span className="label-tech">Processing</span><strong>{detectResult.processing_ms} ms</strong></div>
                   <div className="step-row"><span className="label-tech">Detector</span><strong>{detectResult.detector}</strong></div>
-                  {detectResult.model_version && (
-                    <div className="step-row"><span className="label-tech">Model</span><strong>{detectResult.model_version}</strong></div>
+                  {detectResult.model && (
+                    <>
+                      <div className="step-row"><span className="label-tech">Model</span><strong>{detectResult.model.name}{detectResult.model.version ? ` (${detectResult.model.version})` : ''}</strong></div>
+                      <div className="step-row"><span className="label-tech">Device</span><strong>{detectResult.model.device.toUpperCase()}</strong></div>
+                    </>
                   )}
                 </div>
               </div>
@@ -298,6 +342,13 @@ export default function Detect() {
             {analysis && (
               <div className="archival-frame result-card">
                 <h2 className="heading-display heading-3">Structural Analysis</h2>
+                {analysis.dot_count > 0 && !analysis.validity.is_eulerian_circuit && !analysis.validity.has_eulerian_path && (
+                  <p className="body-text body-text--sm detect-placeholder">
+                    Detection succeeded — structural validation failed. The detected graph is not a valid
+                    single-stroke (Eulerian) structure; this is a property of the detected structure, not a
+                    request failure.
+                  </p>
+                )}
                 <div className="step-table">
                   <div className="step-row"><span className="label-tech">Dot count</span><strong>{analysis.dot_count}</strong></div>
                   <div className="step-row"><span className="label-tech">Graph nodes</span><strong>{analysis.graph.nodes}</strong></div>
@@ -306,34 +357,51 @@ export default function Detect() {
                   <div className="step-row"><span className="label-tech">Motif count</span><strong>{analysis.motifs.motif_count}</strong></div>
                   <div className="step-row"><span className="label-tech">Eulerian circuit</span><strong>{analysis.validity.is_eulerian_circuit ? 'Valid' : 'No'}</strong></div>
                   <div className="step-row"><span className="label-tech">Connected</span><strong>{analysis.validity.largest_component_covers_all_nodes ? 'Yes' : 'No'}</strong></div>
+                  {analysis.timing_ms && (
+                    <div className="step-row"><span className="label-tech">Analysis time</span><strong>{analysis.timing_ms.total} ms</strong></div>
+                  )}
                 </div>
               </div>
-            )}
-
-            {analysisError && (
-              <p className="detect-error" role="alert">
-                Detection succeeded (shown above), but structural analysis failed: {analysisError}
-              </p>
             )}
 
             {reconstruction && (
               <div className="archival-frame result-card">
                 <h2 className="heading-display heading-3">Reconstruction</h2>
-                {reconstruction.reconstruction.note ? (
-                  <p className="body-text body-text--sm">{reconstruction.reconstruction.note}</p>
-                ) : (
-                  <div className="step-table">
-                    <div className="step-row">
-                      <span className="label-tech">Structurally valid</span>
-                      <strong className={reconstruction.reconstruction.is_valid ? 'text-valid' : ''}>
-                        {reconstruction.reconstruction.is_valid ? '✓ Valid' : 'No — see below'}
-                      </strong>
+                <p className="body-text body-text--sm detect-placeholder">
+                  Checks whether the motif/residual decomposition of THIS pattern's own detected
+                  structure reproduces a connected, valid graph. This is not novel-pattern
+                  generation - that capability remains experimental and is not exposed here.
+                </p>
+                {reconstruction.error && (
+                  <p className="detect-error" role="alert">{reconstruction.error}</p>
+                )}
+                {reconstruction.reconstruction?.note && (
+                  <p className="detect-error" role="alert">{reconstruction.reconstruction.note}</p>
+                )}
+                {reconstruction.reconstruction && reconstruction.reconstruction.is_valid !== undefined && (
+                  <>
+                    {!reconstruction.reconstruction.is_valid && (
+                      <p className="detect-error" role="status">
+                        Detection succeeded — reconstruction validation failed (the motif/residual
+                        decomposition does not reproduce a valid single-stroke structure).
+                      </p>
+                    )}
+                    <div className="step-table">
+                      <div className="step-row">
+                        <span className="label-tech">Valid reconstruction</span>
+                        <strong className={reconstruction.reconstruction.is_valid ? 'text-valid' : ''}>
+                          {reconstruction.reconstruction.is_valid ? 'Yes' : 'No'}
+                        </strong>
+                      </div>
+                      <div className="step-row"><span className="label-tech">Motif edges</span><strong>{reconstruction.reconstruction.motif_edges}</strong></div>
+                      <div className="step-row"><span className="label-tech">Residual edges</span><strong>{reconstruction.reconstruction.residual_edges}</strong></div>
+                      <div className="step-row"><span className="label-tech">Capped excess pairs</span><strong>{reconstruction.reconstruction.capped_excess_pairs}</strong></div>
+                      <div className="step-row"><span className="label-tech">Connected</span><strong>{reconstruction.reconstruction.connectivity.largest_component_covers_all_nodes ? 'Yes' : 'No'}</strong></div>
+                      {reconstruction.timing_ms && (
+                        <div className="step-row"><span className="label-tech">Reconstruction time</span><strong>{reconstruction.timing_ms.total} ms</strong></div>
+                      )}
                     </div>
-                    <div className="step-row"><span className="label-tech">Motif-covered edges</span><strong>{reconstruction.reconstruction.motif_edges}</strong></div>
-                    <div className="step-row"><span className="label-tech">Residual edges</span><strong>{reconstruction.reconstruction.residual_edges}</strong></div>
-                    <div className="step-row"><span className="label-tech">Connected components</span><strong>{reconstruction.reconstruction.connectivity.connected_components}</strong></div>
-                    <div className="step-row"><span className="label-tech">Fully connected</span><strong>{reconstruction.reconstruction.connectivity.largest_component_covers_all_nodes ? 'Yes' : 'No'}</strong></div>
-                  </div>
+                  </>
                 )}
               </div>
             )}
@@ -342,6 +410,15 @@ export default function Detect() {
       </section>
     </main>
   )
+}
+
+function stageLabel(stage) {
+  switch (stage) {
+    case 'detecting': return 'Detecting…'
+    case 'analyzing': return 'Building structure…'
+    case 'reconstructing': return 'Reconstructing…'
+    default: return 'Analyzing…'
+  }
 }
 
 function DotOverlay({ mode, detectResult, compareResult, scale }) {
@@ -375,6 +452,10 @@ function describeError(error) {
       return 'The request timed out. Try a smaller image or try again.'
     case 'model_unavailable':
       return 'The ML detector is currently unavailable on the server.'
+    case 'upload_too_large':
+      return error.message || 'That image is too large. Please upload a smaller file (20MB limit).'
+    case 'invalid_request':
+      return error.message || 'That request could not be processed.'
     case 'invalid_image':
       return error.message || 'That file could not be processed as an image.'
     default:

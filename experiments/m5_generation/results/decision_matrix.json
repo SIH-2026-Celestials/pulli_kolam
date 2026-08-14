@@ -1,0 +1,35 @@
+{
+  "comparison": {
+    "baseline (greedy, no connectivity/parity)": {
+      "n": 120,
+      "validity_rate": 0.0,
+      "source": "experiments/m4_2_generation/results/parity_comparison.json:arm_a_baseline"
+    },
+    "connectivity-aware (greedy)": {
+      "n": 120,
+      "validity_rate": 0.0,
+      "source": "experiments/m4_2_generation/results/parity_comparison.json:arm_b_connectivity"
+    },
+    "connectivity+parity-aware (greedy)": {
+      "n": 120,
+      "validity_rate": 0.008333333333333333,
+      "source": "experiments/m4_2_generation/results/parity_comparison.json:arm_c_connectivity_parity"
+    },
+    "multi-restart beam (hand-tuned score, pre-M5)": {
+      "n": 120,
+      "validity_rate": 0.075,
+      "source": "experiments/m4_2_generation/results/beam_comparison.json:arm_d_beam"
+    },
+    "M5 learned-scorer-guided search (THIS SESSION, reduced scale)": {
+      "n": 50,
+      "validity_rate": 0.82,
+      "connectivity_rate": 0.82,
+      "multiplicity_violation_rate": 0.76,
+      "avg_latency_seconds": 19.71030611038208,
+      "novelty_unique_rate": 1.0,
+      "novelty_exact_topological_duplicate_rate": 0.0,
+      "note": "REDUCED-SCALE run: n_generated=50 (vs run_benchmark.py's full N_CANDIDATES=500), n_restarts=12 (vs full N_RESTARTS=16 nominal -- here 12) -- time-budget decision, documented not hidden. See module docstring.",
+      "source": "experiments/m5_generation/results/benchmark_report_lite.json"
+    }
+  }
+}

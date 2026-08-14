@@ -1,0 +1,63 @@
+building train (350 source patterns)...
+  -> 7700 examples, elapsed 890.3s
+building val (75 source patterns)...
+  -> 1650 examples, elapsed 1071.9s
+building test (75 source patterns)...
+  -> 1650 examples, elapsed 1270.4s
+vocabulary size (incl. 3 reserved): 220
+{
+  "n_source_patterns": 500,
+  "n_source_patterns_by_split": {
+    "train": 350,
+    "val": 75,
+    "test": 75
+  },
+  "n_examples_by_split": {
+    "train": 7700,
+    "val": 1650,
+    "test": 1650
+  },
+  "n_examples_total": 11000,
+  "validity_rate_train": 1.0,
+  "topology_distribution_train": {
+    "d4": 2800,
+    "crop": 4900
+  },
+  "symmetry_distribution_train": {
+    "low_symmetry": 7379,
+    "high_symmetry": 321
+  },
+  "complexity_mean_train": 0.44871653402473605,
+  "complexity_min_train": 0.25,
+  "complexity_max_train": 0.5802469135802469,
+  "n_unique_token_sequences_train": 5593,
+  "structural_uniqueness_rate_train": 0.7263636363636363,
+  "duplicate_rate_train": 0.2736363636363637,
+  "vocab_size": 220,
+  "unk_rate_by_split": {
+    "train": {
+      "n_unk_tokens": 3288,
+      "n_total_tokens": 473979,
+      "unk_rate": 0.006937016196920116
+    },
+    "val": {
+      "n_unk_tokens": 1584,
+      "n_total_tokens": 98709,
+      "unk_rate": 0.016047168951159468
+    },
+    "test": {
+      "n_unk_tokens": 2090,
+      "n_total_tokens": 107550,
+      "unk_rate": 0.019432821943282195
+    }
+  },
+  "crop_config": {
+    "n_crops_per_pattern_target": 14,
+    "crop_radius_range": [
+      3,
+      9
+    ]
+  },
+  "build_time_seconds": 1272.4992468357086,
+  "seed": 6262
+}

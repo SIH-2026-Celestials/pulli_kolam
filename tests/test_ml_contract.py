@@ -176,3 +176,46 @@ def test_contract_recommended_collapse_to_fully_empty_avoids_the_blocker():
     preprocessed = image_io.Preprocessed(binary=np.zeros((400, 400), dtype=np.uint8), rotation_deg=0.0)
     safely_collapsed_lattice = image_io.Lattice([], [], 0.0)
     assert image_io.trace_path(preprocessed, safely_collapsed_lattice) == []
+
+
+# ============================================================
+# Regression coverage for the upstream gate (engine.image_io.is_traceable)
+# added alongside these tests -- NOT a change to trace_path itself (the
+# test above still proves trace_path crashes on a direct, ungated call).
+# The gate is applied by engine.image_io.build_graph and by
+# validate_real_photos.py; this section proves both the gate function
+# itself and build_graph's real (not test-local) behavior on an image
+# that organically produces the asymmetric shape.
+# ============================================================
+
+
+def test_is_traceable_flags_the_asymmetric_shape_false():
+    asymmetric_lattice = image_io.Lattice([(100.0, 100.0), (300.0, 300.0)], [], 8.0)
+    assert image_io.is_traceable(asymmetric_lattice) is False
+
+
+def test_is_traceable_true_for_empty_and_well_formed_lattices():
+    assert image_io.is_traceable(image_io.Lattice([], [], 0.0)) is True
+    well_formed = image_io.Lattice([(1.0, 1.0), (2.0, 2.0)], [(0, 0), (1, 1)], 1.0)
+    assert image_io.is_traceable(well_formed) is True
+
+
+def test_build_graph_no_longer_crashes_on_an_image_that_naturally_triggers_the_asymmetric_shape(tmp_path):
+    """Regression test for the fix: an image whose detect_lattice output
+    organically lands in the documented asymmetric shape (2 detected dot
+    blobs, too few to fit a lattice -- the same real-world shape that
+    crashed on kolam_india12_mckaysavage.jpg, see PROJECT_STATE.md M4.0
+    report) no longer raises IndexError through build_graph, the
+    project's single public image->graph entry point. It collapses to an
+    empty graph (0 nodes, 0 edges), matching docs/ML_CONTRACT.md's
+    recommended empty-detection convention -- NOT a silently repaired/
+    invented graph."""
+    binary, _centers = _square_binary_with_perimeter_strokes(centers=[(100, 100), (300, 300)], radius=8)
+    img_path = tmp_path / "two_dot_image.png"
+    cv2.imwrite(str(img_path), binary)
+
+    G = image_io.build_graph(str(img_path))  # must not raise
+
+    assert isinstance(G, nx.MultiGraph)
+    assert G.number_of_nodes() == 0
+    assert G.number_of_edges() == 0

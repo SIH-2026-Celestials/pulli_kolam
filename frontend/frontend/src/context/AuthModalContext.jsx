@@ -41,6 +41,7 @@ export function AuthModalProvider({ children }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuthModal() {
   const ctx = useContext(AuthModalContext)
   if (!ctx) {

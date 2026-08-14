@@ -1,233 +1,404 @@
-import { useState } from 'react'
-import { RotateCw, Grid, GitFork, Infinity as LoopIcon, Flower2, BarChart2 } from 'lucide-react'
+import { Fragment, useEffect, useState } from 'react'
+import { RotateCw, Grid, GitFork, Infinity as LoopIcon, Flower2, BarChart2, Download, Info } from 'lucide-react'
 import { useLanguage } from '../../context/LanguageContext'
+import { useAuth } from '../../context/AuthContext'
+import { createGeneration, getGenerationGraph, generationExportUrl } from '../../lib/api/kolam'
+import RecentKolams from '../RecentKolams/RecentKolams'
 import './GeneratedVariations.css'
+
+// Server-enforced cap (api/routes_generations.py's MAX_GENERATE_COUNT) --
+// mirrored here only to bound the <select> options shown, not
+// re-validated client-side (the backend is still the source of truth;
+// an out-of-range value would simply come back as a 422 INVALID_REQUEST,
+// handled like any other error).
+const MAX_GENERATE_COUNT = 5
+
+/** Small dots+edges SVG built from /generations/{id}/graph -- a
+ * DIFFERENT visualization from the main render_svg (which draws the
+ * kolam's stroke trace): this shows raw topology (every edge as a
+ * straight line, no stroke-order curve), useful for inspecting graph
+ * structure directly. Built client-side from data the backend already
+ * computed (dot_points/edges) -- no client-side graph math beyond
+ * layout scaling. */
+function GraphViewSvg({ graph }) {
+  if (!graph || !graph.dot_points || graph.dot_points.length === 0) return null
+  const scale = 14
+  const margin = 16
+  const xs = graph.dot_points.map((p) => p[0])
+  const ys = graph.dot_points.map((p) => p[1])
+  const minX = Math.min(...xs)
+  const minY = Math.min(...ys)
+  const width = (Math.max(...xs) - minX) * scale + margin * 2
+  const height = (Math.max(...ys) - minY) * scale + margin * 2
+  const toPx = ([x, y]) => [margin + (x - minX) * scale, margin + (y - minY) * scale]
+
+  return (
+    <svg width={Math.min(width, 600)} height={Math.min(height, 420)} viewBox={`0 0 ${width} ${height}`}>
+      <rect x="0" y="0" width={width} height={height} fill="#FFFFFF" />
+      {(graph.edges || []).map(([a, b], i) => {
+        const [ax, ay] = toPx(a)
+        const [bx, by] = toPx(b)
+        return <line key={i} x1={ax} y1={ay} x2={bx} y2={by} stroke="#CFC5B8" strokeWidth="1.5" />
+      })}
+      {graph.dot_points.map((p, i) => {
+        const [px, py] = toPx(p)
+        return <circle key={i} cx={px} cy={py} r="2.5" fill="#8A3324" />
+      })}
+    </svg>
+  )
+}
+
+/** Mathematics panel content -- purely a display of `analysis`, the
+ * exact object POST /api/v1/generations already returned inline (no
+ * extra request needed to show this tab; the backend is the source of
+ * truth for every number shown here, nothing is computed client-side). */
+function MathematicsPanel({ analysis }) {
+  if (!analysis) return null
+  const { graph, eulerian, multiplicity, symmetry, complexity } = analysis
+  return (
+    <div className="math-grid">
+      <div>
+        <div className="math-group-title">Graph</div>
+        <div className="math-row"><span>Vertices</span><span>{graph.vertices}</span></div>
+        <div className="math-row"><span>Edges (instances)</span><span>{graph.edges}</span></div>
+        <div className="math-row"><span>Distinct edges</span><span>{graph.distinct_edges}</span></div>
+        <div className="math-row"><span>Components</span><span>{graph.connected_components}</span></div>
+      </div>
+      <div>
+        <div className="math-group-title">Eulerian</div>
+        <div className="math-row"><span>Odd-degree vertices</span><span>{eulerian.odd_degree_vertex_count}</span></div>
+        <div className="math-row"><span>Circuit</span><span>{eulerian.is_eulerian_circuit ? 'Yes' : 'No'}</span></div>
+        <div className="math-row"><span>Open path</span><span>{eulerian.has_eulerian_path ? 'Yes' : 'No'}</span></div>
+      </div>
+      <div>
+        <div className="math-group-title">Multiplicity</div>
+        <div className="math-row"><span>Max strand count</span><span>{multiplicity.max_multiplicity}</span></div>
+        <div className="math-row"><span>Violations (&gt;2)</span><span>{multiplicity.violations}</span></div>
+      </div>
+      <div>
+        <div className="math-group-title">Symmetry &amp; Complexity</div>
+        <div className="math-row"><span>D4 coverage</span><span>{symmetry.coverage != null ? `${(symmetry.coverage * 100).toFixed(0)}%` : '—'}</span></div>
+        <div className="math-row"><span>Complexity score</span><span>{complexity.complexity_score != null ? complexity.complexity_score.toFixed(3) : '—'}</span></div>
+        <div className="math-row"><span>Density score</span><span>{complexity.density_score != null ? complexity.density_score.toFixed(3) : '—'}</span></div>
+      </div>
+    </div>
+  )
+}
 
 export default function GeneratedVariations() {
   const { t } = useLanguage()
-  const [variationIndex, setVariationIndex] = useState(0)
+  const { addRecentKolam } = useAuth()
+  const [status, setStatus] = useState('loading') // idle | loading | success | error
+  const [candidates, setCandidates] = useState([])
+  const [model, setModel] = useState(null)
+  const [errorMsg, setErrorMsg] = useState(null)
+  const [seedInput, setSeedInput] = useState('')
+  const [count, setCount] = useState(2)
+  const [detailFor, setDetailFor] = useState(null) // candidate id currently expanded, or null
+  const [detailTab, setDetailTab] = useState('math') // 'math' | 'graph'
+  const [graphCache, setGraphCache] = useState({}) // candidate id -> graph payload
 
-  const handleGenerateMore = () => {
-    setVariationIndex((prev) => (prev + 1) % 2)
+  // Recent-kolams history (AuthContext) records each generated candidate
+  // using the persisted-generation response shape (c.analysis.*), not an
+  // older flat c.symmetry_coverage/constraints shape -- this component's
+  // data source is api/routes_generations.py, which returns per-candidate
+  // `analysis`, not a shared top-level `constraints`.
+  const saveCandidatesToHistory = (candList) => {
+    if (candList && candList.length > 0) {
+      candList.forEach((c, idx) => {
+        addRecentKolam({
+          id: `gen_${c.seed}_${idx}`,
+          title: `Generated Kolam Pattern (Seed ${c.seed})`,
+          image_url: `/static/synthetic/kolam19_${(c.seed % 8) + 1}.jpg`,
+          grid_size: c.analysis?.graph?.vertices ? `${c.analysis.graph.vertices} dots` : '—',
+          symmetry: c.analysis?.symmetry?.coverage != null
+            ? `D4 (${(c.analysis.symmetry.coverage * 100).toFixed(0)}%)`
+            : 'D4 Dihedral',
+          validity: c.is_valid ? '✓ Eulerian Single-stroke' : '⚠️ Continuous Subgraph',
+        })
+      })
+    }
   }
 
-  // Set 1 of 4 generated Kolams
-  const kolamSet1 = [
-    // Pattern 1: Diamond 4-Fold Sikku
-    (
-      <svg width="100%" height="100%" viewBox="0 0 160 160" key="k1">
-        <rect width="160" height="160" fill="#0C0A09" />
-        {/* Pulli grid */}
-        {[40, 60, 80, 100, 120].map((y) =>
-          [40, 60, 80, 100, 120].map((x) => (
-            <circle key={`p1-${x}-${y}`} cx={x} cy={y} r="2" fill="#FFFFFF" opacity="0.8" />
-          ))
-        )}
-        {/* Loops */}
-        <g stroke="#FFFFFF" strokeWidth="1.8" fill="none">
-          <path d="M 80 20 C 40 20 40 60 80 60 C 120 60 120 20 80 20 Z" />
-          <path d="M 80 140 C 40 140 40 100 80 100 C 120 100 120 140 80 140 Z" />
-          <path d="M 20 80 C 20 40 60 40 60 80 C 60 120 20 120 20 80 Z" />
-          <path d="M 140 80 C 140 40 100 40 100 80 C 100 120 140 120 140 80 Z" />
-          <path d="M 40 40 C 80 20 140 80 80 140 C 20 80 80 20 40 40 Z" />
-          <circle cx="80" cy="80" r="14" />
-        </g>
-      </svg>
-    ),
-    // Pattern 2: Star 8-Fold Petals
-    (
-      <svg width="100%" height="100%" viewBox="0 0 160 160" key="k2">
-        <rect width="160" height="160" fill="#0C0A09" />
-        {[30, 55, 80, 105, 130].map((y) =>
-          [30, 55, 80, 105, 130].map((x) => (
-            <circle key={`p2-${x}-${y}`} cx={x} cy={y} r="2" fill="#FFFFFF" opacity="0.8" />
-          ))
-        )}
-        <g stroke="#FFFFFF" strokeWidth="1.8" fill="none">
-          <path d="M 80 25 L 95 65 L 135 80 L 95 95 L 80 135 L 65 95 L 25 80 L 65 65 Z" />
-          <path d="M 80 40 Q 120 40 120 80 Q 120 120 80 120 Q 40 120 40 80 Q 40 40 80 40 Z" />
-          <circle cx="80" cy="80" r="8" />
-        </g>
-      </svg>
-    ),
-    // Pattern 3: Radial Interlocking Loops
-    (
-      <svg width="100%" height="100%" viewBox="0 0 160 160" key="k3">
-        <rect width="160" height="160" fill="#0C0A09" />
-        {[35, 57, 80, 103, 125].map((y) =>
-          [35, 57, 80, 103, 125].map((x) => (
-            <circle key={`p3-${x}-${y}`} cx={x} cy={y} r="2" fill="#FFFFFF" opacity="0.8" />
-          ))
-        )}
-        <g stroke="#FFFFFF" strokeWidth="1.8" fill="none">
-          <path d="M 80 30 C 130 30 130 130 80 130 C 30 130 30 30 80 30 Z" />
-          <path d="M 30 80 C 30 130 130 130 130 80 C 130 30 30 30 30 80 Z" />
-          <path d="M 50 50 C 110 50 110 110 50 110 C 110 110 110 50 50 50 Z" />
-        </g>
-      </svg>
-    ),
-    // Pattern 4: Outer Diamond Lattice
-    (
-      <svg width="100%" height="100%" viewBox="0 0 160 160" key="k4">
-        <rect width="160" height="160" fill="#0C0A09" />
-        {[30, 55, 80, 105, 130].map((y) =>
-          [30, 55, 80, 105, 130].map((x) => (
-            <circle key={`p4-${x}-${y}`} cx={x} cy={y} r="2" fill="#FFFFFF" opacity="0.8" />
-          ))
-        )}
-        <g stroke="#FFFFFF" strokeWidth="1.8" fill="none">
-          <path d="M 80 15 L 145 80 L 80 145 L 15 80 Z" />
-          <path d="M 80 35 L 125 80 L 80 125 L 35 80 Z" />
-          <path d="M 80 55 L 105 80 L 80 105 L 55 80 Z" />
-          <circle cx="80" cy="80" r="4" fill="#FFFFFF" />
-        </g>
-      </svg>
-    )
-  ]
+  const runGenerate = async (params) => {
+    setStatus('loading')
+    setErrorMsg(null)
+    setDetailFor(null)
+    // Persisted generation (api/services/generation.py) -- same
+    // ~10-55s/candidate M5 search as before, plus DB persistence so
+    // each candidate is individually retrievable afterward.
+    const { data, error } = await createGeneration(params)
+    if (error) {
+      setStatus('error')
+      setErrorMsg(error.message)
+      return
+    }
+    setCandidates(data.candidates)
+    setModel(data.model_version ? { name: 'M5 (learned-scorer-guided search)', version: data.model_version } : null)
+    setStatus('success')
 
-  // Set 2 of 4 generated Kolams (alternate when clicking Generate More)
-  const kolamSet2 = [
-    (
-      <svg width="100%" height="100%" viewBox="0 0 160 160" key="k5">
-        <rect width="160" height="160" fill="#0C0A09" />
-        {[30, 55, 80, 105, 130].map((y) =>
-          [30, 55, 80, 105, 130].map((x) => (
-            <circle key={`p5-${x}-${y}`} cx={x} cy={y} r="2" fill="#FFFFFF" opacity="0.8" />
-          ))
-        )}
-        <g stroke="#FFFFFF" strokeWidth="1.8" fill="none">
-          <circle cx="80" cy="80" r="50" strokeDasharray="6 4" />
-          <path d="M 80 20 L 140 80 L 80 140 L 20 80 Z" />
-          <path d="M 50 20 Q 80 80 110 20 M 140 50 Q 80 80 140 110 M 110 140 Q 80 80 50 140 M 20 110 Q 80 80 20 50" />
-        </g>
-      </svg>
-    ),
-    (
-      <svg width="100%" height="100%" viewBox="0 0 160 160" key="k6">
-        <rect width="160" height="160" fill="#0C0A09" />
-        {[30, 55, 80, 105, 130].map((y) =>
-          [30, 55, 80, 105, 130].map((x) => (
-            <circle key={`p6-${x}-${y}`} cx={x} cy={y} r="2" fill="#FFFFFF" opacity="0.8" />
-          ))
-        )}
-        <g stroke="#FFFFFF" strokeWidth="1.8" fill="none">
-          <path d="M 80 25 C 135 25 135 135 80 135 C 25 135 25 25 80 25 Z" />
-          <path d="M 80 45 C 115 45 115 115 80 115 C 45 115 45 45 80 45 Z" />
-          <circle cx="80" cy="80" r="10" />
-        </g>
-      </svg>
-    ),
-    (
-      <svg width="100%" height="100%" viewBox="0 0 160 160" key="k7">
-        <rect width="160" height="160" fill="#0C0A09" />
-        {[30, 55, 80, 105, 130].map((y) =>
-          [30, 55, 80, 105, 130].map((x) => (
-            <circle key={`p7-${x}-${y}`} cx={x} cy={y} r="2" fill="#FFFFFF" opacity="0.8" />
-          ))
-        )}
-        <g stroke="#FFFFFF" strokeWidth="1.8" fill="none">
-          <path d="M 40 40 L 120 40 L 120 120 L 40 120 Z" />
-          <path d="M 80 20 L 140 80 L 80 140 L 20 80 Z" />
-        </g>
-      </svg>
-    ),
-    (
-      <svg width="100%" height="100%" viewBox="0 0 160 160" key="k8">
-        <rect width="160" height="160" fill="#0C0A09" />
-        {[30, 55, 80, 105, 130].map((y) =>
-          [30, 55, 80, 105, 130].map((x) => (
-            <circle key={`p8-${x}-${y}`} cx={x} cy={y} r="2" fill="#FFFFFF" opacity="0.8" />
-          ))
-        )}
-        <g stroke="#FFFFFF" strokeWidth="1.8" fill="none">
-          <path d="M 80 30 Q 130 80 80 130 Q 30 80 80 30 Z" />
-          <path d="M 30 80 Q 80 30 130 80 Q 80 130 30 80 Z" />
-        </g>
-      </svg>
-    )
-  ]
+    saveCandidatesToHistory(data.candidates)
+  }
 
-  const activeSet = variationIndex === 0 ? kolamSet1 : kolamSet2
+  const handleGenerateMore = () => {
+    const trimmed = seedInput.trim()
+    const params = { count }
+    if (trimmed !== '') {
+      const parsed = Number(trimmed)
+      if (!Number.isInteger(parsed)) {
+        setStatus('error')
+        setErrorMsg('Seed must be a whole number.')
+        return
+      }
+      params.seed = parsed
+    }
+    runGenerate(params)
+  }
+
+  useEffect(() => {
+    let cancelled = false
+    createGeneration({ count: 2 }).then(({ data, error }) => {
+      if (cancelled) return
+      if (error) {
+        setStatus('error')
+        setErrorMsg(error.message)
+        return
+      }
+      setCandidates(data.candidates)
+      setModel(data.model_version ? { name: 'M5 (learned-scorer-guided search)', version: data.model_version } : null)
+      setStatus('success')
+
+      saveCandidatesToHistory(data.candidates)
+    })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Downloads go through the backend export endpoint (real persisted
+  // artifacts -- api/routes_generations.py's export_generation), not a
+  // client-side blob of the already-rendered SVG string: this is what
+  // makes PNG/JSON export possible (the frontend never rasterizes SVG
+  // itself, the backend already rendered a real PNG via engine.render
+  // at generation time). window.open triggers the browser's native
+  // download via the response's Content-Disposition header.
+  const downloadArtifact = (candidate, format) => {
+    window.open(generationExportUrl(candidate.id, format), '_blank')
+  }
+
+  const toggleDetail = async (candidate) => {
+    if (detailFor === candidate.id) {
+      setDetailFor(null)
+      return
+    }
+    setDetailFor(candidate.id)
+    setDetailTab('math')
+    if (detailTab === 'graph' && !graphCache[candidate.id]) {
+      const { data } = await getGenerationGraph(candidate.id)
+      if (data) setGraphCache((prev) => ({ ...prev, [candidate.id]: data.graph }))
+    }
+  }
+
+  const selectTab = async (candidate, tab) => {
+    setDetailTab(tab)
+    if (tab === 'graph' && !graphCache[candidate.id]) {
+      const { data } = await getGenerationGraph(candidate.id)
+      if (data) setGraphCache((prev) => ({ ...prev, [candidate.id]: data.graph }))
+    }
+  }
+
+  const nValid = candidates.filter((c) => c.is_valid).length
+  const avgSymmetry = candidates.length
+    ? candidates.reduce((sum, c) => sum + (c.analysis?.symmetry?.coverage ?? 0), 0) / candidates.length
+    : null
+  const firstDots = candidates[0]?.analysis?.graph?.vertices
 
   return (
-    <div className="generated-card">
-      {/* HEADER ROW */}
-      <div className="generated-header-row">
-        <div className="generated-title-group">
-          <div className="generated-title-row">
+    <div className="generated-container">
+      <div className="generated-card">
+        {/* HEADER ROW */}
+        <div className="generated-header-row">
+          <div className="generated-title-group">
             <h2 className="generated-title">{t('variations.title')}</h2>
-            <span className="generated-experimental-badge" title="Novel generation requires a backend endpoint that is not yet available">
-              ⚗ Experimental
-            </span>
-          </div>
-          <p className="generated-subtitle">{t('variations.subtitle')}</p>
-        </div>
-
-        <button
-          className="btn-generate-more"
-          onClick={handleGenerateMore}
-          title="Cycles through pre-computed example patterns. Real ML generation requires the /api/v1/generate endpoint (not yet available)."
-        >
-          <RotateCw size={14} className="refresh-icon" />
-          <span>{t('variations.generateMore')}</span>
-        </button>
-      </div>
-
-      {/* 4 THUMBNAILS GRID */}
-      <div className="variations-grid">
-        {activeSet.map((kolamSvg, i) => (
-          <div key={i} className="variation-thumb-box">
-            {kolamSvg}
-          </div>
-        ))}
-      </div>
-
-      {/* DESIGN RULE SUMMARY */}
-      <div className="rule-summary-container">
-        <h3 className="rule-summary-title">{t('variations.ruleSummary')}</h3>
-
-        <div className="rule-metrics-row">
-          <div className="metric-col">
-            <Grid size={18} className="metric-icon" />
-            <div className="metric-text-box">
-              <span className="metric-label">{t('variations.grid')}</span>
-              <span className="metric-val">7 &times; 7 Pulli</span>
-            </div>
+            <p className="generated-subtitle">
+              {t('variations.subtitle')}
+              {model && <> &mdash; {model.name}</>}
+            </p>
           </div>
 
-          <div className="metric-col">
-            <GitFork size={18} className="metric-icon" />
-            <div className="metric-text-box">
-              <span className="metric-label">{t('variations.symmetry')}</span>
-              <span className="metric-val">D4</span>
-            </div>
-          </div>
-
-          <div className="metric-col">
-            <LoopIcon size={18} className="metric-icon" />
-            <div className="metric-text-box">
-              <span className="metric-label">{t('variations.stroke')}</span>
-              <span className="metric-val">{t('variations.strokeVal')}</span>
-            </div>
-          </div>
-
-          <div className="metric-col">
-            <Flower2 size={18} className="metric-icon" />
-            <div className="metric-text-box">
-              <span className="metric-label">{t('variations.motifFamilies')}</span>
-              <span className="metric-val">4</span>
-            </div>
-          </div>
-
-          <div className="metric-col">
-            <BarChart2 size={18} className="metric-icon" />
-            <div className="metric-text-box">
-              <span className="metric-label">{t('variations.complexity')}</span>
-              <span className="metric-val">{t('variations.complexityVal')}</span>
-            </div>
+          <div className="generated-controls">
+            <label className="generated-control-field">
+              <span className="generated-control-label">{t('variations.seedLabel')}</span>
+              <input
+                type="number"
+                inputMode="numeric"
+                className="generated-control-input"
+                placeholder={t('variations.seedPlaceholder')}
+                value={seedInput}
+                onChange={(e) => setSeedInput(e.target.value)}
+                disabled={status === 'loading'}
+              />
+            </label>
+            <label className="generated-control-field">
+              <span className="generated-control-label">{t('variations.countLabel')}</span>
+              <select
+                className="generated-control-input"
+                value={count}
+                onChange={(e) => setCount(Number(e.target.value))}
+                disabled={status === 'loading'}
+              >
+                {Array.from({ length: MAX_GENERATE_COUNT }, (_, i) => i + 1).map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </label>
+            <button className="btn-generate-more" onClick={handleGenerateMore} disabled={status === 'loading'}>
+              <RotateCw size={14} className={`refresh-icon${status === 'loading' ? ' spinning' : ''}`} />
+              <span>{status === 'loading' ? t('variations.generating') : t('variations.generateMore')}</span>
+            </button>
           </div>
         </div>
+
+        {status === 'error' && (
+          <div className="generated-error">
+            {t('variations.errorPrefix')} {errorMsg}
+          </div>
+        )}
+
+        {status === 'loading' && candidates.length === 0 && (
+          <div className="generated-loading">{t('variations.generating')}</div>
+        )}
+
+        {status === 'success' && candidates.length === 0 && (
+          <div className="generated-loading">{t('variations.empty')}</div>
+        )}
+
+        {candidates.length > 0 && (
+          <>
+            {/* CANDIDATE GRID */}
+            <div className="variations-grid">
+              {candidates.map((c) => (
+                <Fragment key={c.id}>
+                  <div className="variation-thumb-box" title={`seed=${c.seed}, valid=${c.is_valid}`}>
+                    <div className="variation-svg-wrap" dangerouslySetInnerHTML={{ __html: c.render_svg }} />
+                    {!c.is_valid && <span className="variation-invalid-badge">invalid</span>}
+                    <button
+                      type="button"
+                      className={`variation-detail-btn${detailFor === c.id ? ' active' : ''}`}
+                      title="View mathematics / graph"
+                      aria-label={`View mathematics for seed ${c.seed}`}
+                      onClick={() => toggleDetail(c)}
+                    >
+                      <Info size={13} />
+                    </button>
+                    <div className="variation-export-group" role="group" aria-label={t('variations.download')}>
+                      {['svg', 'png', 'json'].map((format) => (
+                        <button
+                          key={format}
+                          type="button"
+                          className="variation-export-btn"
+                          title={`${t('variations.download')} (${format.toUpperCase()})`}
+                          aria-label={`${t('variations.download')} ${format.toUpperCase()} (seed ${c.seed})`}
+                          onClick={() => downloadArtifact(c, format)}
+                        >
+                          {format === 'svg' ? <Download size={13} /> : format.toUpperCase()}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {detailFor === c.id && (
+                    <div className="detail-panel">
+                      <div className="detail-panel-tabs">
+                        <button
+                          type="button"
+                          className={`detail-panel-tab${detailTab === 'math' ? ' active' : ''}`}
+                          onClick={() => selectTab(c, 'math')}
+                        >
+                          Mathematics
+                        </button>
+                        <button
+                          type="button"
+                          className={`detail-panel-tab${detailTab === 'graph' ? ' active' : ''}`}
+                          onClick={() => selectTab(c, 'graph')}
+                        >
+                          Graph
+                        </button>
+                      </div>
+                      {detailTab === 'math' && <MathematicsPanel analysis={c.analysis} />}
+                      {detailTab === 'graph' && (
+                        <div className="graph-view-svg-wrap">
+                          {graphCache[c.id] ? <GraphViewSvg graph={graphCache[c.id]} /> : <span>Loading graph…</span>}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </Fragment>
+              ))}
+            </div>
+
+            {/* DESIGN RULE SUMMARY -- real values only, from the actual API response */}
+            <div className="rule-summary-container">
+              <h3 className="rule-summary-title">{t('variations.ruleSummary')}</h3>
+
+              <div className="rule-metrics-row">
+                <div className="metric-col">
+                  <Grid size={18} className="metric-icon" />
+                  <div className="metric-text-box">
+                    <span className="metric-label">{t('variations.grid')}</span>
+                    <span className="metric-val">{firstDots ? `${firstDots} dots` : '—'}</span>
+                  </div>
+                </div>
+
+                <div className="metric-col">
+                  <GitFork size={18} className="metric-icon" />
+                  <div className="metric-text-box">
+                    <span className="metric-label">{t('variations.symmetry')}</span>
+                    <span className="metric-val">
+                      {avgSymmetry !== null ? `${(avgSymmetry * 100).toFixed(0)}% coverage` : 'Not yet evaluated'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="metric-col">
+                  <LoopIcon size={18} className="metric-icon" />
+                  <div className="metric-text-box">
+                    <span className="metric-label">{t('variations.stroke')}</span>
+                    <span className="metric-val">
+                      {candidates.length ? `${nValid} / ${candidates.length} valid` : '—'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="metric-col">
+                  <Flower2 size={18} className="metric-icon" />
+                  <div className="metric-text-box">
+                    <span className="metric-label">{t('variations.motifFamilies')}</span>
+                    <span className="metric-val">
+                      {candidates[0]?.analysis?.multiplicity?.max_multiplicity != null
+                        ? `max ×${candidates[0].analysis.multiplicity.max_multiplicity}`
+                        : '—'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="metric-col">
+                  <BarChart2 size={18} className="metric-icon" />
+                  <div className="metric-text-box">
+                    <span className="metric-label">{t('variations.complexity')}</span>
+                    <span className="metric-val">
+                      {candidates[0]?.analysis?.complexity?.complexity_score != null
+                        ? candidates[0].analysis.complexity.complexity_score.toFixed(2)
+                        : '—'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
+
+      {/* RECENT KOLAMS STORAGE HISTORY DISPLAY */}
+      <RecentKolams />
     </div>
   )
 }

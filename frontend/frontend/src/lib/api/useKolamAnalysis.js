@@ -184,7 +184,7 @@ export function useKolamAnalysis() {
     // Client-side validation before any network call -- same rules as /detect page.
     const validation = validateImageFile(imageFile)
     if (!validation.valid) {
-      setAnalysisState((prev) => ({
+      setAnalysisState(() => ({
         ...makeInitialState(),
         status: 'failed',
         error: validation.message,

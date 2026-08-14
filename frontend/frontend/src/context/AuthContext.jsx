@@ -3,6 +3,8 @@ import { getMe, login as apiLogin, logout as apiLogout, register as apiRegister 
 
 const AuthContext = createContext(null)
 
+const LOCAL_STORAGE_RECENT_KEY = 'pulli_recent_kolams'
+
 // 'loading' | 'authenticated' | 'unauthenticated' | 'error'
 // 'error' is distinct from 'unauthenticated' -- a 401 from /me genuinely
 // means "no session," but a network failure means "we don't know," and
@@ -10,6 +12,14 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [status, setStatus] = useState('loading')
   const [user, setUser] = useState(null)
+  const [recentKolams, setRecentKolams] = useState(() => {
+    try {
+      const stored = localStorage.getItem(LOCAL_STORAGE_RECENT_KEY)
+      return stored ? JSON.parse(stored) : []
+    } catch {
+      return []
+    }
+  })
 
   const refresh = useCallback(async () => {
     setStatus('loading')
@@ -29,7 +39,8 @@ export function AuthProvider({ children }) {
   }, [])
 
   useEffect(() => {
-    refresh()
+    const id = setTimeout(() => refresh(), 0)
+    return () => clearTimeout(id)
   }, [refresh])
 
   const login = useCallback(async (email, password) => {
@@ -56,8 +67,34 @@ export function AuthProvider({ children }) {
     setStatus('unauthenticated')
   }, [])
 
+  // Local, device-scoped history of generated/analyzed Kolams. There is
+  // no backend table for this (unlike users/sessions in api/auth/) --
+  // it deliberately stays client-side only, same scope as the theme/
+  // language preferences already kept in localStorage elsewhere.
+  const addRecentKolam = useCallback((kolamItem) => {
+    const newItem = {
+      id: kolamItem.id || `kolam_${Date.now()}`,
+      title: kolamItem.title || 'Generated Pulli Kolam',
+      image_url: kolamItem.image_url || kolamItem.imagePath || '/static/synthetic/kolam19_1.jpg',
+      grid_size: kolamItem.grid_size || '7×7',
+      symmetry: kolamItem.symmetry || 'D4 Dihedral',
+      validity: kolamItem.validity || '✓ Eulerian Single-stroke',
+      created_at: new Date().toISOString(),
+    }
+    setRecentKolams((prev) => {
+      const updated = [newItem, ...prev.filter((item) => item.id !== newItem.id)].slice(0, 20)
+      try {
+        localStorage.setItem(LOCAL_STORAGE_RECENT_KEY, JSON.stringify(updated))
+      } catch {
+        // localStorage unavailable (private browsing, quota) -- state
+        // still updates for this session, just doesn't persist.
+      }
+      return updated
+    })
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ status, user, login, register, logout, refresh }}>
+    <AuthContext.Provider value={{ status, user, login, register, logout, refresh, recentKolams, addRecentKolam }}>
       {children}
     </AuthContext.Provider>
   )

@@ -1,0 +1,45 @@
+<svg width="170" height="168" viewBox="0 0 170 168" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="#49382E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+
+    <!-- Top sparkle -->
+    <path d="
+      M61 27
+      C62 35 65 38 73 39
+      C65 40 62 43 61 51
+      C60 43 57 40 49 39
+      C57 38 60 35 61 27
+      Z
+    "></path>
+
+    <!-- Left sparkle -->
+    <path d="
+      M43 73
+      C45 84 49 88 60 90
+      C49 91 45 95 43 106
+      C41 95 37 91 26 90
+      C37 88 41 84 43 73
+      Z
+    "></path>
+
+    <!-- Right sparkle -->
+    <path d="
+      M130 74
+      C131 82 134 86 142 87
+      C134 88 131 92 130 100
+      C129 92 126 88 118 87
+      C126 86 129 82 130 74
+      Z
+    "></path>
+
+    <!-- Bottom sparkle -->
+    <path d="
+      M82 103
+      C84 115 88 120 100 122
+      C88 124 84 128 82 140
+      C80 128 76 124 64 122
+      C76 120 80 115 82 103
+      Z
+    "></path>
+
+  </g>
+</svg>
