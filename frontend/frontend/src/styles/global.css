@@ -13,6 +13,13 @@ html, body {
   font-family: var(--font-sans);
   background-color: var(--color-paper);
   color: var(--color-text-dark);
+  background-image: 
+    radial-gradient(rgba(184, 135, 53, 0.08) 1.5px, transparent 1.5px),
+    url('/kolam_tradition_icon.jpg');
+  background-size: 32px 32px, 500px 500px;
+  background-position: 0 0, right -80px top 120px;
+  background-repeat: repeat, no-repeat;
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
