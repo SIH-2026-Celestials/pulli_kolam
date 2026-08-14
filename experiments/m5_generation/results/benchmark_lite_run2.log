@@ -43,3 +43,66 @@ motif library size: 29 (from [('kolam19', 323), ('kolam19', 387), ('kolam29', 51
 42/50  valid_so_far=34  latency=11.3s  elapsed=801s
 43/50  valid_so_far=35  latency=50.2s  elapsed=851s
 44/50  valid_so_far=36  latency=12.6s  elapsed=864s
+45/50  valid_so_far=37  latency=22.5s  elapsed=886s
+46/50  valid_so_far=37  latency=46.8s  elapsed=933s
+47/50  valid_so_far=38  latency=10.6s  elapsed=944s
+48/50  valid_so_far=39  latency=11.5s  elapsed=955s
+49/50  valid_so_far=40  latency=13.0s  elapsed=969s
+50/50  valid_so_far=41  latency=18.8s  elapsed=987s
+{
+  "SCALE_NOTE": "REDUCED-SCALE run: n_generated=50 (vs run_benchmark.py's full N_CANDIDATES=500), n_restarts=12 (vs full N_RESTARTS=16 nominal -- here 12) -- time-budget decision, documented not hidden. See module docstring.",
+  "n_generated": 50,
+  "n_valid": 41,
+  "validity_rate": 0.82,
+  "n_connected_all_nodes": 41,
+  "connectivity_rate": 0.82,
+  "n_multiplicity_violations": 38,
+  "multiplicity_violation_rate": 0.76,
+  "avg_symmetry_coverage": 0.22482089293074686,
+  "avg_generation_latency_seconds": 19.71030611038208,
+  "total_benchmark_time_seconds": 987.2899506092072,
+  "seed_reproducibility_checks": [
+    {
+      "seed": 0,
+      "reproducible": true
+    },
+    {
+      "seed": 5,
+      "reproducible": true
+    }
+  ],
+  "novelty": {
+    "n_candidates": 41,
+    "n_unique_fingerprints": 41,
+    "unique_rate": 1.0,
+    "exact_topological_duplicate_rate": 0.0,
+    "exact_coordinate_duplicate_rate": 0.0,
+    "near_duplicate_rate": 0.0,
+    "near_duplicate_threshold": 0.9,
+    "n_coordinate_comparable_pairs": 41
+  },
+  "reliability_at_k": {
+    "at_1_attempt": false,
+    "at_10_attempts": true,
+    "at_50_attempts": true
+  },
+  "motif_library_size": 29,
+  "n_layouts": 75,
+  "n_restarts_per_candidate": 12,
+  "scorer_metadata": {
+    "architecture": "MLP (16 -> 32 -> 16 -> 1)",
+    "n_parameters": 1089,
+    "n_train_examples": 528175,
+    "n_val_examples": 108690,
+    "n_test_examples": 122675,
+    "epochs": 60,
+    "batch_size": 256,
+    "lr": 0.001,
+    "train_time_seconds": 1684.3,
+    "final_val_acc": 0.9014168977737427,
+    "test_acc": 0.9031832218170166,
+    "test_auc": 0.9624778497533204,
+    "trivial_baseline_acc": 0.800000011920929,
+    "seed": 5252
+  }
+}
