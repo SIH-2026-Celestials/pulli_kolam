@@ -58,6 +58,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+
+from api.security_headers import SecurityHeadersMiddleware
 from fastapi.responses import JSONResponse
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -181,10 +183,14 @@ _cors_kwargs = (
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
+    # DELETE added this session for DELETE /api/v1/generations/{id} (artifact
+    # deletion) -- without it, a real cross-origin browser (Vercel frontend
+    # calling this Render backend) fails CORS preflight on that endpoint.
+    allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["*"],
     **_cors_kwargs,
 )
+app.add_middleware(SecurityHeadersMiddleware)
 
 app.include_router(auth_router)
 app.include_router(generations_router)

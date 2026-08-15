@@ -37,6 +37,27 @@ def _ensure_db():
         session.close()
 
 
+@pytest.fixture(scope="module", autouse=True)
+def _logged_in_user(_ensure_db):
+    """POST /api/v1/generations and friends require login (ownership
+    fix -- generations are private per-user, not a public feed; see
+    api/routes_generations.py's `_get_owned_generation`). `client` is a
+    module-level TestClient, so its cookie jar carries this session
+    across every test in this file, matching a real logged-in browser."""
+    from api.auth.db import init_db as init_auth_db
+
+    init_auth_db()
+    client.post(
+        "/api/v1/auth/register",
+        json={"email": "platform_test_user@example.com", "password": "TestPassword123!", "display_name": "Platform Test"},
+    )
+    r = client.post(
+        "/api/v1/auth/login",
+        json={"email": "platform_test_user@example.com", "password": "TestPassword123!"},
+    )
+    assert r.status_code == 200, r.text
+
+
 def test_models_registry_lists_all_three_families():
     r = client.get("/api/v1/models")
     assert r.status_code == 200
@@ -179,3 +200,219 @@ def test_legacy_generate_endpoint_still_works_unchanged():
     r = client.post("/api/v1/generate", json={"seed": 42, "count": 1})
     assert r.status_code == 200
     assert r.json()["generator"] == "m5"
+
+
+# ============================================================
+# Ownership regression tests (Phase 9's explicit requirement: "a user
+# must never be able to retrieve another user's private generation
+# merely by knowing its ID"). `client` is logged in as
+# platform_test_user@example.com for the whole module (see
+# `_logged_in_user`); `_anon_client`/`_other_user_client` below are
+# deliberately SEPARATE TestClient instances so their cookie jars never
+# collide with the module's primary logged-in session.
+# ============================================================
+
+def test_create_generation_requires_login():
+    anon = TestClient(app)
+    r = anon.post("/api/v1/generations", json={"seed": 900, "count": 1})
+    assert r.status_code == 401
+
+
+def test_get_generation_requires_login():
+    anon = TestClient(app)
+    r = anon.get("/api/v1/generations/does-not-exist")
+    assert r.status_code == 401
+
+
+def test_list_generations_requires_login():
+    anon = TestClient(app)
+    r = anon.get("/api/v1/generations")
+    assert r.status_code == 401
+
+
+def _other_user_client() -> TestClient:
+    other = TestClient(app)
+    other.post(
+        "/api/v1/auth/register",
+        json={"email": "platform_other_user@example.com", "password": "TestPassword123!", "display_name": "Other User"},
+    )
+    r = other.post(
+        "/api/v1/auth/login",
+        json={"email": "platform_other_user@example.com", "password": "TestPassword123!"},
+    )
+    assert r.status_code == 200, r.text
+    return other
+
+
+def test_cannot_retrieve_another_users_generation():
+    """The core ownership check: user A creates a generation, user B
+    (logged in, real session, real account) must get the SAME 404 a
+    nonexistent id would give -- never a 403 that would confirm the id
+    is real but someone else's, and never the actual data."""
+    r = client.post("/api/v1/generations", json={"seed": 901, "count": 1})
+    assert r.status_code == 200
+    result_id = r.json()["candidates"][0]["id"]
+
+    other = _other_user_client()
+    r2 = other.get(f"/api/v1/generations/{result_id}")
+    assert r2.status_code == 404
+    assert r2.json()["code"] == "NOT_FOUND"
+
+
+def test_cannot_retrieve_another_users_generation_mathematics_graph_or_export():
+    r = client.post("/api/v1/generations", json={"seed": 902, "count": 1})
+    result_id = r.json()["candidates"][0]["id"]
+
+    other = _other_user_client()
+    assert other.get(f"/api/v1/generations/{result_id}/mathematics").status_code == 404
+    assert other.get(f"/api/v1/generations/{result_id}/graph").status_code == 404
+    assert other.get(f"/api/v1/generations/{result_id}/export?format=svg").status_code == 404
+
+
+def test_list_generations_only_shows_own_results():
+    """User B's history must not include user A's generations, even
+    though both exist in the same database."""
+    r = client.post("/api/v1/generations", json={"seed": 903, "count": 1})
+    my_result_id = r.json()["candidates"][0]["id"]
+
+    other = _other_user_client()
+    r2 = other.get("/api/v1/generations?page=1&page_size=100")
+    assert r2.status_code == 200
+    other_ids = {item["id"] for item in r2.json()["items"]}
+    assert my_result_id not in other_ids
+
+
+# ============================================================
+# Artifact deletion (Phase 1's explicit test list: successful deletion,
+# missing artifact, unauthorized deletion, database failure, storage
+# failure).
+# ============================================================
+
+def test_delete_generation_success_removes_db_rows_and_storage_object():
+    """1. Successful deletion: after DELETE, the result is truly gone --
+    both the DB row (re-GET returns 404) and the underlying storage file
+    (no longer exists on disk, via the same LocalStorage the app itself
+    uses)."""
+    from api.db.database import get_session as _get_session
+    from api.db.models import Artifact, GenerationResult, PatternAnalysis, PatternVersion, VerificationResult
+    from api.services.artifact_store import get_artifact_store
+
+    r = client.post("/api/v1/generations", json={"seed": 910, "count": 1})
+    result_id = r.json()["candidates"][0]["id"]
+
+    session = _get_session()
+    try:
+        result_row = session.get(GenerationResult, result_id)
+        pv_id = result_row.pattern_version_id
+        artifact_paths = [a.storage_path for a in session.query(Artifact).filter_by(pattern_version_id=pv_id).all()]
+    finally:
+        session.close()
+    assert artifact_paths, "expected at least one Artifact row for a fresh generation"
+    store = get_artifact_store()
+    assert all(store.exists(p) for p in artifact_paths), "artifact file(s) should exist before deletion"
+
+    r_del = client.delete(f"/api/v1/generations/{result_id}")
+    assert r_del.status_code == 204
+
+    # Re-GET returns the same 404 as any nonexistent id.
+    assert client.get(f"/api/v1/generations/{result_id}").status_code == 404
+
+    session = _get_session()
+    try:
+        assert session.get(GenerationResult, result_id) is None
+        assert session.get(PatternVersion, pv_id) is None
+        assert session.query(PatternAnalysis).filter_by(pattern_version_id=pv_id).count() == 0
+        assert session.query(VerificationResult).filter_by(pattern_version_id=pv_id).count() == 0
+        assert session.query(Artifact).filter_by(pattern_version_id=pv_id).count() == 0
+    finally:
+        session.close()
+
+    assert not any(store.exists(p) for p in artifact_paths), "artifact file(s) should be gone from storage after deletion"
+
+
+def test_delete_generation_missing_returns_404():
+    """2. Missing artifact: deleting an id that never existed is a clean
+    404, not a 500 or a silent no-op."""
+    r = client.delete("/api/v1/generations/does-not-exist")
+    assert r.status_code == 404
+    assert r.json()["code"] == "NOT_FOUND"
+
+
+def test_delete_generation_unauthorized_is_rejected_and_nothing_is_deleted():
+    """3. Unauthorized deletion: user B can never delete user A's
+    generation -- same 404-not-403 convention as every other ownership
+    check here, AND the row must still exist afterward (verified via
+    user A's own client, not just "the delete call returned an error")."""
+    r = client.post("/api/v1/generations", json={"seed": 911, "count": 1})
+    result_id = r.json()["candidates"][0]["id"]
+
+    other = _other_user_client()
+    r_del = other.delete(f"/api/v1/generations/{result_id}")
+    assert r_del.status_code == 404
+
+    # Still retrievable by its real owner -- nothing was actually deleted.
+    assert client.get(f"/api/v1/generations/{result_id}").status_code == 200
+
+
+def test_delete_generation_database_failure_returns_500_and_rolls_back(monkeypatch):
+    """4. Database failure: if the delete transaction fails partway
+    through, the request reports a clean 500 (not a crash, not a silent
+    partial success) and the row is verifiably still intact afterward --
+    proving the rollback actually happened, not just that an exception
+    was caught."""
+    from api.db.database import get_session as _get_session
+    from api.db.models import GenerationResult
+
+    r = client.post("/api/v1/generations", json={"seed": 912, "count": 1})
+    result_id = r.json()["candidates"][0]["id"]
+
+    from sqlalchemy.orm import Session as SqlAlchemySession
+
+    def _boom(self, *args, **kwargs):
+        raise RuntimeError("simulated database failure")
+
+    monkeypatch.setattr(SqlAlchemySession, "commit", _boom)
+    r_del = client.delete(f"/api/v1/generations/{result_id}")
+    assert r_del.status_code == 500
+    assert r_del.json()["code"] == "DELETE_FAILED"
+    monkeypatch.undo()
+
+    # The row must still be fully intact -- the failed commit did not
+    # leave a half-applied delete.
+    session = _get_session()
+    try:
+        assert session.get(GenerationResult, result_id) is not None
+    finally:
+        session.close()
+    assert client.get(f"/api/v1/generations/{result_id}").status_code == 200
+
+
+def test_delete_generation_storage_failure_still_deletes_db_rows(monkeypatch):
+    """5. Storage failure: if the underlying storage backend can't
+    delete the file (network error, R2 unreachable, etc.), the DB rows
+    are still removed -- per the endpoint's documented safety ordering,
+    a storage-cleanup failure must never block or fail the DB deletion,
+    since the alternative (leave the DB row) would produce the strictly
+    worse dangling-reference failure mode."""
+    from api.db.database import get_session as _get_session
+    from api.db.models import GenerationResult
+    from api.services.artifact_store import get_artifact_store
+
+    r = client.post("/api/v1/generations", json={"seed": 913, "count": 1})
+    result_id = r.json()["candidates"][0]["id"]
+
+    store = get_artifact_store()
+
+    def _boom(self, relative_path):
+        raise RuntimeError("simulated storage failure")
+
+    monkeypatch.setattr(type(store), "delete", _boom)
+    r_del = client.delete(f"/api/v1/generations/{result_id}")
+    monkeypatch.undo()
+
+    assert r_del.status_code == 204  # storage failure is logged, not surfaced as a request failure
+    session = _get_session()
+    try:
+        assert session.get(GenerationResult, result_id) is None
+    finally:
+        session.close()

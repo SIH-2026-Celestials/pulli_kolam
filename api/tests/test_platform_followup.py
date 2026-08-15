@@ -37,6 +37,25 @@ def _ensure_db():
         session.close()
 
 
+@pytest.fixture(scope="module", autouse=True)
+def _logged_in_user(_ensure_db):
+    """See api/tests/test_platform_generations.py's identical fixture --
+    generation endpoints require login (ownership fix). This file uses
+    its own module-level `client`/cookie jar, so it needs its own login."""
+    from api.auth.db import init_db as init_auth_db
+
+    init_auth_db()
+    client.post(
+        "/api/v1/auth/register",
+        json={"email": "platform_followup_user@example.com", "password": "TestPassword123!", "display_name": "Followup Test"},
+    )
+    r = client.post(
+        "/api/v1/auth/login",
+        json={"email": "platform_followup_user@example.com", "password": "TestPassword123!"},
+    )
+    assert r.status_code == 200, r.text
+
+
 def test_generator_interface_m5generator_produces_real_candidate():
     """Unit-level: M5Generator (the Generator Protocol's only
     registered implementation) produces a real, structurally sound

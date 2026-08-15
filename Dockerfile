@@ -55,9 +55,32 @@ COPY experiments/m4_2/results/dot_heatmap_net_v2.pt ./experiments/m4_2/results/d
 COPY experiments/m5_generation/checkpoints/placement_scorer.pt ./experiments/m5_generation/checkpoints/placement_scorer.pt
 COPY experiments/m5_generation/data/split_manifest.json ./experiments/m5_generation/data/split_manifest.json
 
+# api/generation_service.py loads every source pattern named in
+# split_manifest.json's "test" split via engine.dataset.load_kolam() --
+# NOT just checkpoints -- so those source CSVs must be in the image too.
+# Missing this was a real bug (found by actually running this image, not
+# by inspection): the container built and started, health/live passed,
+# but /api/v1/health/ready reported generation_service_available=false
+# with FileNotFoundError for kolam19.csv. Confirmed the test split only
+# references kolam19/kolam29 (not kolam109, which is ~18MB and unused --
+# checked experiments/m5_generation/data/split_manifest.json before
+# adding these lines, same "verify before copying" discipline as the
+# experiments/ curation above).
+COPY ["kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv", "./kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv"]
+COPY ["kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv", "./kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv"]
+
 # Seed data and migrations
 COPY alembic.ini ./alembic.ini
 COPY alembic/ ./alembic/
+
+# Run as a non-root user. All dependency installs and file copies above
+# happen as root (needed for pip's default install location); everything
+# from here on -- including the app process itself -- runs unprivileged.
+# /app is owned by this user so LocalStorage (dev fallback if STORAGE_PROVIDER
+# is misconfigured in a container) can still write under api/storage/.
+RUN useradd --create-home --uid 1000 --shell /usr/sbin/nologin pulli \
+    && chown -R pulli:pulli /app
+USER pulli
 
 EXPOSE 8000
 
