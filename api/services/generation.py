@@ -92,6 +92,7 @@ def generate(
     count: int,
     verify_recognizer: bool = False,
     reference_sources: "list | None" = None,
+    user_id: "str | None" = None,
 ) -> GenerationServiceResult:
     """The framework-independent entry point. Persists a
     GenerationRequest + GenerationRun + one GenerationResult (and its
@@ -111,7 +112,9 @@ def generate(
     if not generator.available:
         raise GenerationUnavailableError(generator.load_error or "generator unavailable")
 
-    request_row = GenerationRequest(params={"seed": seed, "count": count, "verify_recognizer": verify_recognizer})
+    request_row = GenerationRequest(
+        params={"seed": seed, "count": count, "verify_recognizer": verify_recognizer}, user_id=user_id
+    )
     session.add(request_row)
     session.flush()
 

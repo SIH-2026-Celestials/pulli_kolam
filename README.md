@@ -153,6 +153,20 @@ input pattern → infer the minimal generating grammar → prove it's correct �
 |---|
 | ![Home Pillars](docs/screenshots/home-pillars.jpg) |
 
+### Generative Playground (M7 platform)
+
+Real, persisted M5 generation — mathematics, structural graph, and M4.2 recognizer
+verification, all computed server-side and read back from the database, not
+computed in the browser.
+
+| Generation + Mathematics | Structural Graph |
+|---|---|
+| ![Playground generation](docs/screenshots/playground.jpg) | ![Graph view](docs/screenshots/graph.png) |
+
+| AI Verification | Generation History | Account |
+|---|---|---|
+| ![Verification](docs/screenshots/verification.png) | ![History](docs/screenshots/history.png) | ![Account](docs/screenshots/account.jpg) |
+
 ---
 
 ## Computational pipeline
@@ -257,7 +271,8 @@ The fastest path is the root launcher (see [Run PULLI locally](#run-pulli-locall
 
 ```bash
 pip install -r requirements.txt
-python -m pytest -q                                     # full suite: 277 passing
+python -m pytest api/tests/ -q                          # API/platform suite: 94/94 passing
+python -m pytest tests/ -q                               # core engine suite: 243 tests (see Testing section)
 python -m uvicorn api.main:app --host 0.0.0.0 --port 8000  # backend only
 ```
 
@@ -318,7 +333,9 @@ Measured by running the engine's validation scripts against the real dataset - n
 
 - Evaluated across a 15-pattern sample from `kolam19`.
 - Single-motif models explain only a fraction of a real pattern; multi-motif set-cover induction is what gets recall into the 90%+ range.
-- The full `pytest` suite currently passes **364/364**, spanning the core engine, the ML detector/API integration layer, and the deployment launcher.
+- `api/tests/` (API/platform integration — auth, generation, ownership, artifact deletion, rate limiting, security headers) passes **94/94**, verified this release against both local SQLite and a real disposable PostgreSQL 16 instance.
+- `tests/` (core engine — graph construction, motifs, symmetry, validity, reconstruction) collects **243 tests**; run individually or via CI (`.github/workflows/ci.yml`, clean Ubuntu runner) rather than in this specific local Windows/conda environment, which has a pre-existing `torch`/MKL OpenMP DLL conflict unrelated to this project's code (see `docs/DEPLOYMENT.md` and `PROJECT_STATE.md`) that aborts the process partway through any run mixing `engine.image_io`'s lattice-fitting tests with a loaded `torch` install in the same interpreter.
+- Frontend: **50/50** Vitest tests passing, production build (`npm run build`) and lint (`npm run lint`) both clean.
 
 These are experimental results from the current evaluation sample, not universal claims about the dataset or method.
 
@@ -344,12 +361,20 @@ These are experimental results from the current evaluation sample, not universal
 | M5 learned placement-scorer guided generation | ✅ Done  -  integrated into persisted `/api/v1/generations` endpoint |
 | Persisted generation platform (M7)  -  artifact storage, history, export | ✅ Done  -  SQLite default, Cloudflare R2 optional |
 | Session-based authentication (register, login, logout, recent history) | ✅ Done |
-| Database migrations (Alembic) | ✅ Done |
-| Pluggable artifact storage (local disk / Cloudflare R2) | ✅ Done |
+| Generation ownership / authorization  -  every generation is private to the account that created it | ✅ Done  -  verified with two real accounts; a different user gets the same 404 a nonexistent id would, never a 403 that would leak existence |
+| Database migrations (Alembic) | ✅ Done  -  verified against real PostgreSQL 16, both directions |
+| PostgreSQL production database | ✅ Verified  -  real Postgres via Docker this release; SQLite remains the local-dev default |
+| Pluggable artifact storage (local disk / Cloudflare R2) | ✅ Done locally · 🔶 R2 implemented, not execution-verified (no bucket credentials in this environment) |
+| Artifact lifecycle (deletion removes DB rows + storage object together) | ✅ Done |
+| Rate limiting (per-user for generation, in-process) | ✅ Done  -  known limitation: does not yet share state across multiple backend instances |
+| Security headers (HSTS, CSP, X-Frame-Options, Permissions-Policy) | ✅ Done |
+| Docker non-root container | ✅ Done  -  verified live (`whoami` inside a running container) |
+| Backup/restore procedure | ✅ Verified  -  full drill executed against real (disposable) PostgreSQL; see `docs/DISASTER_RECOVERY.md` |
 | Multilingual UI (en, hi, ta, te, kn, ml) | ✅ Done |
 | Favicon + PWA manifest | ✅ Done |
 | Docker / single-command local launcher | ✅ Done |
 | Novel-pattern generation (M6) | 🔶 Experimental  -  not exposed in production UI |
+| Staging / production cloud deployment (Vercel + Render + Supabase + R2) | 🔴 Not yet deployed  -  external credentials required; see [Production Readiness](#production-readiness) |
 
 ---
 
@@ -362,6 +387,36 @@ These are experimental results from the current evaluation sample, not universal
 **Storage:** Local disk (dev) / Cloudflare R2 (prod)
 **Frontend:** React 19, Vite, React Router, plain CSS, 6-language i18n (en, hi, ta, te, kn, ml)
 **Deployment:** Docker (API-only image), `concurrently` + `cross-env` (single-command local dev launcher), Vercel/Cloudflare Pages (frontend)
+
+---
+
+## Production Readiness
+
+**Production-engineered and deployment-ready. Local production infrastructure —
+PostgreSQL, migrations, backup/restore, Docker, authorization, and security
+headers — has been built and verified with real infrastructure (a disposable
+PostgreSQL 16 instance, a real `docker build`/`docker run`, real HTTP requests).
+External cloud staging/production deployment (Vercel, Render, Supabase, Cloudflare
+R2) has not happened yet — it requires credentials this environment does not
+have, and is reported here as pending, not fabricated.**
+
+| Area | Status |
+|---|---|
+| Backend service (health/live/ready, `$PORT` binding, migration-on-boot) | 🟢 GREEN — verified live against both SQLite and real Postgres |
+| Authentication | 🟢 GREEN — bcrypt, correct cookie flags, verified live |
+| Authorization / generation ownership | 🟢 GREEN — real vulnerability found and fixed; verified with two real accounts |
+| Artifact lifecycle (deletion) | 🟢 GREEN — 5/5 required scenarios tested |
+| Docker (non-root, clean build) | 🟢 GREEN — real `docker build` + `docker run`, `whoami` confirmed non-root inside the container |
+| Database (PostgreSQL) | 🟡 YELLOW — real Postgres 16 verified (found and fixed 3 real bugs along the way); Supabase-specific pooler behavior not yet tested |
+| Backup / restore | 🟡 YELLOW — full drill executed and verified against disposable Postgres; no schedule configured against a real deployment yet |
+| Object storage (Cloudflare R2) | 🟡 YELLOW — implemented and reviewed; not execution-verified, no bucket credentials available |
+| Rate limiting | 🟡 YELLOW — per-user isolation verified; still in-process memory, needs Redis/Valkey to survive multiple backend instances |
+| CI/CD | 🟡 YELLOW — PR gate (tests + build) verified correct; no staging-deploy pipeline stage exists yet |
+| Security headers | 🟢 GREEN — verified live on success, error, and `/docs` responses |
+| Staging deployment | 🔴 RED — not attempted; requires Vercel/Render/Supabase/R2 accounts |
+| Production deployment | 🔴 RED — depends on staging |
+
+Full detail, evidence, and exact deployment steps: [`PRODUCTION_DEPLOYMENT_READINESS.md`](PRODUCTION_DEPLOYMENT_READINESS.md), [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md), and [`docs/DISASTER_RECOVERY.md`](docs/DISASTER_RECOVERY.md).
 
 ---
 

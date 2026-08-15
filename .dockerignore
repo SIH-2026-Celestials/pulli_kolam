@@ -24,8 +24,20 @@ node_modules/
 frontend/frontend/node_modules/
 frontend/frontend/dist/
 
-# Datasets and evaluation corpora -- not needed at inference time
+# Datasets and evaluation corpora -- not needed at inference time.
+# EXCEPTION: kolam19.csv/kolam29.csv ARE needed at inference time --
+# api/generation_service.py loads every source pattern in
+# split_manifest.json's test split via engine.dataset.load_kolam(), which
+# reads these CSVs directly (not just the M5 checkpoint). Found by
+# actually running the built image and hitting
+# generation_service_available=false in /api/v1/health/ready --
+# discovered as a real bug, not assumed away. kolam109.csv (~18MB,
+# unused by the test split) stays excluded.
 kolam_data/
+!kolam_data/Kolam CSV files/
+!kolam_data/Kolam CSV files/Kolam CSV files/
+!kolam_data/Kolam CSV files/Kolam CSV files/kolam19.csv
+!kolam_data/Kolam CSV files/Kolam CSV files/kolam29.csv
 real_photos/
 synthetic_photos/
 synthetic_photos_heldout/
@@ -48,6 +60,22 @@ one-stroke-dotted-pulli-kolam.zip
 artifacts/
 *.md
 !README.md
+
+# Secrets / local runtime state -- never present in the image (Dockerfile
+# uses explicit COPY paths, not `COPY . .`), but excluded here too so a
+# local .env (which may hold real AUTH_SECRET/R2/DATABASE_URL values) or
+# accumulated local dev data is never even uploaded to the Docker daemon
+# as part of the build context.
+.env
+.env.*
+!.env.example
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+api/storage/artifacts/*.svg
+api/storage/artifacts/*.png
+api/storage/artifacts/*.json
 
 # OS
 .DS_Store

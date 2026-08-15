@@ -28,8 +28,15 @@ This is intentionally NOT a general-purpose rate-limiting library. It:
     architecture; a multi-process/multi-node deployment would need a
     shared store (e.g. Redis) instead, same caveat as the artifact
     store and SQLite sections already flag for other components).
-  - keys on client IP (`request.client.host`), since none of the
-    endpoints being protected require authentication today.
+  - keys on client IP (`request.client.host`) by default, OR on an
+    explicit `client_id` override when the caller passes one --
+    `/api/v1/generations` now requires login (ownership fix: generations
+    are private per-user), so its call site passes `client_id=f"user:{id}"`
+    instead, so two different logged-in users behind the same IP
+    (an office network, mobile carrier NAT) get separate buckets rather
+    than fighting over one shared 6-requests/minute allowance. Endpoints
+    that stay unauthenticated (e.g. `/api/v1/generate`, the legacy
+    non-persisted endpoint) keep the IP-keyed default.
   - uses a fixed 60-second sliding window with a deque of timestamps
     per (bucket, ip) -- simple, correct, and cheap enough for this
     request volume (CPU-bound endpoints, not a high-QPS API).
@@ -79,10 +86,14 @@ def _client_key(request: Request) -> str:
     return request.client.host
 
 
-def enforce_rate_limit(request: Request, bucket: str, limit_per_minute: int) -> None:
+def enforce_rate_limit(request: Request, bucket: str, limit_per_minute: int, client_id: "str | None" = None) -> None:
     """Raises HTTPException(429) if `bucket` has already seen
-    `limit_per_minute` calls from this client's IP in the trailing
-    60 seconds; otherwise records this call and returns.
+    `limit_per_minute` calls from this client in the trailing 60 seconds;
+    otherwise records this call and returns.
+
+    `client_id`, when given, overrides the default IP-based key (see
+    module docstring) -- pass e.g. `f"user:{current_user.id}"` for an
+    authenticated endpoint so different users don't share one bucket.
 
     Uses the SAME error envelope shape as every other error path in
     this codebase ({"code": ..., "message": ...} unpacked by
@@ -103,7 +114,7 @@ def enforce_rate_limit(request: Request, bucket: str, limit_per_minute: int) -> 
     if os.environ.get("PYTEST_CURRENT_TEST"):
         return
 
-    key = (bucket, _client_key(request))
+    key = (bucket, client_id if client_id is not None else _client_key(request))
     now = time.monotonic()
     with _lock:
         dq = _hits[key]

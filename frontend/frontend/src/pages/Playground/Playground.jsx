@@ -127,7 +127,7 @@ export default function Playground() {
       setHistoryStatus('loading')
       listGenerations(1, 20).then(({ data, error }) => {
         if (error) {
-          setHistoryStatus('error')
+          setHistoryStatus(error.status === 401 ? 'unauthenticated' : 'error')
           return
         }
         setHistory(data.items || [])
@@ -161,7 +161,7 @@ export default function Playground() {
 
     if (error) {
       setGenStatus('error')
-      setErrorInfo({ message: error.message, code: error.code })
+      setErrorInfo({ message: error.message, code: error.code, status: error.status })
       setStageText('')
       return
     }
@@ -368,6 +368,8 @@ export default function Playground() {
                 <p className="gen-error-hint">
                   {errorInfo.code === 'GENERATION_MODEL_UNAVAILABLE'
                     ? 'The M5 model is not currently loaded on the backend. Retrying will not help until the server is restarted with a valid checkpoint.'
+                    : errorInfo.status === 401
+                    ? 'Generation requires an account so your results are kept private to you. Log in and try again.'
                     : 'This is usually safe to retry.'}
                 </p>
               </div>
@@ -676,6 +678,7 @@ export default function Playground() {
             <div className="history-list">
               {historyStatus === 'loading' && <p className="body-text body-text--sm">Loading…</p>}
               {historyStatus === 'error' && <p className="gen-error-code">Could not load history from the backend.</p>}
+              {historyStatus === 'unauthenticated' && <p className="body-text body-text--sm">Log in to see your generation history.</p>}
               {historyStatus === 'success' && history.length === 0 && <p className="body-text body-text--sm">No generations persisted yet.</p>}
               {history.map((item) => (
                 <button key={item.id} className="history-row" onClick={() => restoreFromHistory(item)}>

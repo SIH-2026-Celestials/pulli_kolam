@@ -38,7 +38,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, BigInteger, Boolean, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from api.db.database import Base
@@ -102,6 +102,14 @@ class GenerationRequest(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     params: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    # Soft reference to api.auth.models.User.id -- NOT a DB-enforced foreign
+    # key, because auth lives in a separate SQLAlchemy Base/metadata (see
+    # api/auth/db.py's module docstring) that may even be a physically
+    # different database from this one. Nullable for pre-ownership rows
+    # created before this column existed; those rows are intentionally
+    # unowned (never returned to any user, see api/routes_generations.py's
+    # ownership check) rather than retroactively guessed.
+    user_id: Mapped["str | None"] = mapped_column(String(36), nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
     runs: Mapped[list["GenerationRun"]] = relationship(back_populates="request")
@@ -154,14 +162,23 @@ class PatternVersion(Base):
     trimmed subset. `fingerprint` is the D4+translation-canonical
     signature from engine.novelty.graph_fingerprint (stored as its
     Python repr since a tuple-of-tuples isn't directly JSON-safe as a
-    column type; used for exact-duplicate lookups)."""
+    column type) -- stored for future exact-duplicate lookups, but NOT
+    indexed: real-Postgres verification this session found large
+    patterns (500 dots) produce a fingerprint repr long enough to exceed
+    Postgres's btree index row-size limit (2704 bytes) --
+    `psycopg2.errors.ProgramLimitExceeded`, never visible against SQLite
+    (no such limit there). Nothing in this codebase currently queries by
+    this column (grepped before removing the index) so dropping it costs
+    nothing today; a future exact-duplicate-lookup feature should index
+    an MD5 hash of this value instead (Postgres's own suggested fix for
+    long indexed text), not re-add a plain btree index here."""
 
     __tablename__ = "pattern_versions"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     pattern_id: Mapped[str] = mapped_column(String(36), ForeignKey("patterns.id"), nullable=False, index=True)
     representation_json: Mapped[dict] = mapped_column(JSON, nullable=False)
-    fingerprint: Mapped[str] = mapped_column(Text, nullable=True, index=True)
+    fingerprint: Mapped[str] = mapped_column(Text, nullable=True)
     n_dots: Mapped[int] = mapped_column(Integer, nullable=False)
     n_distinct_edges: Mapped[int] = mapped_column(Integer, nullable=False)
     is_valid: Mapped[bool] = mapped_column(Boolean, nullable=False)
@@ -280,7 +297,14 @@ class GenerationResult(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     run_id: Mapped[str] = mapped_column(String(36), ForeignKey("generation_runs.id"), nullable=False, index=True)
     pattern_version_id: Mapped[str] = mapped_column(String(36), ForeignKey("pattern_versions.id"), nullable=False)
-    seed: Mapped[int] = mapped_column(Integer, nullable=False)
+    # BigInteger, not Integer: a random seed is 4 random bytes
+    # (api/services/generation.py, int.from_bytes(os.urandom(4), "big")),
+    # i.e. up to 2**32-1 -- real-Postgres verification this session found
+    # this overflows Postgres's Integer (32-bit signed, max 2**31-1) on
+    # roughly half of randomly generated seeds (psycopg2.errors.
+    # NumericValueOutOfRange), invisible against SQLite (dynamically
+    # typed, no such limit).
+    seed: Mapped[int] = mapped_column(BigInteger, nullable=False)
     is_valid: Mapped[bool] = mapped_column(Boolean, nullable=False)
     latency_ms: Mapped[float] = mapped_column(Float, nullable=True)
     rank: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

@@ -4,6 +4,7 @@
 # Markdown / notes (kept locally, not pushed)
 *.md
 !/README.md
+!/CHANGELOG.md
 # Project findings/state docs are institutional memory, not scratch
 # notes -- they must be tracked so they survive across sessions/clones.
 !/PROJECT_STATE.md
@@ -42,6 +43,10 @@
 # Deployment docs -- institutional memory, not scratch notes.
 !/docs/DEPLOYMENT_AUDIT.md
 !/docs/DEPLOYMENT.md
+!/docs/DISASTER_RECOVERY.md
+
+# Alembic migration scope/commands reference -- institutional memory.
+!/alembic/README.md
 
 # Product-hardening audit deliverables -- institutional memory, not
 # scratch notes (referenced directly from the audit task itself).

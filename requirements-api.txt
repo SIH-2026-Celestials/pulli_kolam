@@ -23,7 +23,7 @@ psycopg2-binary==2.9.10
 # Schema migrations (api/db/models.py) -- see alembic/README.md.
 alembic==1.14.0
 
-# S3-compatible client for Cloudflare R2 (api/object_storage/r2.py).
-# Only imported/instantiated when STORAGE_BACKEND=r2; local dev
-# (STORAGE_BACKEND=local, the default) never touches this.
+# S3-compatible client for Cloudflare R2 (api/storage/r2.py). Imported
+# lazily -- only instantiated when STORAGE_PROVIDER=r2; local dev
+# (STORAGE_PROVIDER=local, the default) never touches this.
 boto3==1.35.74

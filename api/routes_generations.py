@@ -22,10 +22,12 @@ from __future__ import annotations
 import os
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import Response
 from pydantic import BaseModel
 
+from api.auth.dependencies import get_current_user
+from api.auth.models import User
 from api.rate_limit import GENERATION_LIMIT_PER_MINUTE, enforce_rate_limit
 from api.db.database import get_session
 from api.db.models import (
@@ -40,6 +42,24 @@ from api.db.models import (
 )
 
 router = APIRouter(prefix="/api/v1")
+
+
+def _get_owned_generation(session, result_id: str, user_id: str) -> "tuple[GenerationResult, GenerationRun, GenerationRequest]":
+    """Look up a GenerationResult AND verify the requesting user owns it,
+    via the GenerationResult -> GenerationRun -> GenerationRequest.user_id
+    chain. Raises the SAME 404 whether the id doesn't exist at all or it
+    exists but belongs to someone else -- deliberately not 403, so a
+    caller can't distinguish "not found" from "not yours" (never confirm
+    another user's generation id is real)."""
+    not_found = _api_error(404, "NOT_FOUND", f"generation result {result_id!r} not found")
+    result_row = session.get(GenerationResult, result_id)
+    if result_row is None:
+        raise not_found
+    run = session.get(GenerationRun, result_row.run_id)
+    request_row = session.get(GenerationRequest, run.request_id) if run else None
+    if request_row is None or request_row.user_id != user_id:
+        raise not_found
+    return result_row, run, request_row
 
 
 def _api_error(status_code: int, code: str, message: str) -> HTTPException:
@@ -140,13 +160,17 @@ def _model_version_to_json(mv: ModelVersion) -> dict:
 # ============================================================
 
 @router.get("/generations")
-def list_generations(page: int = 1, page_size: int = 20):
+def list_generations(page: int = 1, page_size: int = 20, current_user: User = Depends(get_current_user)):
     """Paginated generation HISTORY -- Phase 13's explicit requirement.
     Deliberately a LIGHT payload per row (no SVG, no full representation,
     no full analysis blob) -- "avoid returning huge unnecessary payloads
     in list endpoints" -- a caller drills into one result via
     GET /generations/{id} for the full detail this list intentionally
-    omits."""
+    omits.
+
+    Scoped to the CALLING user's own generations only (joins through
+    GenerationRun -> GenerationRequest.user_id) -- this is one person's
+    private history, not a global feed."""
     if page < 1:
         raise _api_error(422, "INVALID_REQUEST", f"page must be >= 1, got {page}")
     if not (1 <= page_size <= 100):
@@ -154,9 +178,15 @@ def list_generations(page: int = 1, page_size: int = 20):
 
     session = get_session()
     try:
-        total = session.query(GenerationResult).count()
-        rows = (
+        base_query = (
             session.query(GenerationResult)
+            .join(GenerationRun, GenerationResult.run_id == GenerationRun.id)
+            .join(GenerationRequest, GenerationRun.request_id == GenerationRequest.id)
+            .filter(GenerationRequest.user_id == str(current_user.id))
+        )
+        total = base_query.count()
+        rows = (
+            base_query
             .order_by(GenerationResult.created_at.desc())
             .offset((page - 1) * page_size)
             .limit(page_size)
@@ -195,7 +225,7 @@ def list_generations(page: int = 1, page_size: int = 20):
 
 
 @router.post("/generations")
-def create_generation(request: Request, body: CreateGenerationRequest):
+def create_generation(request: Request, body: CreateGenerationRequest, current_user: User = Depends(get_current_user)):
     """Generate + PERSIST N candidates. Same underlying M5 call path as
     the legacy /api/v1/generate, plus full analysis/verification/artifact
     persistence and a stable `run_id`/per-candidate `id` for later
@@ -204,8 +234,12 @@ def create_generation(request: Request, body: CreateGenerationRequest):
     THE canonical, frontend-facing generation endpoint (see
     PRODUCTION_READINESS.md section 1) -- this is the one that most
     needs rate limiting, since it is the only generation path the real
-    UI calls. See api/rate_limit.py for the limit's justification."""
-    enforce_rate_limit(request, "generations", GENERATION_LIMIT_PER_MINUTE)
+    UI calls. See api/rate_limit.py for the limit's justification.
+
+    Requires login: the resulting GenerationRequest is stamped with
+    `current_user.id` so later retrieval can be scoped to its owner (see
+    `_get_owned_generation` / `list_generations`)."""
+    enforce_rate_limit(request, "generations", GENERATION_LIMIT_PER_MINUTE, client_id=f"user:{current_user.id}")
     count = body.count if body.count is not None else 1
     if not isinstance(count, int) or count < 1:
         raise _api_error(422, "INVALID_REQUEST", f"count must be a positive integer, got {body.count!r}")
@@ -217,7 +251,10 @@ def create_generation(request: Request, body: CreateGenerationRequest):
     session = get_session()
     try:
         try:
-            result = generate(session, seed=body.seed, count=count, verify_recognizer=bool(body.verify_recognizer))
+            result = generate(
+                session, seed=body.seed, count=count, verify_recognizer=bool(body.verify_recognizer),
+                user_id=str(current_user.id),
+            )
         except GenerationUnavailableError as e:
             raise _api_error(503, "GENERATION_MODEL_UNAVAILABLE", str(e)) from e
 
@@ -265,19 +302,17 @@ def create_generation(request: Request, body: CreateGenerationRequest):
 
 
 @router.get("/generations/{result_id}")
-def get_generation(result_id: str):
+def get_generation(result_id: str, current_user: User = Depends(get_current_user)):
     """Retrieve one previously-persisted generation candidate by its
     GenerationResult id -- Phase 10's "retrieve previous generations"
     requirement. Returns request/seed/model/timestamp/SVG/structural
-    representation/analysis/verification together in one response."""
+    representation/analysis/verification together in one response.
+
+    Ownership-checked: a result belonging to a different user returns the
+    same 404 as a nonexistent id (see `_get_owned_generation`)."""
     session = get_session()
     try:
-        result_row = session.get(GenerationResult, result_id)
-        if result_row is None:
-            raise _api_error(404, "NOT_FOUND", f"generation result {result_id!r} not found")
-
-        run = session.get(GenerationRun, result_row.run_id)
-        request_row = session.get(GenerationRequest, run.request_id)
+        result_row, run, request_row = _get_owned_generation(session, result_id, str(current_user.id))
         pv = session.get(PatternVersion, result_row.pattern_version_id)
         analysis = session.query(PatternAnalysis).filter_by(pattern_version_id=pv.id).one_or_none()
         verifications = session.query(VerificationResult).filter_by(pattern_version_id=pv.id).all()
@@ -308,15 +343,86 @@ def get_generation(result_id: str):
         session.close()
 
 
-@router.get("/generations/{result_id}/mathematics")
-def get_generation_mathematics(result_id: str):
-    """Mathematics-only view -- no SVG, no raw representation, just the
-    PatternAnalysis row (Phase 9's "Mathematics panel" data source)."""
+@router.delete("/generations/{result_id}", status_code=204)
+def delete_generation(result_id: str, current_user: User = Depends(get_current_user)):
+    """Permanently delete one generated candidate: its GenerationResult,
+    PatternVersion, PatternAnalysis, VerificationResult rows, Artifact
+    rows, AND the underlying storage objects those Artifact rows point
+    to (local disk or R2, whichever STORAGE_PROVIDER is active) --
+    Phase 1's "generation deletion must remove associated artifacts"
+    requirement. Also deletes the parent Pattern row if this was its
+    only PatternVersion (true for every M5-generated pattern today --
+    see Pattern's own docstring), so no empty orphaned Pattern rows
+    accumulate.
+
+    Ownership-checked (same as every other /generations/{id} route) --
+    a result belonging to a different user gets the same 404 a
+    nonexistent id would, never a hint that it exists.
+
+    Safety ordering: DB rows are deleted and committed FIRST; storage
+    object deletion happens AFTER that commit succeeds, in a try/except
+    that never fails the request. If storage deletion fails (network
+    error, R2 unreachable, etc.), the result is an orphaned storage
+    object with no DB row pointing to it -- a leaked file, cleanable
+    later (e.g. an R2 lifecycle rule, see docs/DEPLOYMENT.md section J)
+    -- NOT a dangling DB reference to a missing file, which would be the
+    worse failure mode. The reverse order (storage first) would risk
+    deleting the real artifact while leaving a DB row that still claims
+    it exists, which is strictly worse."""
     session = get_session()
     try:
-        result_row = session.get(GenerationResult, result_id)
-        if result_row is None:
-            raise _api_error(404, "NOT_FOUND", f"generation result {result_id!r} not found")
+        result_row, run, request_row = _get_owned_generation(session, result_id, str(current_user.id))
+        pv = session.get(PatternVersion, result_row.pattern_version_id)
+        artifacts = list(pv.artifacts)
+        storage_paths = [a.storage_path for a in artifacts]
+
+        for a in artifacts:
+            session.delete(a)
+        for row in session.query(PatternAnalysis).filter_by(pattern_version_id=pv.id).all():
+            session.delete(row)
+        for row in session.query(VerificationResult).filter_by(pattern_version_id=pv.id).all():
+            session.delete(row)
+        session.delete(result_row)
+
+        pattern = pv.pattern
+        session.delete(pv)
+        session.flush()
+        remaining_versions = session.query(PatternVersion).filter_by(pattern_id=pattern.id).count()
+        if remaining_versions == 0:
+            session.delete(pattern)
+
+        session.commit()
+    except HTTPException:
+        raise
+    except Exception as e:  # noqa: BLE001 -- a delete must report cleanly, never leave a half-applied transaction
+        session.rollback()
+        raise _api_error(500, "DELETE_FAILED", f"failed to delete generation result: {e}") from e
+    finally:
+        session.close()
+
+    from api.services.artifact_store import get_artifact_store
+
+    store = get_artifact_store()
+    for path in storage_paths:
+        try:
+            store.delete(path)
+        except Exception as e:  # noqa: BLE001 -- see docstring: DB is already consistent, storage cleanup is best-effort
+            import sys
+
+            print(f"[pulli-api] warning: DB rows for generation {result_id!r} deleted, but storage cleanup "
+                  f"of {path!r} failed: {type(e).__name__}: {e}", file=sys.stderr)
+
+    return Response(status_code=204)
+
+
+@router.get("/generations/{result_id}/mathematics")
+def get_generation_mathematics(result_id: str, current_user: User = Depends(get_current_user)):
+    """Mathematics-only view -- no SVG, no raw representation, just the
+    PatternAnalysis row (Phase 9's "Mathematics panel" data source).
+    Ownership-checked, same as GET /generations/{id}."""
+    session = get_session()
+    try:
+        result_row, _run, _request_row = _get_owned_generation(session, result_id, str(current_user.id))
         analysis = session.query(PatternAnalysis).filter_by(pattern_version_id=result_row.pattern_version_id).one_or_none()
         if analysis is None:
             raise _api_error(404, "NOT_FOUND", "analysis not available for this generation result")
@@ -326,14 +432,13 @@ def get_generation_mathematics(result_id: str):
 
 
 @router.get("/generations/{result_id}/graph")
-def get_generation_graph(result_id: str):
+def get_generation_graph(result_id: str, current_user: User = Depends(get_current_user)):
     """Graph-only view -- dot_points + edges only (Phase 9's "Graph
-    view" data source), trimmed from the full representation."""
+    view" data source), trimmed from the full representation.
+    Ownership-checked, same as GET /generations/{id}."""
     session = get_session()
     try:
-        result_row = session.get(GenerationResult, result_id)
-        if result_row is None:
-            raise _api_error(404, "NOT_FOUND", f"generation result {result_id!r} not found")
+        result_row, _run, _request_row = _get_owned_generation(session, result_id, str(current_user.id))
         pv = session.get(PatternVersion, result_row.pattern_version_id)
         rep = pv.representation_json
         return {
@@ -351,21 +456,19 @@ _EXPORT_CONTENT_TYPES = {"svg": "image/svg+xml", "png": "image/png", "json": "ap
 
 
 @router.get("/generations/{result_id}/export")
-def export_generation(result_id: str, format: str = "svg"):  # noqa: A002 -- "format" is the natural query param name here
+def export_generation(result_id: str, format: str = "svg", current_user: User = Depends(get_current_user)):  # noqa: A002 -- "format" is the natural query param name here
     """Phase 14: download the persisted artifact (SVG/PNG/JSON) for one
     generation result. Reads from the SAME Artifact rows/ArtifactStore
     api/services/generation.py already wrote at generation time -- no
     re-rendering, no filesystem path ever exposed to the caller (the
     response IS the file bytes, with a Content-Disposition header, not
-    a path string)."""
+    a path string). Ownership-checked, same as GET /generations/{id}."""
     if format not in _EXPORT_CONTENT_TYPES:
         raise _api_error(422, "INVALID_REQUEST", f"format must be one of {sorted(_EXPORT_CONTENT_TYPES)}, got {format!r}")
 
     session = get_session()
     try:
-        result_row = session.get(GenerationResult, result_id)
-        if result_row is None:
-            raise _api_error(404, "NOT_FOUND", f"generation result {result_id!r} not found")
+        result_row, _run, _request_row = _get_owned_generation(session, result_id, str(current_user.id))
         pv = session.get(PatternVersion, result_row.pattern_version_id)
         artifact = next((a for a in pv.artifacts if a.artifact_type == format), None)
         if artifact is None:
