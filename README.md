@@ -6,7 +6,7 @@
 
 Computational study of traditional South Indian *Pulli Kolam* patterns - representing hand-drawn one-stroke designs as graphs, measuring their symmetry and motif structure, and validating their single-stroke correctness.
 
-[![CI](https://github.com/Abhishek1106kr/pulli_kolam/actions/workflows/ci.yml/badge.svg)](https://github.com/Abhishek1106kr/pulli_kolam/actions/workflows/ci.yml)
+[![CI](https://github.com/SIH-2026-Celestials/pulli_kolam/actions/workflows/ci.yml/badge.svg)](https://github.com/SIH-2026-Celestials/pulli_kolam/actions/workflows/ci.yml)
 
 </div>
 
@@ -141,13 +141,17 @@ input pattern → infer the minimal generating grammar → prove it's correct �
 
 ## Preview
 
-| Home | Explorer (400 patterns) |
+| Home | Analysis Pipeline |
 |---|---|
-| ![Home](docs/screenshots/home-hero.jpg) | ![Explore](docs/screenshots/explore-grid.jpg) |
+| ![Home](docs/screenshots/home-hero.jpg) | ![How it works](docs/screenshots/how-it-works.jpg) |
 
-| Pattern detail | Pipeline walkthrough |
+| Pattern Detail | Explore Gallery |
 |---|---|
-| ![Kolam detail](docs/screenshots/kolam-detail.jpg) | ![How it works](docs/screenshots/how-it-works.jpg) |
+| ![Kolam detail](docs/screenshots/kolam-detail.jpg) | ![Explore](docs/screenshots/explore-grid.jpg) |
+
+| Home Pillars |
+|---|
+| ![Home Pillars](docs/screenshots/home-pillars.jpg) |
 
 ---
 
@@ -200,33 +204,45 @@ PULLI/
 │   ├── validity.py           #   Eulerian circuit/path validity checks
 │   ├── reconstruction.py     #   Motif/residual decomposition + reconstruction
 │   ├── generation.py         #   Stamp an induced motif onto a new dot lattice
-│   ├── novel_generation.py   #   Novel-pattern generation (experimental, see docs/M4_2_GENERATION.md)
+│   ├── learned_generation.py #   M5 learned placement-scorer guided generation
 │   └── ml_contract.py        #   Frozen ML-detector <-> engine interface contract
 │
 ├── api/                       # FastAPI backend (api/main.py)  -  the only backend server
-│   ├── main.py                #   /api/v1/{health,model,detect,analyze,reconstruct,compare-detectors}
+│   ├── main.py                #   /api/v1/{health,model,detect,analyze,reconstruct,compare-detectors,generate}
+│   ├── routes_generations.py  #   M7 platform: POST /api/v1/generations (persisted generation)
 │   ├── detectors.py           #   Classical / ML / ML-gated detector implementations
 │   ├── schemas.py             #   Pydantic response models
+│   ├── auth/                  #   Session-based authentication (register, login, logout)
+│   ├── db/                    #   SQLAlchemy database setup (SQLite default, Postgres production)
+│   ├── services/              #   Generation, analysis, verification, artifact store services
+│   ├── storage/               #   Pluggable artifact storage (local disk / Cloudflare R2)
 │   └── tests/                 #   API integration + acceptance tests
 │
 ├── experiments/                # ML research (training, evaluation, checkpoints)
 │   ├── m4_1/, m4_2/            #   DotHeatmapNetV2 architecture, training, evaluation
+│   ├── m5_generation/          #   M5 learned placement-scorer
 │   └── m4_2/results/dot_heatmap_net_v2.pt   # trained checkpoint (382,769 params)
+│
+├── alembic/                    # Database migrations (Alembic)
 │
 ├── frontend/frontend/          # React 19 + Vite web application
 │   └── src/
-│       ├── pages/               #   Home, Detect, Explore, Analyze, Gallery, About, ...
-│       ├── components/          #   Header, Footer, KolamCard, ResearchPipeline, ...
+│       ├── pages/               #   Home, Detect, Playground, Learn, Technology, Account, ...
+│       ├── components/          #   Header, Footer, GeneratedVariations, AnalysisPipeline, ...
+│       ├── context/             #   AuthContext, LanguageContext
+│       ├── i18n/                #   6-language support (en, hi, ta, te, kn, ml)
 │       └── lib/api/             #   Centralized FastAPI client (client.js, kolam.js)
 │
 ├── scripts/                   # Root dev-launcher helper scripts (preflight, health check)
 ├── docs/                      # Architecture, deployment, and ML evaluation reports
+│   └── screenshots/           #   App screenshots for README
 ├── tests/                     # Core engine pytest suite
 ├── kolam_data/                 # Kaggle "one-stroke-dotted-pulli-kolam" dataset
 ├── real_photos/                # Real (Wikimedia-licensed) evaluation photographs
 │
 ├── package.json                # Root single-command dev launcher (npm run dev)
 ├── Dockerfile                  # API-only production image (CPU-only)
+├── alembic.ini                 # Alembic migration configuration
 ├── requirements*.txt           # Split engine/ml/api dependency layers
 └── .github/workflows/ci.yml    # Python tests + frontend lint/build on every push
 ```
@@ -302,7 +318,7 @@ Measured by running the engine's validation scripts against the real dataset - n
 
 - Evaluated across a 15-pattern sample from `kolam19`.
 - Single-motif models explain only a fraction of a real pattern; multi-motif set-cover induction is what gets recall into the 90%+ range.
-- The full `pytest` suite currently passes **277/277**, spanning the core engine, the ML detector/API integration layer, and the deployment launcher.
+- The full `pytest` suite currently passes **364/364**, spanning the core engine, the ML detector/API integration layer, and the deployment launcher.
 
 These are experimental results from the current evaluation sample, not universal claims about the dataset or method.
 
@@ -325,9 +341,15 @@ These are experimental results from the current evaluation sample, not universal
 | ML detector (`DotHeatmapNetV2`) | 🔶 Experimental  -  strong on synthetic data, documented real-photo domain gap |
 | ML-gated detector (lattice-consistency filter) | 🔶 Experimental  -  partial mitigation of the domain gap |
 | Reconstruction (same-pattern structural decomposition) | ✅ Done, reliable |
-| Novel-pattern generation | 🔶 Experimental  -  1/120 valid candidates on the current benchmark, not exposed in the UI |
+| M5 learned placement-scorer guided generation | ✅ Done  -  integrated into persisted `/api/v1/generations` endpoint |
+| Persisted generation platform (M7)  -  artifact storage, history, export | ✅ Done  -  SQLite default, Cloudflare R2 optional |
+| Session-based authentication (register, login, logout, recent history) | ✅ Done |
+| Database migrations (Alembic) | ✅ Done |
+| Pluggable artifact storage (local disk / Cloudflare R2) | ✅ Done |
+| Multilingual UI (en, hi, ta, te, kn, ml) | ✅ Done |
+| Favicon + PWA manifest | ✅ Done |
 | Docker / single-command local launcher | ✅ Done |
-| M5 structural grammar | ⬜ Not started |
+| Novel-pattern generation (M6) | 🔶 Experimental  -  not exposed in production UI |
 
 ---
 
@@ -335,9 +357,11 @@ These are experimental results from the current evaluation sample, not universal
 
 **Engine:** Python, NetworkX (`MultiGraph`), Pandas, NumPy, SciPy, scikit-image, OpenCV, Matplotlib
 **ML:** PyTorch (CPU-only), a 382,769-param U-Net (`DotHeatmapNetV2`)
-**Backend:** FastAPI, Uvicorn, Pydantic
-**Frontend:** React 19, Vite, React Router, plain CSS
-**Deployment:** Docker (API-only image), `concurrently` + `cross-env` (single-command local dev launcher)
+**Backend:** FastAPI, Uvicorn, Pydantic, SQLAlchemy, Alembic
+**Auth:** Session-based (httpOnly cookies), bcrypt password hashing, SQLite (dev) / PostgreSQL (prod)
+**Storage:** Local disk (dev) / Cloudflare R2 (prod)
+**Frontend:** React 19, Vite, React Router, plain CSS, 6-language i18n (en, hi, ta, te, kn, ml)
+**Deployment:** Docker (API-only image), `concurrently` + `cross-env` (single-command local dev launcher), Vercel/Cloudflare Pages (frontend)
 
 ---
 
