@@ -139,21 +139,7 @@ input pattern → infer the minimal generating grammar → prove it's correct �
 
 ---
 
-## Preview
-
-| Home | Analysis Pipeline |
-|---|---|
-| ![Home](docs/screenshots/home-hero.jpg) | ![How it works](docs/screenshots/how-it-works.jpg) |
-
-| Pattern Detail | Explore Gallery |
-|---|---|
-| ![Kolam detail](docs/screenshots/kolam-detail.jpg) | ![Explore](docs/screenshots/explore-grid.jpg) |
-
-| Home Pillars |
-|---|
-| ![Home Pillars](docs/screenshots/home-pillars.jpg) |
-
-### Generative Playground (M7 platform)
+## Preview - Generative Playground (M7 platform)
 
 Real, persisted M5 generation — mathematics, structural graph, and M4.2 recognizer
 verification, all computed server-side and read back from the database, not
