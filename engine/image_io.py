@@ -339,3 +339,32 @@ def build_graph(image_path: str) -> nx.MultiGraph:
     for a, b in edges:
         G.add_edge(a, b)
     return G
+
+
+def analyze_kolam_type(graph_edges: nx.Graph | nx.MultiGraph) -> str:
+    """Analyze kolam graph topology to route between SIKKU_LOOP, MULTI_LOOP_SIKKU, and KAMBI_DIRECT_LINE models.
+    
+    - Sikku (Loop) Kolams contain half-integer detour nodes (e.g. x or y at x.5).
+      - If connected components > 1: "MULTI_LOOP_SIKKU"
+      - Otherwise: "SIKKU_LOOP"
+    - Kambi (Direct-Line) Kolams connect integer lattice nodes directly.
+    """
+    half_integer_nodes = [n for n in graph_edges.nodes if (n[0] % 1 != 0 or n[1] % 1 != 0)]
+    n_components = nx.number_connected_components(graph_edges) if len(graph_edges.nodes) > 0 else 0
+    if len(half_integer_nodes) > 0:
+        if n_components > 1:
+            return "MULTI_LOOP_SIKKU"
+        return "SIKKU_LOOP"
+    else:
+        return "KAMBI_DIRECT_LINE"
+
+
+def decompose_multi_loop_graph(graph_edges: nx.Graph | nx.MultiGraph) -> list[nx.MultiGraph]:
+    """Decompose a multi-component kolam graph into separate sub-graphs for each closed loop/component."""
+    if len(graph_edges.nodes) == 0:
+        return []
+    components = list(nx.connected_components(graph_edges))
+    subgraphs = [graph_edges.subgraph(c).copy() for c in components]
+    return subgraphs
+
+

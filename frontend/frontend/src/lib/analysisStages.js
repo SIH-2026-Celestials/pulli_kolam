@@ -53,7 +53,7 @@ export const KOLAM_STAGES = Object.freeze([
   },
 ]);
 
-/** Build the initial stage state array — all pending. */
+/** Build the initial stage state array  -  all pending. */
 export function makeInitialStages() {
   return KOLAM_STAGES.map((s) => ({
     id: s.id,

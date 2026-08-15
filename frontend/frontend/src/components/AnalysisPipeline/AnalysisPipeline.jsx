@@ -5,14 +5,14 @@ import { KOLAM_STAGES } from '../../lib/analysisStages'
 import './AnalysisPipeline.css'
 
 /**
- * AnalysisPipeline — renders the 8-stage stepper driven by real SSE
+ * AnalysisPipeline  -  renders the 8-stage stepper driven by real SSE
  * events from the backend.
  *
  * Props:
- *   analysisState  — object from useKolamAnalysis().analysisState
- *   onUpload       — called with (File, detector) when user selects an image
- *   detector       — 'classical' | 'ml'
- *   onDetectorChange — called with new detector string
+ *   analysisState   -  object from useKolamAnalysis().analysisState
+ *   onUpload        -  called with (File, detector) when user selects an image
+ *   detector        -  'classical' | 'ml'
+ *   onDetectorChange  -  called with new detector string
  *
  * When analysisState is null/undefined the component renders the
  * upload prompt (idle state), exactly preserving the original card
@@ -61,7 +61,7 @@ export default function AnalysisPipeline({
       <div className="analysis-card-top-row">
         <h2 className="analysis-title">{t('analysis.title')}</h2>
 
-        {/* Detector selector — only visible when idle or after completion */}
+        {/* Detector selector  -  only visible when idle or after completion */}
         {(status === 'idle' || status === 'completed' || status === 'failed') && onDetectorChange && (
           <div className="pipeline-detector-select">
             <label className="pipeline-detector-label" htmlFor="pipeline-detector">Detector:</label>
@@ -184,7 +184,7 @@ export default function AnalysisPipeline({
 
         <span className="panel-arrow">&rarr;</span>
 
-        {/* Panel 4: Graph — highlight when build_graph is active/complete */}
+        {/* Panel 4: Graph  -  highlight when build_graph is active/complete */}
         <div className={`panel-box ${stages[3]?.status === 'running' || stages[3]?.status === 'completed' ? 'panel-active' : ''}`}>
           <div className="panel-img-frame dark-bg">
             <svg width="100%" height="100%" viewBox="0 0 160 160">

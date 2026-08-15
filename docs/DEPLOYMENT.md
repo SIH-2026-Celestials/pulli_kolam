@@ -10,7 +10,7 @@ There is no queue, object storage, GPU, or background worker anywhere in
 this system. Uploaded images are ephemeral: written to a temp file for the
 duration of one request and deleted immediately after (`api/main.py`). The
 one piece of persistent state is the identity/session database
-(`api/auth/`) — by default a local SQLite file, zero setup required; see
+(`api/auth/`)  -  by default a local SQLite file, zero setup required; see
 section H. Do not deploy infrastructure beyond that unless a real feature
 needs it.
 
@@ -26,14 +26,14 @@ cp .env.example .env          # optional locally; defaults work without it
 python -m uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-`--reload` is for local development only — never use it in production
+`--reload` is for local development only  -  never use it in production
 (see section E). `api/main.py` loads `.env` automatically via
 `python-dotenv` (production deployments should set these through the
 hosting platform's env config instead of shipping a `.env` file).
 
 On startup, `api/main.py` also calls `api/auth/db.py:init_db()`, which
 creates the `users`/`user_sessions` tables if they don't already exist
-(plain `Base.metadata.create_all()` — there is no migration tool wired up
+(plain `Base.metadata.create_all()`  -  there is no migration tool wired up
 yet; see section H).
 
 ### Frontend
@@ -47,7 +47,7 @@ npm run dev
 The frontend reads `VITE_API_BASE_URL` (see `.env.example`) at **build
 time** via Vite's `import.meta.env`. If unset, it defaults to
 `http://localhost:8000` (`frontend/frontend/src/lib/api/client.js`), which
-matches the default `uvicorn` command above — no configuration needed for
+matches the default `uvicorn` command above  -  no configuration needed for
 local development.
 
 ### CORS in local development
@@ -57,7 +57,7 @@ startup. If unset, it falls back to a permissive
 `http://localhost:<any port>` / `http://127.0.0.1:<any port>` regex, so
 `npm run dev` talks to `uvicorn --reload` on whatever port Vite picks,
 with no extra setup. This fallback does **not** apply outside of local
-development — see section G.
+development  -  see section G.
 
 ---
 
@@ -69,15 +69,15 @@ docker build -t pulli-api .
 
 The image contains only the API runtime: `engine/`, `api/`, and the
 runtime-required subset of `experiments/m4_1`/`experiments/m4_2` (model
-definition modules + the one checkpoint the ML detector loads —
+definition modules + the one checkpoint the ML detector loads  - 
 `experiments/m4_2/results/dot_heatmap_net_v2.pt`). Datasets,
-training/evaluation data, the frontend, and `.git` are excluded — see the
+training/evaluation data, the frontend, and `.git` are excluded  -  see the
 `Dockerfile` header comment and `.dockerignore` for the exact list and why
 each exclusion is safe.
 
 The image is CPU-only. `torch` is installed from PyPI's dedicated CPU
 wheel index (`https://download.pytorch.org/whl/cpu`) specifically so no
-CUDA/`nvidia-*` packages are pulled in — this project has no GPU code.
+CUDA/`nvidia-*` packages are pulled in  -  this project has no GPU code.
 
 ---
 
@@ -93,7 +93,7 @@ docker run --rm -p 8000:8000 \
 `CORS_ORIGINS` and `AUTH_SECRET` are the environment variables that matter
 for a real deployment (see section G for the full list, including
 `DATABASE_URL`/`COOKIE_SECURE`/`COOKIE_DOMAIN` for the auth system).
-`KMP_DUPLICATE_LIB_OK` is set internally by `api/main.py` — do not set it
+`KMP_DUPLICATE_LIB_OK` is set internally by `api/main.py`  -  do not set it
 yourself.
 
 ---
@@ -112,9 +112,9 @@ present on disk:
 ```
 
 This is an existence check, not a full dependency health check
-(`docs/DEPLOYMENT_AUDIT.md` section 9) — it does not currently verify the
+(`docs/DEPLOYMENT_AUDIT.md` section 9)  -  it does not currently verify the
 auth database is reachable. The `Dockerfile` also declares a `HEALTHCHECK`
-that polls this same endpoint from inside the container — no new health
+that polls this same endpoint from inside the container  -  no new health
 logic was added.
 
 ---
@@ -140,12 +140,12 @@ FastAPI container (this Dockerfile), e.g. Render / Fly.io / Railway
 ```
 
 There is no queue, object storage, or worker in this architecture, and
-none should be added speculatively — see `docs/DEPLOYMENT_AUDIT.md`
+none should be added speculatively  -  see `docs/DEPLOYMENT_AUDIT.md`
 sections 6-7 for the reasoning (the detect/analyze/reconstruct/generate
 endpoints are synchronous, sub-second, and stateless; only the auth system
 touches a database).
 
-Never run `uvicorn --reload` in production — use the exact command the
+Never run `uvicorn --reload` in production  -  use the exact command the
 `Dockerfile` runs:
 
 ```bash
@@ -164,12 +164,12 @@ VITE_API_BASE_URL=https://<backend-domain> npm run build
 
 or configure it as a build-time environment variable in your static host
 (Vercel/Cloudflare Pages project settings). It cannot be changed after the
-build without rebuilding — it is baked into the static JS bundle by Vite,
+build without rebuilding  -  it is baked into the static JS bundle by Vite,
 not read at runtime in the browser.
 
 ---
 
-## G. Backend deployment — environment variables
+## G. Backend deployment  -  environment variables
 
 Copy `.env.example` to `.env` for local development, or set these through
 your hosting platform's env config in production:
@@ -212,7 +212,7 @@ The session cookie (`pulli_session`, set by `api/auth/router.py`) is
 `HttpOnly` always, and `Secure` + `SameSite=Lax` when `COOKIE_SECURE=true`.
 Concretely:
 
-- Serve the frontend and backend over HTTPS in production — a `Secure`
+- Serve the frontend and backend over HTTPS in production  -  a `Secure`
   cookie set over HTTP is silently dropped by the browser.
 - If the frontend and API are on different subdomains of the same parent
   domain, set `COOKIE_DOMAIN` to the shared parent. Leave it unset for a
@@ -234,7 +234,7 @@ out) but does not affect stored password hashes.
 ## I. Production upload limits
 
 `api/main.py` validates upload **content type** only
-(`ALLOWED_CONTENT_TYPES` — jpeg/png/webp/bmp); there is currently **no
+(`ALLOWED_CONTENT_TYPES`  -  jpeg/png/webp/bmp); there is currently **no
 application-level upload size limit**. This is a known gap, documented in
 `docs/DEPLOYMENT_AUDIT.md` section 9.
 
@@ -242,7 +242,7 @@ application-level upload size limit**. This is a known gap, documented in
 platform or reverse-proxy layer** (e.g. your hosting platform's own
 request size cap, or a reverse proxy in front of the container) before
 being exposed to untrusted traffic. This document does not specify a
-provider-specific number — check the limit your chosen platform already
+provider-specific number  -  check the limit your chosen platform already
 enforces by default and confirm it's reasonable for a single kolam photo
 upload; do not assume one is in place without checking.
 
@@ -254,36 +254,36 @@ item if the platform-level limit turns out to be absent or too permissive.
 
 ## Troubleshooting
 
-- **`OMP: Error #15` / process crashes on first request** — `KMP_DUPLICATE_LIB_OK`
+- **`OMP: Error #15` / process crashes on first request**  -  `KMP_DUPLICATE_LIB_OK`
   must be set before torch or numpy is imported. It's set at the very top
-  of `api/main.py`, before any other import — if this ever moves, the
+  of `api/main.py`, before any other import  -  if this ever moves, the
   crash returns. Do not "fix" this by removing the line.
-- **CORS errors in the browser console** — check `CORS_ORIGINS` matches
+- **CORS errors in the browser console**  -  check `CORS_ORIGINS` matches
   the frontend's *exact* origin (scheme + host + port), and that you
   didn't leave a trailing slash.
-- **Login "works" locally but fails in production** — almost always
+- **Login "works" locally but fails in production**  -  almost always
   `COOKIE_SECURE=true` with the site served over plain HTTP, or
   `CORS_ORIGINS` not listing the frontend's exact origin. See section H.
-- **`/api/v1/detect` with `detector=ml` returns 503** — the ML checkpoint
+- **`/api/v1/detect` with `detector=ml` returns 503**  -  the ML checkpoint
   (`experiments/m4_2/results/dot_heatmap_net_v2.pt`) is missing or failed
-  to load. This is intentional (rule: no silent fallback to classical) —
+  to load. This is intentional (rule: no silent fallback to classical)  - 
   check `GET /api/v1/health`'s `ml_detector_available` field.
 
 ## Rollback
 
-- **Backend code rollback**: standard — redeploy the previous image tag
+- **Backend code rollback**: standard  -  redeploy the previous image tag
   on your platform. The auth tables' shape hasn't changed across this
   feature's commits, so no data migration is needed to roll back.
 - **Database rollback**: since there's no migration tool, "rollback" for
   the auth tables means restoring a database backup if you need to undo
-  data changes (not schema changes — nothing here alters existing
+  data changes (not schema changes  -  nothing here alters existing
   columns). Take a backup before any manual schema change.
 - **If `AUTH_SECRET` is rotated by mistake**: not reversible from the old
-  value alone (it isn't stored anywhere but the env config) — restore the
+  value alone (it isn't stored anywhere but the env config)  -  restore the
   previous secret from wherever it was originally generated/stored (e.g.
   your secrets manager's history) rather than regenerating a new one, or
   accept that all users need to log in again.
-- **Frontend rollback**: the frontend is a static build — rolling back
+- **Frontend rollback**: the frontend is a static build  -  rolling back
   means redeploying the previous `dist/` build or, on Vercel/Cloudflare
   Pages, promoting a previous deployment. No data migration involved.
 

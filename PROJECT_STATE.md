@@ -4,34 +4,34 @@ Last updated: post-merge of two diverged histories (this branch's
 sessions 21-23, and `origin/master`'s follow-on work that wired
 Session 21's experimental gate into the live API as `detector=ml-gated`,
 PR #14, "wire the gated ML detector into API endpoints with full pytest
-coverage" — see `api/detectors.py::GatedMLDetector`,
+coverage"  -  see `api/detectors.py::GatedMLDetector`,
 `api/tests/test_api.py`'s `test_no_silent_fallback_on_ml_gated_failure`
 and `test_*_ml_gated` cases). **This supersedes Session 21/23's own
-"Not integrated" note below for the gate specifically** — the gate is
+"Not integrated" note below for the gate specifically**  -  the gate is
 now reachable via `detector=ml-gated` on `/detect`, `/analyze`, and
 `/reconstruct`, with no silent fallback to classical on failure
 (verified). It is still NOT the production default (`detector=classical`
 remains default everywhere) and its own real-photo false-positive
-numbers (55.6%, still worse than classical's 33.3% — see
+numbers (55.6%, still worse than classical's 33.3%  -  see
 `docs/M4_1_ML_COMPLETION_REPORT.md` Section 15) are unchanged by this
 wiring; only its reachability changed, not its measured quality.
 
-Session 23 (real-kolam GRAPH-quality preprocessing experiment —
+Session 23 (real-kolam GRAPH-quality preprocessing experiment  - 
 NEGATIVE result, see Session 23 below). Extended `engine/canonicalize.py`
 with area-based small-component removal + border crop (variants F/G)
 and benchmarked all 7 variants' effect on downstream GRAPH quality
 (components, odd-degree, Eulerian) on the 4 real in-scope photos with
-full graph construction — **every non-baseline variant increased
+full graph construction  -  **every non-baseline variant increased
 fragmentation and odd-degree count on 3 of 4 photos; no variant reached
 `reconstruction_valid=True` anywhere, including the baseline.** Not
-integrated (unrelated to the gate above — this is a preprocessing
+integrated (unrelated to the gate above  -  this is a preprocessing
 experiment, not a detection-gating one). M4.1 status unchanged:
 **PARTIAL** (`docs/M4_1_ML_COMPLETION_REPORT.md`). Session 22
-(canonicalization false-positive experiment — also negative, 5 variants,
+(canonicalization false-positive experiment  -  also negative, 5 variants,
 no-dot FP stayed 100% for all). Session 21 (M4.1 ML completion campaign
-— gating experiment — see below; the gate this session built is the one
+ -  gating experiment  -  see below; the gate this session built is the one
 PR #14 later wired into the API, per the paragraph above).
-**M4.2 generation validity moved from 0/120 to 1/120** — combining
+**M4.2 generation validity moved from 0/120 to 1/120**  -  combining
 connectivity-aware and parity-aware scoring produced PULLI's first-ever
 valid novel-generated candidate, but at 0.83%, concentrated on a single
 layout, this is proof-of-concept, not a reliable capability. **M4.2
@@ -85,12 +85,12 @@ bar. No production integration has occurred at any point in sessions
 13-16; `detector=classical` remains the default everywhere. Total test
 count: **168/168 passing** (123 core + 16 M4.1 + 18 M4.2 + 11 API).
 
-## Session 23 — real-kolam graph-quality preprocessing experiment (NEGATIVE result, not committed)
+## Session 23  -  real-kolam graph-quality preprocessing experiment (NEGATIVE result, not committed)
 
 **Scope**: given a task describing a specific 260×280 dense sikku-kolam
 image with a watermark (~870 dots, 1792 edges, 22 motifs, disconnected,
 non-Eulerian) and asked to build/validate preprocessing to fix it. **The
-image was not available** — not in the repository, and the API never
+image was not available**  -  not in the repository, and the API never
 persists uploads. Confirmed with the user, who said to proceed against
 the existing corpus. `kolam_naduveetu_meenakshisundaram.jpg` (this
 project's densest, lowest-contrast real in-scope photo: 3072×2304, gray
@@ -100,7 +100,7 @@ just this one.
 
 **Result: negative, and more decisive than Session 22's.** Extended
 `engine/canonicalize.py` (5→7 variants): added `_remove_small_components`
-(area-based connected-component filtering — deliberately NOT
+(area-based connected-component filtering  -  deliberately NOT
 morphological opening, which risks eroding closely-spaced real dots;
 verified by a direct unit test that it preserves a dense 8×8 dot grid
 while dropping isolated single-pixel specks) and `_crop_border` (fixed
@@ -115,15 +115,15 @@ at n=4).
 components) AND increased odd-degree node count, on 3 of the 4 photos,
 without exception.** More aggressive variants (adaptive threshold,
 illumination normalization, small-component removal) increased raw
-detection count substantially (563→1193 on the densest photo) — and
+detection count substantially (563→1193 on the densest photo)  -  and
 more detections on an already over-detecting model produced MORE, not
 fewer, disconnected lattice fragments. One narrow exception: variant B
 (CLAHE only) on `kolam2_tshrinivasan.jpg` (components 16→13, odd nodes
-30→16, Eulerian preserved) — reported honestly, not generalized (B made
+30→16, Eulerian preserved)  -  reported honestly, not generalized (B made
 the other 2 tested photos worse).
 
 **`reconstruction_valid` was `False` for every one of 32 benchmarked
-rows** (4 photos × 8 configs including raw) — including the unmodified
+rows** (4 photos × 8 configs including raw)  -  including the unmodified
 production baseline, which on 2 photos already reaches `eulerian=True`
 on its largest component (but never covers all nodes). No variant
 closed this gap; 2 variants (F, G) even destroyed the baseline's
@@ -131,7 +131,7 @@ pre-existing partial Eulerian property on `kolam2_tshrinivasan.jpg`.
 
 **Diagnosis (Phase 13 of the task's own menu, ruled out directly, not
 by elimination)**: not a lattice-fitting bug, not a `trace_path` bug,
-not a parity-scoring bug — the same unmodified functions correctly
+not a parity-scoring bug  -  the same unmodified functions correctly
 handled both the 58-dot and 1193-dot inputs. **It is the model's domain
 gap** (Sessions 16/21/22's already-established finding): cleaner-looking
 preprocessing makes the CNN MORE trigger-happy (higher local
@@ -139,24 +139,24 @@ contrast/edge content → more candidate peaks clear its confidence
 threshold), not less. Fixing the input image cannot compensate for
 what the model learned. The already-identified, actually-effective
 mitigation remains Session 21's POST-detection lattice-consistency
-gate (100%→55.6% no-dot FP, zero synthetic cost) — still not wired into
+gate (100%→55.6% no-dot FP, zero synthetic cost)  -  still not wired into
 the API, still the single highest-value next integration step.
 
 **Files**: `engine/canonicalize.py` (extended), new
 `experiments/real_image_preprocessing/run_graph_benchmark.py` + results,
 `tests/test_canonicalize.py` (+1), new `tests/test_real_kolam_preprocess.py`
 (9 tests), `docs/M4_2_REAL_IMAGE_PREPROCESSING.md`. **Not integrated**
-into `api/` or the frontend — no evidence supported it. Tests: 267/267
+into `api/` or the frontend  -  no evidence supported it. Tests: 267/267
 passing (248 before this session's two experiments + 9 (Session 22) +
 10 new this session). Zero changes to `engine/image_io.py`,
 `engine/ml_contract.py`, `api/`, `frontend/`, or the model checkpoint.
 
-## Session 22 — canonicalization experiment (NEGATIVE result, not committed)
+## Session 22  -  canonicalization experiment (NEGATIVE result, not committed)
 
 **Scope**: ~60-minute time-boxed sprint testing whether deterministic
 photo-canonicalization (illumination normalization, CLAHE, adaptive
 thresholding, morphological cleanup) improves the existing, unmodified
-`DotHeatmapNetV2` checkpoint's real-photo behavior — no retraining, no
+`DotHeatmapNetV2` checkpoint's real-photo behavior  -  no retraining, no
 model change, only the pixels fed to the model changed.
 
 **Result: negative, reported honestly.** `engine/canonicalize.py` (new,
@@ -165,20 +165,20 @@ experimental, does not touch `engine.image_io.preprocess()`) implements
 adaptive-threshold + morphology). Tested on synthetic val (45 images,
 ground truth) + all 22 real photos (no ground truth, raw stats only):
 **all 5 variants tied at 100% no-dot false-positive rate (18/18),
-identical to baseline — zero improvement on the #1-priority metric.**
+identical to baseline  -  zero improvement on the #1-priority metric.**
 Variants D and E additionally REGRESSED synthetic precision (0.9995 →
-0.63 and 0.90). **No variant integrated into `api/` or the frontend** —
+0.63 and 0.90). **No variant integrated into `api/` or the frontend**  - 
 correctly not promoted, per the experiment's own evidence.
 
 **Key finding**: the false-positive problem is not caused by
-binarization noise (this experiment's working hypothesis) — it persists
+binarization noise (this experiment's working hypothesis)  -  it persists
 identically across 5 meaningfully different preprocessing recipes,
 including one that measurably produces a much cleaner-looking binary
 mask (variant E's foreground fraction on the worst-case low-contrast
 photo dropped from 67% to 8%) with NO effect on the CNN's false firing
 rate. This means the false-positive behavior is a property of what the
 model LEARNED (confident on synthetic-render statistics, confidently
-wrong on real-photo statistics — consistent with Session 21's 0.93-0.98
+wrong on real-photo statistics  -  consistent with Session 21's 0.93-0.98
 confidence-on-false-positives finding), not a property of the input
 image's cleanliness. A ruled-out hypothesis, not a wasted effort.
 
@@ -189,27 +189,27 @@ Tests: 257/257 passing (248 before + 9 new). Zero changes to `api/`,
 `engine/image_io.py`, `engine/ml_contract.py`, or `frontend/`.
 
 **M4.1 status: unchanged, still PARTIAL.** This experiment neither
-closes nor worsens it — it rules out one specific, plausible hypothesis
+closes nor worsens it  -  it rules out one specific, plausible hypothesis
 with real evidence. The already-identified next step is unchanged from
 Session 21: wire the lattice-CONSISTENCY gate (a post-detection filter,
-not a pre-detection image transform — the one mitigation that DID show
+not a pre-detection image transform  -  the one mitigation that DID show
 a measured, non-zero benefit: 100%→55.6% no-dot FP) into `api/detectors.py`.
 
-## Session 21 — M4.1 ML completion campaign: gating experiment (M4.1 still PARTIAL, not committed)
+## Session 21  -  M4.1 ML completion campaign: gating experiment (M4.1 still PARTIAL, not committed)
 
 **Scope**: given a 13-phase "complete the ML milestone end-to-end"
 campaign (dataset audit, augmentation ablation, hybrid detector, gating,
 performance, deployment, production decision). Confirmed with the user
 before starting that most of these phases are individually substantial
 (augmentation ablation needs new training runs; a full hybrid detector
-is its own architecture) — scoped this session to the **gating
+is its own architecture)  -  scoped this session to the **gating
 experiment** (Phase 6) done rigorously, with the audit/documentation
 phases (0, 1, 2, 3, 7, 8, 11, 12, 13) done alongside it at a
 verification depth, and augmentation (4), full hybrid (5), and deep
 performance work (9) explicitly NOT attempted.
 
 **Bottom line: a real, measured, zero-synthetic-cost improvement to the
-worst documented ML defect — but still not enough to change the
+worst documented ML defect  -  but still not enough to change the
 production decision.** A lattice-geometric-consistency gate (reuses
 `engine.image_io._fit_lattice_coords`, the SAME function the classical
 detector already uses, as a post-hoc plausibility check on ML output)
@@ -217,7 +217,7 @@ cuts the ML detector's no-dot false-positive rate from **100% (18/18)
 to 55.6% (10/18)** at the production confidence threshold (0.6), with
 **zero measured cost** to synthetic recall/precision/F1. The honest
 cost: the same gate also rejects 3 of the 4 real in-scope photos'
-detections entirely — their lattice-fit residuals overlap with several
+detections entirely  -  their lattice-fit residuals overlap with several
 no-dot photos' residuals, so geometric consistency correlates with but
 does not cleanly separate the two populations.
 
@@ -230,22 +230,22 @@ does not cleanly separate the two populations.
   rate only, no fabricated ground truth). Full results:
   `experiments/m4_2/results/gating_experiment.json`.
 - `experiments/m4_2/gated_ml_lattice_detector.py`: `GatedLearnedLatticeDetectorV2`,
-  a new, tested, `MLLatticeDetector`-contract-conforming class — **NOT
+  a new, tested, `MLLatticeDetector`-contract-conforming class  -  **NOT
   wired into `api/main.py`/`api/detectors.py`** (deliberate scope
   decision: not yet recommended for production, so no API schema
   change was made). Rejection collapses to the same existing
   `Lattice([], [], 0.0)` empty convention every other adapter already
-  uses — no new failure shape, no silent repair.
+  uses  -  no new failure shape, no silent repair.
 - `experiments/m4_2/tests/test_gated_ml_lattice_detector.py`: 12 new
   tests (residual computation, contract conformance, determinism,
   malformed input, rejection-path safety, real no-dot photo
-  integration, `is_traceable`/`trace_path` boundary safety — the
+  integration, `is_traceable`/`trace_path` boundary safety  -  the
   latter proving `trace_path` itself remains unmodified and the
   Session-17 `is_traceable` gate is untouched).
-- `docs/M4_1_ML_COMPLETION_REPORT.md` — full 18-section report,
+- `docs/M4_1_ML_COMPLETION_REPORT.md`  -  full 18-section report,
   including the explicit Phase-13 completion checklist (one item
   unresolved: live Docker/API deployment smoke test not re-run this
-  session, only inferred from passing unit/integration tests — this
+  session, only inferred from passing unit/integration tests  -  this
   alone keeps the status PARTIAL, per the task's own binary rule).
 - Tests: **239/239 passing** (227 before this session + 12 new). No
   existing test modified or weakened; the `trace_path` crash-reproduction
@@ -255,18 +255,18 @@ does not cleanly separate the two populations.
 
 - **Threshold alone cannot solve the false-positive problem at any
   usable operating point**: synthetic recall stays ~0.999 through
-  threshold=0.8, then collapses to 0.52 at 0.95 and 0.01 at 0.99 — the
+  threshold=0.8, then collapses to 0.52 at 0.95 and 0.01 at 0.99  -  the
   ONLY threshold that reaches 0% no-dot FP (0.99) also makes the
   detector useless on synthetic data. Confirmed across a wider range
   than M4.2's original sweep ever tested.
 - **The gate is not a clean separator**: real in-scope photos' lattice
   residuals (9.1-19.8px) overlap with several no-dot photos' residuals
-  in the same range — a residual-threshold sensitivity table (5-30px)
+  in the same range  -  a residual-threshold sensitivity table (5-30px)
   shows no value achieves both "keep all 4 in-scope detections" and
   "eliminate most false positives."
 - **The domain gap is a confidence problem, not a calibration problem**:
-  raw ML confidence on some no-dot real photos reaches 0.93-0.98 —
-  confidently wrong, not merely uncertain — consistent with Session 16's
+  raw ML confidence on some no-dot real photos reaches 0.93-0.98  - 
+  confidently wrong, not merely uncertain  -  consistent with Session 16's
   conclusion that gray-mean/std-matched synthetic augmentation alone
   does not close the real-photo transfer gap.
 
@@ -276,7 +276,7 @@ Per the campaign's own Phase-13 checklist (reproduced in
 `docs/M4_1_ML_COMPLETION_REPORT.md` Section 17): 15/16 items satisfied;
 "deployment smoke tests pass" was not re-run live this session (Docker/
 API), only inferred from the passing test suite. Per the task's own
-explicit rule ("if any box is false, ML STATUS = PARTIAL — do not
+explicit rule ("if any box is false, ML STATUS = PARTIAL  -  do not
 declare completion"), **M4.1 remains PARTIAL**, unchanged in
 classification from before this session, though with meaningfully more
 evidence and one real mitigation now available (experimental, not
@@ -285,7 +285,7 @@ deployed).
 ### Production decision: unchanged
 
 `detector=classical` remains default. The gate's 55.6% no-dot FP rate is
-still worse than classical's own 33.3% — a genuine improvement over
+still worse than classical's own 33.3%  -  a genuine improvement over
 ML's prior 100%, not yet competitive with classical. This is reported as
 the correct, evidence-based conclusion, not a failure to find something
 useful (the gate IS useful and is recommended for future integration).
@@ -296,11 +296,11 @@ Wire the gate into `api/detectors.py` behind an explicit opt-in flag,
 run it through `evaluate_m4_2.py`'s full pre-committed decision-rule
 framework (not just this session's threshold/FP-rate slice), and
 separately investigate WHY the in-scope/no-dot residual distributions
-overlap, to find a cleaner-separating signal. **Not M5** — unrelated
+overlap, to find a cleaner-separating signal. **Not M5**  -  unrelated
 milestone, unaffected by this session (see `docs/M4_2_PARITY_EVALUATION.md`'s
 still-standing M5 gate answer).
 
-## Session 20 — parity-aware novel generation (MARGINAL IMPROVEMENT, M4.2 still PARTIAL, not committed)
+## Session 20  -  parity-aware novel generation (MARGINAL IMPROVEMENT, M4.2 still PARTIAL, not committed)
 
 **Scope**: Session 19 identified Eulerian parity (odd-degree nodes) as
 the precise remaining bottleneck after connectivity-aware scoring fixed

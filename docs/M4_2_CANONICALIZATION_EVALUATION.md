@@ -4,43 +4,43 @@
 (illumination normalization, CLAHE, adaptive thresholding, morphological
 cleanup, in various combinations) were tested against the existing,
 unmodified `DotHeatmapNetV2` checkpoint on all 22 real photos. **None
-improved the no-dot false-positive rate — all 5 remained at 100%
+improved the no-dot false-positive rate  -  all 5 remained at 100%
 (18/18), identical to the current production baseline.** Two variants
 (D, E) additionally REGRESSED synthetic precision (0.63 and 0.90 vs.
 baseline's 0.9995). No variant is integrated into the API or frontend.
 
 ## Methodology
 
-`engine/canonicalize.py` (new, experimental, opt-in — does not modify
+`engine/canonicalize.py` (new, experimental, opt-in  -  does not modify
 `engine.image_io.preprocess()`) implements 5 deterministic
 preprocessing variants, all ending in the same single-channel uint8
 binary ink-mask format the model already expects:
 
 | Variant | Recipe |
 |---|---|
-| A (baseline) | grayscale + global Otsu threshold — **identical to current production** `engine.image_io.preprocess()`, verified by a direct equality test |
+| A (baseline) | grayscale + global Otsu threshold  -  **identical to current production** `engine.image_io.preprocess()`, verified by a direct equality test |
 | B | grayscale + CLAHE (local contrast) + global Otsu |
 | C | grayscale + illumination normalization (flat-field division by a heavily-blurred background estimate) + global Otsu |
 | D | grayscale + CLAHE + adaptive (local) threshold + light morphological opening |
 | E | grayscale + illumination normalization + adaptive threshold + light morphological opening |
 
 Same checkpoint, same confidence threshold (0.6) and min-peak-distance
-(2.0 heatmap cells) as production, for every variant — only the
+(2.0 heatmap cells) as production, for every variant  -  only the
 preprocessing changed, per the task's explicit "do not change the model
 checkpoint between A and B" instruction.
 
 **Time-budget note**: the full graph-construction check (`trace_path`,
-which calls `skimage.skeletonize` — slow on some real photos up to
+which calls `skimage.skeletonize`  -  slow on some real photos up to
 9248×6936px) was run for the baseline only, not for all 5 variants. A
 fast screening pass (detection + lattice-fit only, no skeletonize) was
 run first for all 5 variants; it already produced a decisive, consistent
 result on the #1-priority metric (no-dot false-positive rate) across
 every variant, so the more expensive full-graph check for the losing
-variants was not run — it would not have changed the conclusion.
+variants was not run  -  it would not have changed the conclusion.
 
 ## Variants tested
 
-All 5 (A–E), per the task's request — no variant was skipped.
+All 5 (A–E), per the task's request  -  no variant was skipped.
 
 ## Raw ML benchmark (variant A = current production path)
 
@@ -63,7 +63,7 @@ All 5 (A–E), per the task's request — no variant was skipped.
 
 ## Best variant
 
-**None.** Every variant tied at 100% no-dot false-positive rate — the
+**None.** Every variant tied at 100% no-dot false-positive rate  -  the
 task's own Phase 5 priority-#1 metric ("fewer catastrophic false
 positives"). Per that explicit hierarchy, a variant that does not
 improve on priority #1 is not promoted regardless of what happens
@@ -71,7 +71,7 @@ further down the list (detection count, raw confidence, etc.). If
 forced to rank purely on "does the LEAST additional harm," **B** is
 closest to baseline on every synthetic metric, but "closest to doing
 nothing" is not the same as "an improvement," and it is reported as
-such — not selected as a winner.
+such  -  not selected as a winner.
 
 ## Improvement/regression table
 
@@ -83,7 +83,7 @@ such — not selected as a winner.
 | Synthetic F1 | 0.9993 | −0.0005 | −0.0018 | **−0.2385** | **−0.0575** |
 
 **No variant helps the target problem. D and E actively hurt an
-unrelated, already-working metric (synthetic precision)** — adaptive
+unrelated, already-working metric (synthetic precision)**  -  adaptive
 (local) thresholding introduces spurious low-level texture peaks even
 on clean synthetic renders, a real, measured cost, not a hypothetical
 one.
@@ -91,11 +91,11 @@ one.
 ## Downstream lattice/graph results
 
 Lattice-fit success on the 4 real in-scope photos was 4/4 for every
-variant tested at the fast-pass stage (unchanged from baseline — the
+variant tested at the fast-pass stage (unchanged from baseline  -  the
 model already produces ≥3 detections on all 4, so this metric was never
 differentiating). Full graph construction (connectivity, odd-degree
 count) was not run beyond the baseline, per the time-budget note above
-— not needed to reach the negative conclusion, since no variant cleared
+ -  not needed to reach the negative conclusion, since no variant cleared
 the higher-priority false-positive gate that would have justified the
 additional expensive check.
 
@@ -103,9 +103,9 @@ additional expensive check.
 
 **Not integrated.** Per the task's own explicit instruction ("if the
 experiment clearly improves ML performance, then make the canonicalized
-ML path available through the API") — it does not clearly improve
+ML path available through the API")  -  it does not clearly improve
 (actually: measurably regresses on 2/5 variants, and is flat on the
-target metric for all 5) — so `detector=ml_canonical` was NOT added to
+target metric for all 5)  -  so `detector=ml_canonical` was NOT added to
 `api/detectors.py`/`api/main.py`. Existing `detector=classical`/`ml`/
 `compare` are completely unchanged (verified: zero diff to
 `api/detectors.py` this session; `engine/canonicalize.py` is a
@@ -114,27 +114,27 @@ standalone new module with no import from or into any API file).
 ## Frontend integration status
 
 **Not attempted**, per Phase 7's own "only if the backend path is
-validated" condition — it was not.
+validated" condition  -  it was not.
 
 ## Tests
 
 `tests/test_canonicalize.py`, 9 new tests: all 5 variants produce a
 valid binary uint8 mask; unknown variant / missing file raise cleanly;
 determinism; dimension preservation; **variant A is proven byte-identical
-to `engine.image_io.preprocess()`'s own output** (not just documented —
+to `engine.image_io.preprocess()`'s own output** (not just documented  - 
 tested); illumination-normalized variants measurably reduce foreground
 fraction on a synthetic uneven-lighting test image (the one thing this
 module DOES demonstrably do); `engine.canonicalize` proven to import
 nothing from `engine.image_io` (namespace-level check, not a fragile
 text search). Full suite: **257/257 passing** (248 before this session's
-canonicalize tests — some additional tests from concurrent, unrelated
+canonicalize tests  -  some additional tests from concurrent, unrelated
 work also landed in this count; 9 are this session's). No existing test
 modified or weakened.
 
 ## Runtime/latency
 
 127–194ms per real photo depending on variant (baseline 127ms; D/E
-slower due to adaptive threshold + morphology on large images — up to
+slower due to adaptive threshold + morphology on large images  -  up to
 ~200ms, still well within the existing ML detector's overall latency
 budget documented in `docs/M4_1_ML_COMPLETION_REPORT.md`).
 
@@ -153,14 +153,14 @@ budget documented in `docs/M4_1_ML_COMPLETION_REPORT.md`).
 
 - The domain-gap problem (real no-dot photos triggering confident false
   positives, `docs/M4_1_ML_COMPLETION_REPORT.md`) is UNCHANGED by this
-  experiment — canonicalization at the preprocessing level does not
+  experiment  -  canonicalization at the preprocessing level does not
   touch it, because the CNN's false firing is not primarily caused by
   binarization noise (the working hypothesis this experiment tested),
   it persists even on a visually much "cleaner" mask (see Phase 9 note
   below).
 - The already-recommended, more promising mitigation remains the
   lattice-CONSISTENCY gate from `docs/M4_1_ML_COMPLETION_REPORT.md`
-  (100%→55.6% no-dot FP, zero synthetic cost) — a POST-detection
+  (100%→55.6% no-dot FP, zero synthetic cost)  -  a POST-detection
   geometric filter, not a pre-detection image transform. This
   experiment's negative result makes that prior finding look
   comparatively more important, not less.
@@ -171,7 +171,7 @@ budget documented in `docs/M4_1_ML_COMPLETION_REPORT.md`).
 ## M4.1/M4.2 readiness verdict
 
 **Unchanged. M4.1 remains PARTIAL** (`docs/M4_1_ML_COMPLETION_REPORT.md`),
-**M4.2 remains PARTIAL** (`docs/M4_2_PARITY_EVALUATION.md`) — this
+**M4.2 remains PARTIAL** (`docs/M4_2_PARITY_EVALUATION.md`)  -  this
 experiment is scoped entirely within the already-PARTIAL M4.1 ML
 detection problem and does not touch M4.2 generation at all. This
 session neither closes nor worsens either milestone's status; it rules
@@ -183,7 +183,7 @@ outcome per this project's explicit rules.
 
 **Not another canonicalization variant.** This experiment's clearest
 finding is that image-level preprocessing changes do not move the
-false-positive needle at all (100% → 100%, five different ways) — the
+false-positive needle at all (100% → 100%, five different ways)  -  the
 false-firing behavior is a property of what the CNN LEARNED (confident
 on synthetic-render statistics, confidently wrong on real-photo
 statistics), not a property of how the binary mask is computed before
@@ -191,7 +191,7 @@ reaching it. The highest-value next step is therefore the ALREADY
 -IDENTIFIED one from `docs/M4_1_ML_COMPLETION_REPORT.md`'s own "next
 step": wire the lattice-consistency GATE (post-detection, not
 pre-detection) into `api/detectors.py` as an opt-in path and run it
-through `evaluate_m4_2.py`'s full decision-rule framework — that
+through `evaluate_m4_2.py`'s full decision-rule framework  -  that
 mitigation already has a measured, non-zero benefit; this session's
 canonicalization work does not, and should not be pursued further along
 this specific axis without first testing whether real-photo-DERIVED

@@ -18,6 +18,7 @@
 matplotlib==3.10.0
 
 pytest==8.3.4
+httpx
 
 # Pillow (engine/render.py's PNG dependency) is pulled in transitively
 # via -r requirements-api.txt -> requirements-ml.txt ->

@@ -239,3 +239,55 @@ def test_dense_pattern_threshold_fix_does_not_regress_sparse_patterns():
     lattice = image_io.detect_lattice(image_io.preprocess(_image_path("kolam19_k1")))
     gt = _load_ground_truth("kolam19_k1")
     assert len(lattice.lattice_coords) == gt["n_nodes"]
+
+
+def test_analyze_kolam_type_sikku_and_kambi():
+    """Verify analyze_kolam_type correctly distinguishes Sikku loop patterns (with half-integer nodes) from Kambi direct-line patterns (integer nodes only)."""
+    import networkx as nx
+
+    # Sikku Graph: contains half-integer node offsets like (0.5, 0.5)
+    G_sikku = nx.MultiGraph()
+    G_sikku.add_edge((0, 0), (0.5, 0.5))
+    G_sikku.add_edge((0.5, 0.5), (1, 1))
+    assert image_io.analyze_kolam_type(G_sikku) == "SIKKU_LOOP"
+
+    # Kambi Graph: integer lattice nodes only
+    G_kambi = nx.MultiGraph()
+    G_kambi.add_edge((0, 0), (1, 0))
+    G_kambi.add_edge((1, 0), (1, 1))
+    assert image_io.analyze_kolam_type(G_kambi) == "KAMBI_DIRECT_LINE"
+
+
+def test_analyze_kolam_type_multi_loop_sikku():
+    """Verify analyze_kolam_type correctly identifies multi-loop Sikku graphs with >1 connected components."""
+    import networkx as nx
+
+    # Disjoint sub-loops with half-integer nodes
+    G_multi = nx.MultiGraph()
+    # Loop 1
+    G_multi.add_edge((0, 0), (0.5, 0.5))
+    G_multi.add_edge((0.5, 0.5), (1, 1))
+    # Loop 2 (disjoint)
+    G_multi.add_edge((5, 5), (5.5, 5.5))
+    G_multi.add_edge((5.5, 5.5), (6, 6))
+
+    assert image_io.analyze_kolam_type(G_multi) == "MULTI_LOOP_SIKKU"
+
+
+def test_decompose_multi_loop_graph():
+    """Verify decompose_multi_loop_graph splits a multi-loop graph into distinct sub-graphs for each closed loop/component."""
+    import networkx as nx
+
+    G_multi = nx.MultiGraph()
+    # Loop 1
+    G_multi.add_edge((0, 0), (0.5, 0.5))
+    G_multi.add_edge((0.5, 0.5), (1, 1))
+    # Loop 2
+    G_multi.add_edge((5, 5), (5.5, 5.5))
+    G_multi.add_edge((5.5, 5.5), (6, 6))
+
+    subgraphs = image_io.decompose_multi_loop_graph(G_multi)
+    assert len(subgraphs) == 2
+    assert set(subgraphs[0].nodes).isdisjoint(set(subgraphs[1].nodes))
+
+

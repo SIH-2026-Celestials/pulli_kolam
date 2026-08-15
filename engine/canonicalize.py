@@ -8,7 +8,7 @@ Preprocessed object every current caller receives"). This module is a
 NEW, opt-in preprocessing variant, built to test whether closing the
 illumination/contrast gap between synthetic renders and real photos
 (the domain-gap finding in `docs/M4_1_ML_COMPLETION_REPORT.md` Section 7
-— real no-dot photos reach ML confidence 0.93-0.98, i.e. the model is
+ -  real no-dot photos reach ML confidence 0.93-0.98, i.e. the model is
 confidently wrong, not merely under-confident) improves the EXISTING
 `DotHeatmapNetV2` checkpoint's real-photo behavior. No model change, no
 retraining, no new checkpoint.

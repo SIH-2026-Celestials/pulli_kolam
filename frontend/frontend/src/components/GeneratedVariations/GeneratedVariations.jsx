@@ -65,9 +65,9 @@ function MathematicsPanel({ analysis }) {
       </div>
       <div>
         <div className="math-group-title">Symmetry &amp; Complexity</div>
-        <div className="math-row"><span>D4 coverage</span><span>{symmetry.coverage != null ? `${(symmetry.coverage * 100).toFixed(0)}%` : '—'}</span></div>
-        <div className="math-row"><span>Complexity score</span><span>{complexity.complexity_score != null ? complexity.complexity_score.toFixed(3) : '—'}</span></div>
-        <div className="math-row"><span>Density score</span><span>{complexity.density_score != null ? complexity.density_score.toFixed(3) : '—'}</span></div>
+        <div className="math-row"><span>D4 coverage</span><span>{symmetry.coverage != null ? `${(symmetry.coverage * 100).toFixed(0)}%` : ' - '}</span></div>
+        <div className="math-row"><span>Complexity score</span><span>{complexity.complexity_score != null ? complexity.complexity_score.toFixed(3) : ' - '}</span></div>
+        <div className="math-row"><span>Density score</span><span>{complexity.density_score != null ? complexity.density_score.toFixed(3) : ' - '}</span></div>
       </div>
     </div>
   )
@@ -325,7 +325,7 @@ export default function GeneratedVariations() {
                   <Grid size={18} className="metric-icon" />
                   <div className="metric-text-box">
                     <span className="metric-label">{t('variations.grid')}</span>
-                    <span className="metric-val">{firstDots ? `${firstDots} dots` : '—'}</span>
+                    <span className="metric-val">{firstDots ? `${firstDots} dots` : ' - '}</span>
                   </div>
                 </div>
 
@@ -344,7 +344,7 @@ export default function GeneratedVariations() {
                   <div className="metric-text-box">
                     <span className="metric-label">{t('variations.stroke')}</span>
                     <span className="metric-val">
-                      {candidates.length ? `${nValid} / ${candidates.length} valid` : '—'}
+                      {candidates.length ? `${nValid} / ${candidates.length} valid` : ' - '}
                     </span>
                   </div>
                 </div>
@@ -356,7 +356,7 @@ export default function GeneratedVariations() {
                     <span className="metric-val">
                       {candidates[0]?.analysis?.multiplicity?.max_multiplicity != null
                         ? `max ×${candidates[0].analysis.multiplicity.max_multiplicity}`
-                        : '—'}
+                        : ' - '}
                     </span>
                   </div>
                 </div>
@@ -368,7 +368,7 @@ export default function GeneratedVariations() {
                     <span className="metric-val">
                       {candidates[0]?.analysis?.complexity?.complexity_score != null
                         ? candidates[0].analysis.complexity.complexity_score.toFixed(2)
-                        : '—'}
+                        : ' - '}
                     </span>
                   </div>
                 </div>
