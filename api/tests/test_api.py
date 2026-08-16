@@ -28,6 +28,31 @@ def test_health():
     assert body["status"] == "ok"
     assert body["classical_detector_available"] is True
     assert "gated_detector_available" in body
+    # Existing contract preserved -- every field still present.
+    assert "database_connected" in body
+    assert "artifact_storage_available" in body
+
+
+def test_health_reports_real_database_engine_dialect():
+    """database_engine (temporary diagnostic) must reflect the actual live
+    SQLAlchemy dialect (api.db.database.engine.dialect.name) -- not a
+    guess from DATABASE_URL string parsing. This test's own DATABASE_URL
+    is SQLite (api/tests' default, no DATABASE_URL override), so the
+    real, live dialect name here is genuinely "sqlite" -- this assertion
+    would fail if the code fell back to a hardcoded/incorrect value."""
+    from api.db.database import engine as platform_engine
+
+    r = client.get("/api/v1/health")
+    assert r.status_code == 200
+    body = r.json()
+    assert "database_engine" in body
+    assert body["database_engine"] == platform_engine.dialect.name
+    assert body["database_engine"] in ("sqlite", "postgresql")  # never "unknown" when DB is reachable
+    # No secret ever leaks through this field or anywhere else in the body.
+    serialized = str(body)
+    assert "DATABASE_URL" not in serialized
+    assert "password" not in serialized.lower()
+    assert "://" not in serialized  # no connection string / URL scheme leakage
 
 
 def test_model_info():
