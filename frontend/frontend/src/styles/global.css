@@ -10,6 +10,7 @@
 html, body {
   width: 100%;
   min-height: 100vh;
+  overflow-x: hidden;
   font-family: var(--font-sans);
   background-color: var(--color-paper);
   color: var(--color-text-dark);
@@ -28,6 +29,7 @@ html, body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 button {
@@ -51,6 +53,7 @@ a {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 .app-shell > .kolam-grid-pattern {
