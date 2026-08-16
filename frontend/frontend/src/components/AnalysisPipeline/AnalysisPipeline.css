@@ -377,25 +377,37 @@
 
   .stepper-container {
     overflow-x: auto;
-    padding-bottom: 12px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    padding: 2px 4px 10px 4px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-card-border) transparent;
   }
   .stepper-container::-webkit-scrollbar {
-    display: none;
+    display: block;
+    height: 3px;
+  }
+  .stepper-container::-webkit-scrollbar-thumb {
+    background: var(--color-card-border);
+    border-radius: 3px;
   }
   .stepper-steps {
-    min-width: 540px;
+    min-width: 480px;
   }
   .stepper-line-bg,
   .stepper-line-active {
-    min-width: 450px;
+    min-width: 420px;
   }
 
   .pipeline-panels-row {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+  }
+
+  .panel-box {
+    min-width: 0;
+    width: 100%;
   }
 
   .panel-arrow {
@@ -403,9 +415,10 @@
   }
 
   .panel-caption {
-    font-size: 10px;
+    font-size: 8.5px;
     word-break: break-word;
-    line-height: 1.2;
+    line-height: 1.15;
+    text-align: center;
   }
 
   .building-graph-box {
@@ -413,6 +426,17 @@
     align-items: flex-start;
     gap: 12px;
     padding: 14px 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .graph-box-text {
+    width: 100%;
+  }
+
+  .graph-box-desc {
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
   .progress-bar-row {
@@ -431,7 +455,26 @@
     gap: 4px;
   }
   .panel-caption {
-    font-size: 8.5px;
+    font-size: 7.5px;
+    letter-spacing: -0.02em;
+  }
+  .stepper-steps {
+    min-width: 440px;
+  }
+  .stepper-line-bg,
+  .stepper-line-active {
+    min-width: 380px;
+  }
+  .step-item {
+    width: 55px;
+  }
+  .step-circle {
+    width: 22px;
+    height: 22px;
+    font-size: 10px;
+  }
+  .step-label {
+    font-size: 9px;
   }
 }
 
@@ -444,8 +487,12 @@
     font-size: 18px;
   }
 
+  .pipeline-panels-row {
+    gap: 3px;
+  }
+
   .panel-caption {
-    font-size: 7.5px;
+    font-size: 7px;
   }
 }
 
