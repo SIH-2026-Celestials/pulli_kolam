@@ -10,6 +10,7 @@
 html, body {
   width: 100%;
   min-height: 100vh;
+  overflow-x: hidden;
   font-family: var(--font-sans);
   background-color: var(--color-paper);
   color: var(--color-text-dark);
@@ -28,6 +29,7 @@ html, body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 button {
@@ -51,6 +53,7 @@ a {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 .app-shell > .kolam-grid-pattern {
@@ -80,8 +83,35 @@ a {
   padding: 0 40px;
 }
 
+@media (max-width: 1024px) {
+  .container,
+  .container--narrow {
+    padding: 0 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .container,
+  .container--narrow {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 375px) {
+  .container,
+  .container--narrow {
+    padding: 0 12px;
+  }
+}
+
 .section {
   padding: 48px 0;
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: 32px 0;
+  }
 }
 
 .section--bordered {

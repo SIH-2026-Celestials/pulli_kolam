@@ -84,7 +84,7 @@
   background-color: #FFFFFF;
   border: 1px solid var(--color-card-border);
   border-radius: 12px;
-  overflow: hidden;
+  overflow-x: auto;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
 }
 
@@ -92,6 +92,7 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  min-width: 500px;
 }
 
 .refs-table th {
@@ -137,5 +138,23 @@
   }
   .why-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .learn-header,
+  .learn-why-section,
+  .learn-refs-section {
+    padding: 32px 0;
+  }
+
+  .why-card {
+    padding: 18px;
+  }
+
+  .refs-table th,
+  .refs-table td {
+    padding: 12px 16px;
+    font-size: 12.5px;
   }
 }

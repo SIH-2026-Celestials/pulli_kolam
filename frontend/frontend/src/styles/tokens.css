@@ -100,7 +100,7 @@
   --color-white:        var(--color-paper-card);
   
   /* Desaturated heritage tones for dark mode elegance */
-  --color-header-bg:    #1A1213; /* Desaturated dark charcoal-maroon */
+  --color-header-bg:    #5A0615; /* Primary Deep Maroon (matches brand logo SVG background) */
   --color-footer-bg:    #140E0F; /* Muted dark wine-charcoal */
   --color-maroon-main:  #9B4A53; /* Soft desaturated rose-maroon button */
   --color-maroon-dark:  #7D343C;

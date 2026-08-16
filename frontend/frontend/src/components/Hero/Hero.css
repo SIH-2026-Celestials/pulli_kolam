@@ -88,6 +88,32 @@
   .hero-container {
     padding: 0 12px;
   }
+
+  .hero-main-title {
+    font-size: 24px;
+  }
+
+  .tradition-card {
+    padding: 18px 16px;
+  }
+
+  .upload-modal {
+    padding: 24px 16px;
+  }
+
+  .upload-dropzone {
+    padding: 24px 14px;
+  }
+}
+
+@media (max-width: 375px) {
+  .hero-main-title {
+    font-size: 22px;
+  }
+
+  .hero-lead-text {
+    font-size: 13px;
+  }
 }
 
 /* LEFT COLUMN */

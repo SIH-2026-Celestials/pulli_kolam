@@ -25,18 +25,39 @@
   align-items: center;
   gap: 12px;
   text-decoration: none;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.navbar-brand:focus,
+.navbar-brand:active,
+.navbar-brand:hover {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .brand-icon-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
 }
 
 .brand-logo-img {
   width: 78px;
   height: 78px;
   object-fit: contain;
+  border: none !important;
+  border-style: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  clip-path: inset(2px) !important; /* Crop outer edges to completely eliminate subpixel SVG background yellow bleed */
 }
 
 .brand-text {
@@ -181,13 +202,106 @@
     order: 3;
     width: 100%;
     flex-wrap: wrap;
-    gap: 16px 24px;
+    gap: 12px 20px;
     justify-content: center;
   }
 
   .navbar-controls {
     flex-wrap: wrap;
     justify-content: flex-end;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-inner {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .navbar-controls {
+    width: 100%;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .auth-controls {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .navbar-nav {
+    order: 3;
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    padding: 6px 4px 10px 4px !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .navbar-nav::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .nav-item {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    padding: 6px 14px !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-radius: 999px !important;
+    font-size: 13px !important;
+    border-bottom: none !important;
+  }
+
+  .nav-item::after {
+    display: none !important;
+  }
+
+  .nav-item.active {
+    background-color: var(--color-gold) !important;
+    color: #FFFFFF !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-inner {
+    padding: 0 12px;
+  }
+
+  .brand-logo-img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .brand-title {
+    font-size: 21px;
+  }
+
+  .brand-subtitle {
+    font-size: 9.5px;
+  }
+
+  .btn-lang {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+
+  .btn-login {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 375px) {
+  .brand-subtitle {
+    display: none;
   }
 }
 
@@ -278,7 +392,7 @@
   margin: 0;
   padding: 6px 0;
   z-index: 2000;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .lang-option {

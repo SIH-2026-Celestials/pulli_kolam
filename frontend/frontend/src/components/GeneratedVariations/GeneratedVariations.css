@@ -461,4 +461,32 @@
   .rule-metrics-row {
     grid-template-columns: 1fr;
   }
+
+  .generated-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .btn-generate-more {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 375px) {
+  .generated-card {
+    padding: 14px 10px;
+  }
+
+  .generated-title {
+    font-size: 18px;
+  }
+
+  .variations-grid {
+    gap: 8px;
+  }
+
+  .metric-val {
+    font-size: 11.5px;
+  }
 }

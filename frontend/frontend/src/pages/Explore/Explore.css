@@ -94,7 +94,25 @@
 }
 
 @media (max-width: 640px) {
+  .explore-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  .explore-search-wrap {
+    max-width: 100%;
+  }
+
   .explore-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4) var(--space-3);
+  }
+}
+
+@media (max-width: 375px) {
+  .explore-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 8px;
   }
 }
