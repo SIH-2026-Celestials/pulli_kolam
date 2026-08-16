@@ -32,6 +32,12 @@ class HealthResponse(BaseModel):
     generation_service_error: Optional[str] = None
     database_connected: bool = False
     artifact_storage_available: bool = False
+    # Temporary diagnostic (see api/main.py's health()) -- the live
+    # SQLAlchemy dialect name (e.g. "postgresql", "sqlite"), read
+    # directly off api.db.database.engine.dialect.name, never inferred
+    # from DATABASE_URL string parsing. "unknown" if it can't be read.
+    # No credentials/hostnames/connection strings are ever included.
+    database_engine: str = "unknown"
 
 
 class ModelInfoResponse(BaseModel):

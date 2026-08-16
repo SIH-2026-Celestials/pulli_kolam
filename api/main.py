@@ -306,6 +306,22 @@ def health():
     except Exception:  # noqa: BLE001 -- health check must never itself crash
         database_connected = False
 
+    # Temporary diagnostic: which SQLAlchemy dialect the live app is
+    # actually running against (e.g. distinguishing a Render deployment
+    # still on SQLite from one correctly pointed at PostgreSQL), without
+    # a Render shell/dashboard. Read directly off the real engine object
+    # already in use elsewhere in this process -- never a second
+    # connection, never DATABASE_URL string-parsed/inferred, never
+    # logged or included in any response. `dialect.name` on SQLAlchemy's
+    # own Dialect class is exactly "postgresql" / "sqlite" / etc., not a
+    # value this code constructs itself.
+    try:
+        from api.db.database import engine as _platform_engine
+
+        database_engine = _platform_engine.dialect.name
+    except Exception:  # noqa: BLE001 -- health check must never itself crash
+        database_engine = "unknown"
+
     try:
         from api.services.artifact_store import get_artifact_store
 
@@ -325,6 +341,7 @@ def health():
         "generation_service_available": generation_service_available,
         "generation_service_error": generation_service_error,
         "database_connected": database_connected,
+        "database_engine": database_engine,
         "artifact_storage_available": artifact_storage_available,
     }
 
