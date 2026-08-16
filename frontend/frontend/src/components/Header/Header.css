@@ -25,12 +25,17 @@
   align-items: center;
   gap: 12px;
   text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
 .navbar-brand:focus,
-.navbar-brand:active {
+.navbar-brand:active,
+.navbar-brand:hover {
   outline: none !important;
+  border: none !important;
   box-shadow: none !important;
 }
 
@@ -40,6 +45,8 @@
   justify-content: center;
   border: none !important;
   outline: none !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
 }
 
 .brand-logo-img {
@@ -49,6 +56,8 @@
   border: none !important;
   border-style: none !important;
   outline: none !important;
+  box-shadow: none !important;
+  clip-path: inset(2px) !important; /* Crop outer edges to completely eliminate subpixel SVG background yellow bleed */
 }
 
 .brand-text {
@@ -383,7 +392,7 @@
   margin: 0;
   padding: 6px 0;
   z-index: 2000;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .lang-option {
