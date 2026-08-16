@@ -153,3 +153,25 @@
     padding: var(--space-12) 0;
   }
 }
+
+@media (max-width: 640px) {
+  .container,
+  .container--narrow {
+    padding: 0 var(--space-4);
+  }
+
+  .section {
+    padding: var(--space-8) 0;
+  }
+
+  .archival-frame {
+    padding: var(--space-4);
+  }
+}
+
+@media (max-width: 375px) {
+  .container,
+  .container--narrow {
+    padding: 0 var(--space-3);
+  }
+}

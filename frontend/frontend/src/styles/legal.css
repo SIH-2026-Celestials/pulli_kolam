@@ -196,4 +196,29 @@
   .legal-header {
     padding: 32px 0 24px;
   }
+
+  .legal-contact-card {
+    padding: 24px 20px;
+  }
+
+  .legal-contact-email-badge {
+    font-size: var(--text-base);
+    padding: 10px 16px;
+    max-width: 100%;
+    word-break: break-all;
+  }
+}
+
+@media (max-width: 375px) {
+  .legal-card {
+    padding: 20px 14px;
+  }
+
+  .legal-container {
+    padding: 0 12px;
+  }
+
+  .legal-content h2 {
+    font-size: 1.25rem;
+  }
 }

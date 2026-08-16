@@ -80,8 +80,35 @@ a {
   padding: 0 40px;
 }
 
+@media (max-width: 1024px) {
+  .container,
+  .container--narrow {
+    padding: 0 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .container,
+  .container--narrow {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 375px) {
+  .container,
+  .container--narrow {
+    padding: 0 12px;
+  }
+}
+
 .section {
   padding: 48px 0;
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: 32px 0;
+  }
 }
 
 .section--bordered {

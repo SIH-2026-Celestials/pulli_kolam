@@ -839,3 +839,44 @@
     padding: 1.5rem;
   }
 }
+
+@media (max-width: 480px) {
+  .info-card {
+    padding: 1.25rem;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .info-value {
+    text-align: left;
+  }
+
+  .playground-cta-banner {
+    padding: 1.25rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cta-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 375px) {
+  .profile-hero-body {
+    padding: 0 0.85rem 1.25rem 0.85rem;
+  }
+
+  .profile-name {
+    font-size: 1.45rem;
+  }
+
+  .info-card {
+    padding: 1rem;
+  }
+}

@@ -420,7 +420,23 @@
     display: none;
   }
   .panel-caption {
-    font-size: 9.5px;
+    font-size: 9px;
+    word-break: break-word;
+    line-height: 1.2;
+  }
+}
+
+@media (max-width: 375px) {
+  .analysis-card {
+    padding: 14px 10px;
+  }
+
+  .analysis-title {
+    font-size: 18px;
+  }
+
+  .panel-caption {
+    font-size: 8.5px;
   }
 }
 

@@ -176,7 +176,8 @@
 
 .overlay-legend {
   display: flex;
-  gap: var(--space-4);
+  flex-wrap: wrap;
+  gap: var(--space-3);
   margin-top: var(--space-4);
   font-size: var(--text-xs);
   font-family: var(--font-mono);
@@ -191,8 +192,7 @@
   background-color: currentColor;
 }
 
-/* --- Analysis pipeline / generated variations section (same components
-   Home.jsx uses) --- */
+/* --- Analysis pipeline / generated variations section --- */
 
 .detect-pipeline-section {
   padding-top: var(--space-8);
@@ -202,5 +202,23 @@
 @media (max-width: 900px) {
   .detect-pipeline-section .main-content-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .compare-columns {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+}
+
+@media (max-width: 480px) {
+  .detect-upload-panel,
+  .result-card {
+    padding: var(--space-4);
+  }
+
+  .dropzone {
+    min-height: 240px;
   }
 }

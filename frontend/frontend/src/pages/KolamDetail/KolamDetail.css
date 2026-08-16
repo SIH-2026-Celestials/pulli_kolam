@@ -161,3 +161,20 @@
     position: static;
   }
 }
+
+@media (max-width: 640px) {
+  .detail-bar__inner {
+    height: auto;
+    padding: 10px 0;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+}
